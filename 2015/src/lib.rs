@@ -12,7 +12,7 @@ pub fn solve_first(content: &str) -> i32 {
     result
 }
 
-fn calculate_wrapper_needed_paper_surface(line: &str) -> i32 {
+fn calculate_wrapper_needed_materials(line: &str) -> (i32, i32) {
     let dimensions = line
         .split("x")
         .map(|x| x.parse::<i32>().unwrap())
@@ -21,20 +21,34 @@ fn calculate_wrapper_needed_paper_surface(line: &str) -> i32 {
     let w = dimensions[1];
     let h = dimensions[2];
     let mut smallest = l * w;
+    let mut smallest_perimeter = l + w;
+
     if w * h < smallest {
         smallest = w * h;
+        smallest_perimeter = w + h;
     }
     if h * l < smallest {
         smallest = h * l;
+        smallest_perimeter = h + l;
     }
-    2 * l * w + 2 * w * h + 2 * h * l + smallest
+    (
+        2 * l * w + 2 * w * h + 2 * h * l + smallest,
+        smallest_perimeter * 2 + l * w * h,
+    )
 }
 
-fn solve_first_first(content: &str) -> i32 {
-    content
+fn solve_first_first(content: &str) -> (i32, i32) {
+    let materials = content
         .lines()
-        .map(calculate_wrapper_needed_paper_surface)
-        .sum()
+        .map(calculate_wrapper_needed_materials)
+        .collect::<Vec<_>>();
+    let mut wrapper = 0;
+    let mut ribbon = 0;
+    for (w, r) in materials {
+        wrapper += w;
+        ribbon += r;
+    }
+    (wrapper, ribbon)
 }
 
 pub fn solve_second(content: &str) -> usize {
@@ -69,9 +83,10 @@ mod tests {
 
     #[test]
     fn first_second_test() {
-        let expected = 58;
-        let result = solve_first_first(&EXAMPLE_2);
-        assert_eq!(expected, result);
+        let (expected_wrapper, expected_ribbon) = (58, 34);
+        let (wrapper, ribbon) = solve_first_first(&EXAMPLE_2);
+        assert_eq!(expected_wrapper, wrapper);
+        assert_eq!(expected_ribbon, ribbon);
     }
 
     #[test]
@@ -83,9 +98,10 @@ mod tests {
 
     #[test]
     fn first_second_prod() {
-        let expected = 1588178;
-        let result = solve_first_first(&PROD_2);
-        assert_eq!(expected, result);
+        let (expected_wrapper, expexted_ribbon) = (1588178, 3783758);
+        let (wrapper, ribbon) = solve_first_first(&PROD_2);
+        assert_eq!(expected_wrapper, wrapper);
+        assert_eq!(expexted_ribbon, ribbon);
     }
 
     #[test]
