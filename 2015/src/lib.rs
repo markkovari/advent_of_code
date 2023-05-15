@@ -1,15 +1,73 @@
 use std::println;
 
-pub fn solve_first(content: &str) -> i32 {
-    let mut result: i32 = 0;
-    for c in content.chars() {
-        if c == '(' {
-            result += 1;
-        } else if c == ')' {
-            result -= 1;
+struct Excersise {
+    content: String,
+    example: String,
+}
+
+trait Readable {
+    fn get_example(&self) -> String;
+    fn get_prod(&self) -> String;
+}
+
+impl Readable for Excersise {
+    fn get_example(&self) -> String {
+        self.example.clone()
+    }
+    fn get_prod(&self) -> String {
+        self.content.clone()
+    }
+}
+
+trait Solvable {
+    fn first(&self, content: String) -> i32;
+    fn solve_first(&self, is_prod: bool) -> i32;
+    fn second(&self, content: String) -> i32;
+    fn solve_second(&self, is_prod: bool) -> i32;
+}
+
+impl Solvable for Excersise {
+    fn solve_first(&self, is_prod: bool) -> i32 {
+        if is_prod {
+            self.first(self.content.to_owned())
+        } else {
+            self.first(self.example.to_owned())
         }
     }
-    result
+
+    fn solve_second(&self, is_prod: bool) -> i32 {
+        if is_prod {
+            self.second(self.content.to_owned())
+        } else {
+            self.second(self.example.to_owned())
+        }
+    }
+    fn first(&self, content: String) -> i32 {
+        let mut result: i32 = 0;
+        for c in content.chars() {
+            if c == '(' {
+                result += 1;
+            } else if c == ')' {
+                result -= 1;
+            }
+        }
+        result
+    }
+
+    fn second(&self, content: String) -> i32 {
+        let mut result: i32 = 0;
+        for (at, c) in content.chars().enumerate() {
+            if c == '(' {
+                result += 1;
+            } else if c == ')' {
+                result -= 1;
+            }
+            if result == -1 {
+                return (at + 1) as i32;
+            }
+        }
+        return (content.len() + 1) as i32;
+    }
 }
 
 fn calculate_wrapper_needed_materials(line: &str) -> (i32, i32) {
@@ -51,21 +109,6 @@ fn solve_first_first(content: &str) -> (i32, i32) {
     (wrapper, ribbon)
 }
 
-pub fn solve_second(content: &str) -> usize {
-    let mut result: i32 = 0;
-    for (at, c) in content.chars().enumerate() {
-        if c == '(' {
-            result += 1;
-        } else if c == ')' {
-            result -= 1;
-        }
-        if result == -1 {
-            return at + 1;
-        }
-    }
-    return content.len() + 1;
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -76,9 +119,25 @@ mod tests {
 
     #[test]
     fn first_test() {
-        let expected = 3;
-        let result = solve_first(&EXAMPLE_1);
-        assert_eq!(expected, result);
+        let first_excersise = Excersise {
+            content: String::from(PROD_1),
+            example: String::from(EXAMPLE_1),
+        };
+
+        let expected_example = 3;
+        let expected_prod = 232;
+
+        let result_example = first_excersise.solve_first(false);
+        let result_prod = first_excersise.solve_first(true);
+        assert_eq!(expected_example, result_example);
+        assert_eq!(expected_prod, result_prod);
+
+        let expected_example = 1;
+        let expected_prod = 1783;
+        let result_example = first_excersise.solve_second(false);
+        let result_prod = first_excersise.solve_second(true);
+        assert_eq!(expected_example, result_example);
+        assert_eq!(expected_prod, result_prod);
     }
 
     #[test]
@@ -90,13 +149,6 @@ mod tests {
     }
 
     #[test]
-    fn first_prod() {
-        let expected = 232;
-        let result = solve_first(&PROD_1);
-        assert_eq!(expected, result);
-    }
-
-    #[test]
     fn first_second_prod() {
         let (expected_wrapper, expexted_ribbon) = (1588178, 3783758);
         let (wrapper, ribbon) = solve_first_first(&PROD_2);
@@ -104,17 +156,17 @@ mod tests {
         assert_eq!(expexted_ribbon, ribbon);
     }
 
-    #[test]
-    fn second_test() {
-        let expected = 1;
-        let result = solve_second(&EXAMPLE_1);
-        assert_eq!(expected, result);
-    }
+    // #[test]
+    // fn second_test() {
+    //     let expected = 1;
+    //     let result = solve_second(&EXAMPLE_1);
+    //     assert_eq!(expected, result);
+    // }
 
-    #[test]
-    fn second_prod() {
-        let expected = 1783;
-        let result = solve_second(&PROD_1);
-        assert_eq!(expected, result);
-    }
+    // #[test]
+    // fn second_prod() {
+    //     let expected = 1783;
+    //     let result = solve_second(&PROD_1);
+    //     assert_eq!(expected, result);
+    // }
 }
