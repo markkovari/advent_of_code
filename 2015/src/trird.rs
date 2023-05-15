@@ -52,6 +52,17 @@ struct ThirdDay {
     exercise: Excercise,
 }
 
+fn get_visited_multiple_times(first: Santa, second: Santa) -> usize {
+    let mut visited = HashMap::new();
+    for (key, value) in first.visited.iter() {
+        visited.insert(key, value);
+    }
+    for (key, value) in second.visited.iter() {
+        visited.insert(key, value);
+    }
+    visited.values().filter(|&x| *x >= &1).count()
+}
+
 impl Solvable for ThirdDay {
     fn solve_first(&self, is_prod: bool) -> i32 {
         if is_prod {
@@ -77,7 +88,16 @@ impl Solvable for ThirdDay {
     }
 
     fn second(&self, content: String) -> i32 {
-        2
+        let mut santa = Santa::new();
+        let mut robo_santa = Santa::new();
+        for direction in content.chars().enumerate() {
+            if direction.0 % 2 == 0 {
+                santa.move_to(direction.1);
+            } else {
+                robo_santa.move_to(direction.1);
+            }
+        }
+        get_visited_multiple_times(santa, robo_santa) as i32
     }
 }
 
@@ -104,11 +124,11 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        // let expected_example = 1;
-        // let expected_prod = 1783;
-        // let result_example = first_excersise.solve_second(false);
-        // let result_prod = first_excersise.solve_second(true);
-        // assert_eq!(expected_example, result_example);
-        // assert_eq!(expected_prod, result_prod);
+        let expected_example = 3;
+        let expected_prod = 2631;
+        let result_example = first_excersise.solve_second(false);
+        let result_prod = first_excersise.solve_second(true);
+        assert_eq!(expected_example, result_example);
+        assert_eq!(expected_prod, result_prod);
     }
 }
