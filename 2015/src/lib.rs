@@ -1,5 +1,6 @@
 pub mod first;
 pub mod second;
+pub mod trird;
 
 struct Excercise {
     content: String,
