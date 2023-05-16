@@ -1,4 +1,5 @@
 use crate::{Excercise, Solvable};
+use iter_tools::Itertools;
 
 struct FifthDay {
     exercise: Excercise,
@@ -22,6 +23,7 @@ impl Solvable for FifthDay {
             self.second(self.exercise.example.to_owned())
         }
     }
+
     fn first(&self, content: String) -> i32 {
         content
             .lines()
@@ -36,7 +38,20 @@ impl Solvable for FifthDay {
     }
 
     fn second(&self, content: String) -> i32 {
-        2
+        content
+            .lines()
+            .filter(|line| line.len() >= 3)
+            .filter(|line: &&str| {
+                line.chars()
+                    .enumerate()
+                    .any(|(i, c)| i > 2 && c == line.chars().nth(i - 2).unwrap())
+            })
+            .filter(|line: &&str| {
+                line.chars()
+                    .tuple_windows()
+                    .any(|(c1, c2)| line.matches(&format!("{}{}", c1, c2)).count() > 1)
+            })
+            .count() as i32
     }
 }
 
@@ -48,7 +63,7 @@ mod tests {
 
     #[test]
     fn first_test() {
-        let first_excersise = FifthDay {
+        let mut first_excersise = FifthDay {
             exercise: Excercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
@@ -70,8 +85,11 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        let expected_example = 5714438;
-        let expected_prod = 9958218;
+        first_excersise.exercise.example =
+            String::from("qjhvhtzxzqqjkmpb\nxxyxx\nuurcxstgmygtbstg\nieodomkazucvgmuy");
+
+        let expected_example = 2;
+        let expected_prod = 55;
         let result_example = first_excersise.solve_second(false);
         let result_prod = first_excersise.solve_second(true);
         assert_eq!(expected_example, result_example);
