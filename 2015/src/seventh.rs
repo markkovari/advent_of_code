@@ -1,3 +1,5 @@
+use std::{collections::HashMap, println};
+
 use crate::{Excercise, Solvable};
 
 struct SeventhDay {
@@ -6,7 +8,8 @@ struct SeventhDay {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum Operation {
-    Assignment(u32),
+    Assignment(u16),
+    AssignmentFromRefence(String),
     And(String, String),
     Or(String, String),
     LShift(String, usize),
@@ -20,7 +23,10 @@ impl TryFrom<&str> for Operation {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let parts = value.split_whitespace().collect::<Vec<&str>>();
         match parts.len() {
-            1 => Ok(Operation::Assignment(parts[0].parse::<u32>().unwrap())),
+            1 => match parts[0].parse::<u16>() {
+                Ok(value) => Ok(Operation::Assignment(value)),
+                Err(_) => Ok(Operation::AssignmentFromRefence(parts[0].to_owned())),
+            },
             2 => match parts[0] {
                 "NOT" => Ok(Operation::Not(parts[1].to_owned())),
                 _ => Err("Invalid operation"),
@@ -43,6 +49,7 @@ impl TryFrom<&str> for Operation {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct Instruction {
     target: String,
     operation: Operation,
@@ -68,6 +75,138 @@ impl TryFrom<&str> for Instruction {
     }
 }
 
+fn parse_instructions(content: String) -> Vec<Instruction> {
+    content
+        .lines()
+        .map(|line| Instruction::try_from(line).unwrap())
+        .collect::<Vec<Instruction>>()
+}
+
+fn calculate_values(instructions: Vec<Instruction>) -> HashMap<String, u16> {
+    let mut values: HashMap<String, u16> = HashMap::new();
+    let mut operations = instructions
+        .iter()
+        .map(|instruction| {
+            (
+                instruction.target.to_owned(),
+                instruction.operation.to_owned(),
+            )
+        })
+        .collect::<Vec<(String, Operation)>>();
+    let mut current_operation_index = 0;
+    loop {
+        let (target, operation) = operations[current_operation_index].to_owned();
+        match operation {
+            Operation::Assignment(value) => {
+                values.insert(target, value);
+                operations.remove(current_operation_index);
+            }
+            Operation::AssignmentFromRefence(reference) => {
+                if values.contains_key(&reference) {
+                    let value = values.get(&reference).unwrap();
+                    values.insert(target, *value);
+                    operations.remove(current_operation_index);
+                }
+            }
+            Operation::And(left, right) => {
+                let left_as_number = left.parse::<u16>();
+                let right_as_number = right.parse::<u16>();
+                match (left_as_number, right_as_number) {
+                    (Ok(left_value), Ok(right_value)) => {
+                        values.insert(target, left_value & right_value);
+                        operations.remove(current_operation_index);
+                    }
+                    (Ok(left_value), Err(_)) => {
+                        if values.contains_key(&right) {
+                            let right_value = values.get(&right).unwrap();
+                            values.insert(target, left_value & right_value);
+                            operations.remove(current_operation_index);
+                        }
+                    }
+                    (Err(_), Ok(right_value)) => {
+                        if values.contains_key(&left) {
+                            let left_value = values.get(&left).unwrap();
+                            values.insert(target, left_value & right_value);
+                            operations.remove(current_operation_index);
+                        }
+                    }
+                    _ => {
+                        if values.contains_key(&left) && values.contains_key(&right) {
+                            let left_value = values.get(&left).unwrap();
+                            let right_value = values.get(&right).unwrap();
+                            values.insert(target, left_value & right_value);
+                            operations.remove(current_operation_index);
+                        }
+                    }
+                }
+            }
+            Operation::Or(left, right) => {
+                let left_as_number = left.parse::<u16>();
+                let right_as_number = right.parse::<u16>();
+                match (left_as_number, right_as_number) {
+                    (Ok(left_value), Ok(right_value)) => {
+                        values.insert(target, left_value | right_value);
+                        operations.remove(current_operation_index);
+                    }
+                    (Ok(left_value), Err(_)) => {
+                        if values.contains_key(&right) {
+                            let right_value = values.get(&right).unwrap();
+                            values.insert(target, left_value | right_value);
+                            operations.remove(current_operation_index);
+                        }
+                    }
+                    (Err(_), Ok(right_value)) => {
+                        if values.contains_key(&left) {
+                            let left_value = values.get(&left).unwrap();
+                            values.insert(target, left_value | right_value);
+                            operations.remove(current_operation_index);
+                        }
+                    }
+                    _ => {
+                        if values.contains_key(&left) && values.contains_key(&right) {
+                            let left_value = values.get(&left).unwrap();
+                            let right_value = values.get(&right).unwrap();
+                            values.insert(target, left_value | right_value);
+                            operations.remove(current_operation_index);
+                        }
+                    }
+                }
+            }
+            Operation::LShift(left, right) => {
+                if values.contains_key(&left) {
+                    let left_value = values.get(&left).unwrap();
+                    values.insert(target, left_value << right);
+                    operations.remove(current_operation_index);
+                }
+            }
+            Operation::RShift(left, right) => {
+                if values.contains_key(&left) {
+                    let left_value = values.get(&left).unwrap();
+                    values.insert(target, left_value >> right);
+                    operations.remove(current_operation_index);
+                }
+            }
+            Operation::Not(left) => {
+                if values.contains_key(&left) {
+                    let left_value = values.get(&left).unwrap();
+                    values.insert(target, !left_value);
+                    operations.remove(current_operation_index);
+                }
+            }
+        }
+        println!("{:?}", values);
+        if values.contains_key("a") {
+            break;
+        }
+        if operations.len() == 0 {
+            break;
+        }
+        current_operation_index += 1;
+        current_operation_index %= operations.len();
+    }
+    values
+}
+
 impl Solvable for SeventhDay {
     fn solve_first(&self, is_prod: bool) -> i32 {
         if is_prod {
@@ -86,7 +225,9 @@ impl Solvable for SeventhDay {
     }
 
     fn first(&self, content: String) -> i32 {
-        2
+        let instructions = parse_instructions(content);
+        let values = calculate_values(instructions);
+        *values.get("a").unwrap_or(&0) as i32
     }
 
     fn second(&self, content: String) -> i32 {
@@ -97,17 +238,28 @@ impl Solvable for SeventhDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("6_test.txt");
-    const PROD: &str = include_str!("6_prod.txt");
+    const EXAMPLE: &str = include_str!("7_test.txt");
+    const PROD: &str = include_str!("7_prod.txt");
 
     #[test]
     fn test_parse() {
-        let operation = Operation::try_from("123 -> x").unwrap();
-        assert_eq!(operation, Operation::Assignment(123));
+        let instructions = parse_instructions(String::from(EXAMPLE));
+        assert_eq!(instructions.len(), 8);
+        assert_eq!(
+            instructions[0],
+            Instruction::new(String::from("x"), Operation::Assignment(123),)
+        );
+        assert_eq!(
+            instructions[1],
+            Instruction::new(String::from("y"), Operation::Assignment(456))
+        );
+        assert_eq!(
+            instructions[4],
+            Instruction::new(String::from("f"), Operation::LShift("x".to_owned(), 2))
+        );
     }
 
     #[test]
-    #[ignore]
     fn first_test() {
         let mut first_excersise = SeventhDay {
             exercise: Excercise {
@@ -116,22 +268,19 @@ mod tests {
             },
         };
 
-        let expected_example = 998996;
-        let expected_prod = 569999;
+        let expected_example = 0;
+        let expected_prod = 46065;
 
         let result_example = first_excersise.solve_first(false);
         let result_prod = first_excersise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        first_excersise.exercise.example =
-            String::from("turn on 0,0 through 0,0\ntoggle 0,0 through 999,999\n");
-
-        let expected_example = 2000001;
-        let expected_prod = 17836115;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+        // let expected_example = 2000001;
+        // let expected_prod = 17836115;
+        // let result_example = first_excersise.solve_second(false);
+        // let result_prod = first_excersise.solve_second(true);
+        // assert_eq!(expected_example, result_example);
+        // assert_eq!(expected_prod, result_prod);
     }
 }
