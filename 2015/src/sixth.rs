@@ -5,6 +5,7 @@ struct SixthDay {
 }
 
 type Grid = [[bool; 1000]; 1000];
+type GridAmbient = [[i8; 1000]; 1000];
 
 fn apply_on_grid(instruction: Instruction, grid: &mut Grid) {
     for x in instruction.start.0..=instruction.end.0 {
@@ -18,9 +19,29 @@ fn apply_on_grid(instruction: Instruction, grid: &mut Grid) {
     }
 }
 
+fn apply_on_ambient_grid(instruction: Instruction, grid: &mut GridAmbient) {
+    for x in instruction.start.0..=instruction.end.0 {
+        for y in instruction.start.1..=instruction.end.1 {
+            grid[x as usize][y as usize] += match (instruction.action, grid[x as usize][y as usize])
+            {
+                (Action::On, _) => 1,
+                (Action::Off, 0) => 0,
+                (Action::Off, _) => -1,
+                (_, _) => 2,
+            }
+        }
+    }
+}
+
 fn apply_instructions(instructions: Vec<Instruction>, grid: &mut Grid) {
     for instruction in instructions {
         apply_on_grid(instruction, grid);
+    }
+}
+
+fn apply_increasing_instructions(instructions: Vec<Instruction>, grid: &mut GridAmbient) {
+    for instruction in instructions {
+        apply_on_ambient_grid(instruction, grid);
     }
 }
 
@@ -36,7 +57,17 @@ fn count_lit(grid: &Grid) -> i32 {
     count
 }
 
-#[derive(Debug, PartialEq, Eq)]
+fn count_brigthness(grid: &GridAmbient) -> i32 {
+    let mut count: i32 = 0;
+    for x in 0..1000 {
+        for y in 0..1000 {
+            count += grid[x][y] as i32;
+        }
+    }
+    count
+}
+
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 enum Action {
     On,
     Off,
@@ -125,7 +156,13 @@ impl Solvable for SixthDay {
     }
 
     fn second(&self, content: String) -> i32 {
-        2
+        let instructions = content
+            .lines()
+            .map(|line| Instruction::try_from(line).unwrap())
+            .collect::<Vec<Instruction>>();
+        let mut grid: GridAmbient = [[0; 1000]; 1000];
+        apply_increasing_instructions(instructions, &mut grid);
+        count_brigthness(&grid)
     }
 }
 
@@ -159,11 +196,14 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        // let expected_example = 2;
-        // let expected_prod = 55;
-        // let result_example = first_excersise.solve_second(false);
-        // let result_prod = first_excersise.solve_second(true);
-        // assert_eq!(expected_example, result_example);
-        // assert_eq!(expected_prod, result_prod);
+        first_excersise.exercise.example =
+            String::from("turn on 0,0 through 0,0\ntoggle 0,0 through 999,999\n");
+
+        let expected_example = 2000001;
+        let expected_prod = 17836115;
+        let result_example = first_excersise.solve_second(false);
+        let result_prod = first_excersise.solve_second(true);
+        assert_eq!(expected_example, result_example);
+        assert_eq!(expected_prod, result_prod);
     }
 }
