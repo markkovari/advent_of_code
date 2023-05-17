@@ -194,7 +194,6 @@ fn calculate_values(instructions: Vec<Instruction>) -> HashMap<String, u16> {
                 }
             }
         }
-        println!("{:?}", values);
         if values.contains_key("a") {
             break;
         }
@@ -231,7 +230,21 @@ impl Solvable for SeventhDay {
     }
 
     fn second(&self, content: String) -> i32 {
-        2
+        let mut instructions = parse_instructions(content);
+        let mut values = calculate_values(instructions.clone());
+        let a_value = *values.get("a").unwrap_or(&0);
+        values.insert("b".to_owned(), a_value);
+
+        instructions = instructions
+            .iter()
+            .map(|x| match x.target.as_str() {
+                "b" => Instruction::new(String::from("b"), Operation::Assignment(a_value as u16)),
+                _ => x.clone(),
+            })
+            .collect();
+
+        let values = calculate_values(instructions);
+        *values.get("a").unwrap_or(&0) as i32
     }
 }
 
@@ -276,11 +289,11 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        // let expected_example = 2000001;
-        // let expected_prod = 17836115;
-        // let result_example = first_excersise.solve_second(false);
-        // let result_prod = first_excersise.solve_second(true);
-        // assert_eq!(expected_example, result_example);
-        // assert_eq!(expected_prod, result_prod);
+        let expected_example = 0;
+        let expected_prod = 14134;
+        let result_example = first_excersise.solve_second(false);
+        let result_prod = first_excersise.solve_second(true);
+        assert_eq!(expected_example, result_example);
+        assert_eq!(expected_prod, result_prod);
     }
 }
