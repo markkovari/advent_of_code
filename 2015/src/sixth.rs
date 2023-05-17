@@ -4,6 +4,38 @@ struct SixthDay {
     exercise: Excercise,
 }
 
+type Grid = [[bool; 1000]; 1000];
+
+fn apply_on_grid(instruction: Instruction, grid: &mut Grid) {
+    for x in instruction.start.0..=instruction.end.0 {
+        for y in instruction.start.1..=instruction.end.1 {
+            match instruction.action {
+                Action::On => grid[x as usize][y as usize] = true,
+                Action::Off => grid[x as usize][y as usize] = false,
+                Action::Toggle => grid[x as usize][y as usize] = !grid[x as usize][y as usize],
+            }
+        }
+    }
+}
+
+fn apply_instructions(instructions: Vec<Instruction>, grid: &mut Grid) {
+    for instruction in instructions {
+        apply_on_grid(instruction, grid);
+    }
+}
+
+fn count_lit(grid: &Grid) -> i32 {
+    let mut count = 0;
+    for x in 0..1000 {
+        for y in 0..1000 {
+            if grid[x][y] {
+                count += 1;
+            }
+        }
+    }
+    count
+}
+
 #[derive(Debug, PartialEq, Eq)]
 enum Action {
     On,
@@ -83,7 +115,13 @@ impl Solvable for SixthDay {
     }
 
     fn first(&self, content: String) -> i32 {
-        2
+        let instructions = content
+            .lines()
+            .map(|line| Instruction::try_from(line).unwrap())
+            .collect::<Vec<Instruction>>();
+        let mut grid: Grid = [[false; 1000]; 1000];
+        apply_instructions(instructions, &mut grid);
+        count_lit(&grid)
     }
 
     fn second(&self, content: String) -> i32 {
@@ -113,13 +151,13 @@ mod tests {
             },
         };
 
-        let expected_example = 2;
-        let expected_prod = 255;
+        let expected_example = 998996;
+        let expected_prod = 569999;
 
         let result_example = first_excersise.solve_first(false);
         let result_prod = first_excersise.solve_first(true);
-        // assert_eq!(expected_example, result_example);
-        // assert_eq!(expected_prod, result_prod);
+        assert_eq!(expected_example, result_example);
+        assert_eq!(expected_prod, result_prod);
 
         // let expected_example = 2;
         // let expected_prod = 55;
