@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 iter_tools = "0.1.4"
 md5 = "0.7.0"
+onig = "6.4.0"
+regex = "1.8.1"
