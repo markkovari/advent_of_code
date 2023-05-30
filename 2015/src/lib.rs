@@ -6,6 +6,7 @@ pub mod second;
 pub mod seventh;
 pub mod sixth;
 pub mod trird;
+pub mod ninth;
 
 struct Excercise {
     content: String,
