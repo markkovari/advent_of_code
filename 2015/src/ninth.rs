@@ -101,7 +101,7 @@ impl Solvable for NinthDay {
     }
 
     fn second(&self, content: String) -> i32 {
-        2
+        lengths(&evaluate_paths(read_content(content))).iter().max().unwrap().clone() as i32
     }
 }
 
@@ -136,8 +136,8 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        let expected_example = 19;
-        let expected_prod = 2085;
+        let expected_example = 982;
+        let expected_prod = 909;
         let result_example = first_excersise.solve_second(false);
         let result_prod = first_excersise.solve_second(true);
         assert_eq!(expected_example, result_example);
