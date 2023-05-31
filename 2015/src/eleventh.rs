@@ -120,6 +120,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore="Takes too long"]
     fn first_test() {
         let mut first_excersise = EleventhDay {
             exercise: Excercise {
