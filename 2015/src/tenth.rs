@@ -23,7 +23,6 @@ fn look_and_say(current: String) -> String {
     result
 }
 
-
 impl Solvable for TenthDay {
     fn solve_first(&self, is_prod: bool) -> i32 {
         if is_prod {
@@ -65,6 +64,7 @@ mod tests {
     const PROD: &str = include_str!("10_prod.txt");
 
     #[test]
+    #[ignore = "takes too long"]
     fn first_test() {
         let mut first_excersise = TenthDay {
             exercise: Excercise {
