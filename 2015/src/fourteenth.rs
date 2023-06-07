@@ -69,6 +69,27 @@ fn highest_distance(raindeer: Vec<Raindeer>, duration: usize) -> usize {
         .unwrap() as usize
 }
 
+fn highest_score(raindeer: Vec<Raindeer>, duration: usize) -> usize {
+    let mut scores: HashMap<String, usize> = HashMap::new();
+    for name in raindeer.iter().map(|r| r.name.to_owned()) {
+        scores.insert(name, 0);
+    }
+    for i in 1..=duration {
+        let mut distances: HashMap<String, i32> = HashMap::new();
+        for raindeer in raindeer.iter() {
+            distances.insert(raindeer.name.to_owned(), raindeer.distance(i as i32));
+        }
+        let max_distance = distances.values().max().unwrap();
+        for (name, distance) in distances.iter() {
+            if distance == max_distance {
+                scores.entry(name.to_owned()).and_modify(|e| *e += 1);
+            }
+        }
+    }
+
+    *scores.values().max().unwrap()
+}
+
 impl FourteenthDay {
     fn solve_first(&self, is_prod: bool, duration: usize) -> i32 {
         if is_prod {
@@ -78,11 +99,11 @@ impl FourteenthDay {
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool, duration: usize) -> i32 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(self.exercise.content.to_owned(), duration)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(self.exercise.example.to_owned(), duration)
         }
     }
 
@@ -96,8 +117,14 @@ impl FourteenthDay {
         ) as i32
     }
 
-    fn second(&self, content: String) -> i32 {
-        2
+    fn second(&self, content: String, duration: usize) -> i32 {
+        highest_score(
+            content
+                .lines()
+                .map(|line| Raindeer::try_from(line).unwrap())
+                .collect(),
+            duration,
+        ) as i32
     }
 }
 
@@ -123,10 +150,10 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        let expected_example = 286;
+        let expected_example = 689;
         let expected_prod = 668;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_excersise.solve_second(false, 1000);
+        let result_prod = first_excersise.solve_second(true, 2503);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }
