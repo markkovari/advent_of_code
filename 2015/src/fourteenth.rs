@@ -151,7 +151,7 @@ mod tests {
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 689;
-        let expected_prod = 668;
+        let expected_prod = 1059;
         let result_example = first_excersise.solve_second(false, 1000);
         let result_prod = first_excersise.solve_second(true, 2503);
         assert_eq!(expected_example, result_example);
