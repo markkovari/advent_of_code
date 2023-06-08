@@ -27,6 +27,17 @@ fn get_combinations(containers: Vec<u64>, liters: u64) -> Vec<Vec<u64>> {
     combinations
 }
 
+fn minimum_containers(combinations: Vec<Vec<u64>>) -> i64 {
+    let mut map: HashMap<usize, Vec<Vec<u64>>> = HashMap::new();
+    for combination in combinations {
+        map.entry(combination.len())
+            .and_modify(|e| e.push(combination.clone()))
+            .or_insert(vec![combination]);
+    }
+    let min = map.keys().min().unwrap();
+    map.get(min).unwrap().len() as i64
+}
+
 impl SeventeenthDay {
     fn solve_first(&self, is_prod: bool, amount: usize) -> i64 {
         if is_prod {
@@ -36,11 +47,11 @@ impl SeventeenthDay {
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
+    fn solve_second(&self, is_prod: bool, amount: u64) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(self.exercise.content.to_owned(), amount)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(self.exercise.example.to_owned(), amount)
         }
     }
 
@@ -49,8 +60,9 @@ impl SeventeenthDay {
         get_combinations(containers, amount as u64).len() as i64
     }
 
-    fn second(&self, content: String) -> i64 {
-        2
+    fn second(&self, content: String, amount: u64) -> i64 {
+        let containers = read_containers(content);
+        minimum_containers(get_combinations(containers, amount as u64))
     }
 }
 
@@ -76,11 +88,11 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        // // let expected_example = 57600000;
-        // let expected_prod = 11171160;
-        // // let result_example = first_excersise.solve_second(false);
-        // let result_prod = first_excersise.solve_second(true);
-        // // assert_eq!(expected_example, result_example);
-        // assert_eq!(expected_prod, result_prod);
+        let expected_example = 3;
+        let expected_prod = 17;
+        let result_example = first_excersise.solve_second(false, 25);
+        let result_prod = first_excersise.solve_second(true, 150);
+        assert_eq!(expected_example, result_example);
+        assert_eq!(expected_prod, result_prod);
     }
 }
