@@ -137,7 +137,7 @@ mod tests {
         assert_eq!(expected_prod, result_prod);
 
         // let expected_example = 57600000;
-        let expected_prod = 11171160;
+        let expected_prod = 405;
         // let result_example = first_excersise.solve_second(false);
         let result_prod = first_excersise.solve_second(true);
         // assert_eq!(expected_example, result_example);
