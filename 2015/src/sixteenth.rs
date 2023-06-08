@@ -87,7 +87,30 @@ impl SixteenthDay {
     }
 
     fn second(&self, content: String) -> i64 {
-        2
+        let search = get_search_elements();
+        let sues = content
+            .lines()
+            .map(|line| Sue::try_from(line).unwrap())
+            .collect_vec();
+        for sue in sues {
+            let mut possible = true;
+            for key in search.keys() {
+                if sue.items.contains_key(key)
+                    && match key.as_str() {
+                        "cats" | "trees" => sue.items.get(key) <= search.get(key),
+                        "pomeranians" | "goldfish" => sue.items.get(key) >= search.get(key),
+                        _ => sue.items.get(key) != search.get(key),
+                    }
+                {
+                    possible = false;
+                    break;
+                }
+            }
+            if possible {
+                return sue.name.parse().unwrap();
+            }
+        }
+        -1
     }
 }
 
