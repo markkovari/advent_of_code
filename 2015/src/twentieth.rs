@@ -14,28 +14,43 @@ struct TwentiethDay {
     exercise: Excercise,
 }
 
+fn presents_at1(house_nr: usize) -> usize {
+    divisors(house_nr).into_iter().sum::<usize>() * 10
+}
+
+fn divisors(until: usize) -> Vec<usize> {
+    let small_divisors: Vec<usize> = Vec::from_iter(1..((until as f64).sqrt() as usize + 1))
+        .into_iter()
+        .filter(|i| until % *i == 0)
+        .collect();
+
+    let large_divisors: Vec<usize> = small_divisors
+        .iter()
+        .filter(|d| until != **d * **d)
+        .map(|d| until / d)
+        .collect();
+    [small_divisors, large_divisors].concat()
+}
+
 impl TwentiethDay {
-    fn solve_first(&self, is_prod: bool, starting: String) -> i64 {
-        if is_prod {
-            self.first(self.exercise.content.to_owned(), starting)
-        } else {
-            self.first(self.exercise.example.to_owned(), starting)
+    fn solve_first(&self, until: usize) -> usize {
+        self.first(&until)
+    }
+
+    fn solve_second(&self, until: usize) -> usize {
+        self.second(&until)
+    }
+
+    fn first(&self, input: &usize) -> usize {
+        for house_nr in 1..usize::MAX {
+            if presents_at1(house_nr) >= *input {
+                return house_nr;
+            }
         }
+        0
     }
 
-    fn solve_second(&self, is_prod: bool, starting: String) -> i64 {
-        if is_prod {
-            self.second(self.exercise.content.to_owned(), starting)
-        } else {
-            self.second(self.exercise.example.to_owned(), starting)
-        }
-    }
-
-    fn first(&self, content: String, starting: String) -> i64 {
-        2
-    }
-
-    fn second(&self, content: String, starting: String) -> i64 {
+    fn second(&self, until: &usize) -> usize {
         2
     }
 }
@@ -55,17 +70,17 @@ mod tests {
             },
         };
 
-        let expected_example = 7;
-        let expected_prod = 518;
-        let result_example = first_excersise.solve_first(false, "HOHOHO".to_owned());
-        let result_prod = first_excersise.solve_first(true, BASE.clone());
+        let expected_example = 4;
+        let expected_prod = 831600;
+        let result_example = first_excersise.first(&70);
+        let result_prod = first_excersise.first(&36000000);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 3;
         let expected_prod = 200;
-        let result_example = first_excersise.second(example_second, "HOH".to_owned());
-        let result_prod = first_excersise.solve_second(true, BASE);
+        let result_example = first_excersise.second(&100);
+        let result_prod = first_excersise.second(&36000000);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }
