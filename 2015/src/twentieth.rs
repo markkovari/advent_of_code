@@ -18,6 +18,14 @@ fn presents_at1(house_nr: usize) -> usize {
     divisors(house_nr).into_iter().sum::<usize>() * 10
 }
 
+fn presents_at2(until: usize) -> usize {
+    divisors(until)
+        .into_iter()
+        .filter(|d| until / d <= 50)
+        .sum::<usize>()
+        * 11
+}
+
 fn divisors(until: usize) -> Vec<usize> {
     let small_divisors: Vec<usize> = Vec::from_iter(1..((until as f64).sqrt() as usize + 1))
         .into_iter()
@@ -51,7 +59,12 @@ impl TwentiethDay {
     }
 
     fn second(&self, until: &usize) -> usize {
-        2
+        for house_nr in 1..usize::MAX {
+            if presents_at2(house_nr) >= *until {
+                return house_nr;
+            }
+        }
+        0
     }
 }
 
@@ -77,9 +90,9 @@ mod tests {
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        let expected_example = 3;
-        let expected_prod = 200;
-        let result_example = first_excersise.second(&100);
+        let expected_example = 4;
+        let expected_prod = 884520;
+        let result_example = first_excersise.second(&70);
         let result_prod = first_excersise.second(&36000000);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
