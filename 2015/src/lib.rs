@@ -21,6 +21,7 @@ pub mod twentieth;
 pub mod twentyfirst;
 pub mod twentysecond;
 pub mod twentythird;
+pub mod twentyfourth;
 
 struct Excercise {
     content: String,
