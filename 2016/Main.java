@@ -1,6 +1,4 @@
-import src.mark.kovari.adventofcode.First;
-import src.mark.kovari.adventofcode.Second;
-import src.mark.kovari.adventofcode.Third;
+import src.mark.kovari.adventofcode.*;
 
 class Main {
   public static void main(String... args) {
@@ -10,5 +8,7 @@ class Main {
     second.solve();
     Third third = new Third();
     third.solve();
+    Fourth fourth = new Fourth();
+    fourth.solve();
   }
 }
