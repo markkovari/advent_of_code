@@ -3,11 +3,7 @@ package src.mark.kovari.adventofcode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.Identity;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -83,12 +79,14 @@ public class Fourth {
         Room room = Room.fromString(line.trim());
         if (room != null) {
           rooms.add(room);
-          System.out.println(room.decrypt() + " " + room.getSectorValue());
+          if (room.decrypt().contains("northpole")) {
+
+            System.out.println(room.decrypt() + " " + room.getSectorValue());
+          }
         }
       }
       System.out.println(
           "Fourth day: first result " + rooms.stream().map(Room::getSectorValue).reduce(0, Integer::sum));
-
     } catch (IOException e) {
       e.printStackTrace();
     }

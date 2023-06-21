@@ -10,5 +10,7 @@ class Main {
     third.solve();
     Fourth fourth = new Fourth();
     fourth.solve();
+    Fifth fifth = new Fifth();
+    fifth.solve();
   }
 }
