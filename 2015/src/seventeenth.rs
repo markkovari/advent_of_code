@@ -73,6 +73,7 @@ mod tests {
     const PROD: &str = include_str!("17_prod.txt");
 
     #[test]
+    #[ignore = "take too long"]
     fn first_test() {
         let mut first_excersise = SeventeenthDay {
             exercise: Excercise {

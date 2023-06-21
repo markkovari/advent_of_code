@@ -18,10 +18,11 @@ pub mod thirteenth;
 pub mod trird;
 pub mod twelfth;
 pub mod twentieth;
+pub mod twentyfifth;
 pub mod twentyfirst;
+pub mod twentyfourth;
 pub mod twentysecond;
 pub mod twentythird;
-pub mod twentyfourth;
 
 struct Excercise {
     content: String,
