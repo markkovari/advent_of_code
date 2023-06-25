@@ -12,7 +12,9 @@ class Main {
     // fourth.solve();
     // Fifth fifth = new Fifth();
     // fifth.solve();
-    Sixth sixth = new Sixth();
-    sixth.solve();
+    // Sixth sixth = new Sixth();
+    // sixth.solve();
+    Seventh seventh = new Seventh();
+    seventh.solve();
   }
 }
