@@ -86,9 +86,8 @@ public class TwentySecond {
                     state -> new Point(0, 0).equals(state.data())
             );
 
-            System.out.println("TwentySecond: Part 1: " + countViablePairs(map));
-            System.out.println("TwentySecond: Part 2: " + result.orElseThrow().getDist());
-
+            System.out.println("Part 1: " + countViablePairs(map));
+            System.out.println("Part 2: " + result.orElseThrow().getDist());
         } catch (IOException e) {
             e.printStackTrace();
         }
