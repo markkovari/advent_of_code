@@ -45,7 +45,7 @@ public class Seventh {
       }
       String firstHalf = String.format("%c%c", of.get(0), of.get(1));
       String secondHalfReversed = String.format("%c%c", of.get(3), of.get(2));
-      return firstHalf.equals(secondHalfReversed) && of.get(0) != of.get(1);
+      return firstHalf.equals(secondHalfReversed) && !of.get(0).equals(of.get(1));
     }
 
     private String fromChars(final List<Character> from) {
