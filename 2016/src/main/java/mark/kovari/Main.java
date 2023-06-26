@@ -1,5 +1,6 @@
 package mark.kovari;
 
+import mark.kovari.aoc.Eleventh;
 import mark.kovari.aoc.Tenth;
 
 public class Main {
@@ -22,7 +23,10 @@ public class Main {
         // eighth.solve();
         // Ninth ninth = new Ninth();
         // ninth.solve();
-        Tenth tenth = new Tenth();
-        tenth.solve();
+        // Tenth tenth = new Tenth();
+        // tenth.solve();
+        Eleventh eleventh = new Eleventh();
+        eleventh.solve();
+
     }
 }
