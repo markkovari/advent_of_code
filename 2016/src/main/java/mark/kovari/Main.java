@@ -1,6 +1,6 @@
 package mark.kovari;
 
-import mark.kovari.aoc.Seventeenth;
+import mark.kovari.aoc.Eighteenth;
 
 public class Main {
     public static void main(String[] args) {
@@ -36,8 +36,10 @@ public class Main {
         // fifteenth.solve();
         // Sixteenth sixteenth = new Sixteenth();
         // sixteenth.solve();
-        Seventeenth seventeenth = new Seventeenth();
-        seventeenth.solve();
-
+        // Seventeenth seventeenth = new Seventeenth();
+        // seventeenth.solve();
+        Eighteenth eighteenth = new Eighteenth();
+        eighteenth.solve();
+        
     }
 }
