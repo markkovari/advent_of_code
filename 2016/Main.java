@@ -14,10 +14,12 @@ class Main {
         // fifth.solve();
         // Sixth sixth = new Sixth();
         // sixth.solve();
-        //    Seventh seventh = new Seventh();
-        //    seventh.solve();
+        // Seventh seventh = new Seventh();
+        // seventh.solve();
+        // Eighth eighth = new Eighth();
+        // eighth.solve();
+        Ninth ninth = new Ninth();
+        ninth.solve();
 
-        Eighth eighth = new Eighth();
-        eighth.solve();
     }
 }
