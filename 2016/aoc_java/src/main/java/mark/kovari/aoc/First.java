@@ -1,4 +1,4 @@
-package src.mark.kovari.adventofcode;
+package mark.kovari.aoc;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;

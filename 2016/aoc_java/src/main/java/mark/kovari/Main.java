@@ -1,7 +1,9 @@
-import src.mark.kovari.adventofcode.*;
+package mark.kovari;
 
-class Main {
-    public static void main(String... args) {
+import mark.kovari.aoc.Tenth;
+
+public class Main {
+    public static void main(String[] args) {
         // First first = new First();
         // first.solve();
         // Second second = new Second();
@@ -18,8 +20,9 @@ class Main {
         // seventh.solve();
         // Eighth eighth = new Eighth();
         // eighth.solve();
-        Ninth ninth = new Ninth();
-        ninth.solve();
-
+        // Ninth ninth = new Ninth();
+        // ninth.solve();
+        Tenth tenth = new Tenth();
+        tenth.solve();
     }
 }

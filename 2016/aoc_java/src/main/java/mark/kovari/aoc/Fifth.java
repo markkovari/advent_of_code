@@ -1,4 +1,4 @@
-package src.mark.kovari.adventofcode;
+package mark.kovari.aoc;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
