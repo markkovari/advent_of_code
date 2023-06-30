@@ -1,6 +1,6 @@
 package mark.kovari;
 
-import mark.kovari.aoc.TwentyThird;
+import mark.kovari.aoc.TwentyFourth;
 
 public class Main {
     public static void main(String[] args) {
@@ -46,9 +46,10 @@ public class Main {
         // twentyfirst.solve();
         // TwentySecond twentysecond = new TwentySecond();
         // twentysecond.solve();
-        TwentyThird twentythird = new TwentyThird();
-        twentythird.solve();
-
+        // TwentyThird twentythird = new TwentyThird();
+        //twentythird.solve();
+        TwentyFourth twentyfourth = new TwentyFourth();
+        twentyfourth.solve();
 
     }
 }

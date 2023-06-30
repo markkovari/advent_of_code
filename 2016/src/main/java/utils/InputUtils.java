@@ -66,6 +66,18 @@ public final class InputUtils {
         return matrix;
     }
 
+    public static char[][] readCharMatrix(Path ofPath) throws IOException {
+        var lines = Files.readAllLines(ofPath, StandardCharsets.UTF_8);
+        var matrix = new char[lines.size()][];
+        for (int i = 0, n = matrix.length; i < n; i++) {
+            matrix[i] = new char[lines.get(i).length()];
+            for (int j = 0, m = matrix[i].length; j < m; j++) {
+                matrix[i][j] = lines.get(i).charAt(j);
+            }
+        }
+        return matrix;
+    }
+
     private static Path getPath(String fileName) {
         return Path.of(InputUtils.class.getResource("../" + fileName).getPath());
     }
