@@ -42,6 +42,20 @@ func Day1First(isProd bool) (int, error) {
 
 	return part1(input), nil
 }
+func Day1Second(isProd bool) (int, error) {
+	example, prod, err := ReadTextsOfDay("1")
+	if err != nil {
+		return 0, err
+	}
+	var input string
+	if isProd {
+		input = prod
+	} else {
+		input = example
+	}
+
+	return part2(input), nil
+}
 
 func part1(input string) int {
 	digits := parseInput(input)
@@ -50,6 +64,18 @@ func part1(input string) int {
 		current := digits[i]
 		next := digits[(i+1)%len(digits)]
 		if current == next {
+			sum += digits[i]
+		}
+	}
+	return sum
+}
+
+func part2(input string) int {
+	digits := parseInput(input)
+	var sum int
+	offset := len(digits) / 2
+	for i := 0; i < len(digits); i++ {
+		if digits[i] == digits[(i+offset)%len(digits)] {
 			sum += digits[i]
 		}
 	}
