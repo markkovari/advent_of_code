@@ -53,7 +53,6 @@ func part2(input string) int {
 	spreadSheet := parseInput(input)
 	var sum int
 	for _, row := range spreadSheet {
-		println(row, getDivisible(row))
 		sum += getDivisible(row)
 	}
 	return sum
