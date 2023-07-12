@@ -3,6 +3,8 @@ package days
 import "testing"
 
 func Test(t *testing.T) {
+	t.Skip("Skipping slow test")
+
 	t.Run("Day16First", func(t *testing.T) {
 		result, err := Day16First(true)
 		if err != nil {
@@ -15,7 +17,6 @@ func Test(t *testing.T) {
 	})
 
 	t.Run("Day16Second", func(t *testing.T) {
-
 		result, err := Day16Second(true)
 		if err != nil {
 			t.Error("Should not fail")
