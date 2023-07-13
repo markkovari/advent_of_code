@@ -50,6 +50,6 @@ mod tests {
         let example = first_revisit(read_numbers(false));
         let prod = first_revisit(read_numbers(true));
         assert_eq!(example, Some(2));
-        assert_eq!(prod, Some(2));
+        assert_eq!(prod, Some(566));
     }
 }
