@@ -3,10 +3,6 @@ use std::{
     vec,
 };
 
-pub fn double(i: i32) -> i32 {
-    i * 2
-}
-
 fn read_freqs(is_prod: bool) -> Vec<HashMap<char, usize>> {
     let mut content = include_str!("./example.data");
     if is_prod {
