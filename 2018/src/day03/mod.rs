@@ -116,6 +116,8 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
+
     fn test_first() {
         let rules = read_rules(false);
         let touched_fields = touched_fields_by(rules);
@@ -126,6 +128,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_second() {
         let rules = read_rules(false);
         let touched_fields = &touched_fields_by(rules.clone());

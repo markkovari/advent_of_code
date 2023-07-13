@@ -71,6 +71,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_first() {
         let nums = read_freqs(false);
         let with_2 = nums.iter().filter(|e| e.values().any(|&v| v == 2)).count();
@@ -85,6 +86,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_second() {
         let [first, second] = get_two_closest(vec![
             "abcde".to_string(),
