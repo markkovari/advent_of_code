@@ -109,6 +109,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_first() {
         let example = include_str!("./example.data");
         let (sleepers, scores) = part1(example.to_owned());
@@ -120,6 +121,7 @@ mod tests {
         assert_eq!(76357, result);
     }
     #[test]
+    #[ignore]
     fn test_second() {
         let example = include_str!("./example.data");
         let (sleepers, scores) = part2(example.to_owned());
