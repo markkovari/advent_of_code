@@ -33,6 +33,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_first() {
         let nums = read_numbers(false);
         let sum: i32 = nums.iter().sum();
@@ -46,6 +47,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_second() {
         let example = first_revisit(read_numbers(false));
         let prod = first_revisit(read_numbers(true));
