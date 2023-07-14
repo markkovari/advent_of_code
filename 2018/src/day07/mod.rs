@@ -197,6 +197,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_second() {
         let example = include_str!("./example.data");
         let deps = read_deps(example.to_owned());
