@@ -1,9 +1,7 @@
-
-
 use lazy_static::lazy_static;
 use regex::{Error, Regex};
 
-use std::io::{BufRead};
+use std::io::BufRead;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Node {
