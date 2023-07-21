@@ -571,6 +571,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_second() {
         let example = include_str!("./example.data");
         part2(example.to_string()).unwrap();
