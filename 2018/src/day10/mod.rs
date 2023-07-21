@@ -1,9 +1,9 @@
-use std::{collections::HashMap, fmt::Display};
+
 
 use lazy_static::lazy_static;
 use regex::{Error, Regex};
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+
+use std::io::{BufRead};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Node {
@@ -68,7 +68,7 @@ fn visualize(nodes: &Vec<Node>) {
 }
 
 fn part1(content: String) -> Result<(), Error> {
-    let path = format!("./input/{}", "day10.txt");
+    let _path = format!("./input/{}", "day10.txt");
 
     let mut nodes: Vec<Node> = content
         .lines()
@@ -88,8 +88,8 @@ mod tests {
     #[ignore]
     fn test_first() {
         let example = include_str!("./example.data");
-        part1(example.to_owned());
+        let _ = part1(example.to_owned());
         let prod = include_str!("./prod.data");
-        part1(prod.to_owned());
+        let _ = part1(prod.to_owned());
     }
 }

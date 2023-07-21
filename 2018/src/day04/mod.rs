@@ -29,7 +29,7 @@ fn read_events(input: String) -> Vec<Event> {
 
     let mut events = Vec::new();
     for line in input.lines() {
-        let captures = scanner.captures(&line).unwrap();
+        let captures = scanner.captures(line).unwrap();
         let timestamp = Utc
             .datetime_from_str(&captures[1], "%Y-%m-%d %H:%M")
             .unwrap();
@@ -58,7 +58,7 @@ fn format_results(sleepers: &HashMap<usize, [u32; 60]>, scores: &HashMap<usize, 
         .unwrap()
         .0;
 
-    best_sleeper * (best_minute as usize)
+    best_sleeper * best_minute
 }
 
 fn get_sleeps(events: Vec<Event>) -> HashMap<usize, [u32; 60]> {

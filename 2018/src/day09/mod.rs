@@ -1,6 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
-    fmt, io,
+    fmt,
 };
 
 fn play_game(players: &mut [Player], circle: &mut Circle, marbles: u32) {
@@ -127,7 +126,7 @@ impl fmt::Debug for Circle {
         Ok(())
     }
 }
-fn part1(content: String) -> usize {
+fn part1(_content: String) -> usize {
     const PLAYERS: usize = 493;
     const LAST_MARBLE: u32 = 71863;
 
@@ -136,7 +135,7 @@ fn part1(content: String) -> usize {
     players.iter().map(|p| p.points).max().unwrap() as usize
 }
 
-fn part2(content: String) -> usize {
+fn part2(_content: String) -> usize {
     const PLAYERS: usize = 493;
     const LAST_MARBLE: u32 = 71863 * 100;
 

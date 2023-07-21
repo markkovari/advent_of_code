@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+
 
 #[derive(Debug, Default)]
 struct Node {
@@ -19,7 +19,7 @@ impl Node {
             ..Node::default()
         };
         for _ in 0..child_count {
-            let child = Node::from_flat((&flat[node.len..]).to_vec())?;
+            let child = Node::from_flat(flat[node.len..].to_vec())?;
             node.len += child.len;
             node.children.push(child);
         }
