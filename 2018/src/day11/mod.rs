@@ -1,9 +1,9 @@
-use std::{collections::HashMap, fmt::Display};
 
-use lazy_static::lazy_static;
-use regex::{Error, Regex};
-use std::fs::File;
-use std::io::{BufRead, BufReader, Result};
+
+
+
+
+use std::io::{Result};
 
 const SERIAL_NUMBER: i32 = 6392;
 const GRID_SIZE: i32 = 300;
@@ -25,7 +25,7 @@ impl Grid {
 
     fn get(&self, x: i32, y: i32) -> Option<i32> {
         let (x, y) = (x - 1, y - 1);
-        if 0 <= x && x < GRID_SIZE && 0 <= y && y < GRID_SIZE {
+        if (0..GRID_SIZE).contains(&x) && (0..GRID_SIZE).contains(&y) {
             Some(self.power[x as usize][y as usize])
         } else {
             None

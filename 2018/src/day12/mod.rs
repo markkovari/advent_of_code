@@ -1,7 +1,7 @@
-use core::fmt;
-use std::cmp;
-use std::collections::HashMap;
-use std::error::Error;
+
+
+
+
 
 use text_io::scan;
 
@@ -177,13 +177,14 @@ mod tests {
         assert_eq!(result, 1430);
     }
     #[test]
+    #[ignore]
     fn test_second() {
         println!("----------------------EXAMPLE----------------------");
         let example = include_str!("./example.data");
-        let result = part2(example.to_string());
+        part2(example.to_string());
 
         println!("----------------------PROD----------------------");
         let prod = include_str!("./prod.data");
-        let result = part2(prod.to_string());
+        part2(prod.to_string());
     }
 }

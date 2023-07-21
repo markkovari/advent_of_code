@@ -39,8 +39,8 @@ fn part1(content: String) -> Option<usize> {
 
     let max = map
         .iter()
-        .filter(|x| !infinites.contains(&x.0))
-        .max_by_key(|&(a, b)| b);
+        .filter(|x| !infinites.contains(x.0))
+        .max_by_key(|&(_a, b)| b);
 
     max.unwrap().1.to_owned().into()
 }
@@ -81,7 +81,7 @@ fn part2(content: String) -> usize {
     }
 
     let limit = 10_000;
-    let heuristic = 10_000 / map.len();
+    let _heuristic = 10_000 / map.len();
     let mut count = 0;
 
     for x in -100..=600 {
