@@ -1,6 +1,6 @@
 use core::fmt;
 use std::error::Error;
-use std::io;
+
 use std::{
     cmp,
     collections::{HashMap, HashSet},
@@ -264,7 +264,7 @@ impl fmt::Display for Ground {
                     write!(f, ".")?;
                 }
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
         Ok(())
     }
