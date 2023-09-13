@@ -1,9 +1,4 @@
-
-
-
-
-
-use std::io::{Result};
+use std::io::Result;
 
 const SERIAL_NUMBER: i32 = 6392;
 const GRID_SIZE: i32 = 300;

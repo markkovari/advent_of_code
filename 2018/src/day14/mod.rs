@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::io::{self, Write};
+
 use std::result;
 
 type Result<T> = result::Result<T, Box<dyn Error>>;
@@ -85,7 +85,7 @@ mod tests {
         // let result = part2(&[3, 7]).unwrap();
         // assert_eq!(result, 20291131);
 
-        let prod: usize = include_str!("./prod.data").parse().unwrap();
+        let _prod: usize = include_str!("./prod.data").parse().unwrap();
         let result = part2(&[6, 5, 2, 6, 0, 1]).unwrap();
         assert_eq!(result, 20261485);
     }
