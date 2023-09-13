@@ -23,10 +23,10 @@ fn part2(digits: &[u32]) -> Result<usize> {
     let mut recipes = Recipes::new();
     let ends_at;
     loop {
-        if recipes.scores.ends_with(&digits) {
+        if recipes.scores.ends_with(digits) {
             ends_at = recipes.scores.len() - digits.len();
             break;
-        } else if recipes.scores[..recipes.scores.len() - 1].ends_with(&digits) {
+        } else if recipes.scores[..recipes.scores.len() - 1].ends_with(digits) {
             ends_at = recipes.scores.len() - digits.len() - 1;
             break;
         }

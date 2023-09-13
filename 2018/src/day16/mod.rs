@@ -88,7 +88,7 @@ fn part1(content: String) -> usize {
                 >= 3
         })
         .count();
-    return result;
+    result
 }
 
 fn part2() -> usize {
@@ -130,7 +130,7 @@ fn part2() -> usize {
             })
             .collect();
 
-        op_codes[op].retain(|op_code| possible.contains(&op_code));
+        op_codes[op].retain(|op_code| possible.contains(op_code));
     }
 
     while known_codes.len() < ALL_OP_CODES.len() {
@@ -158,7 +158,7 @@ fn part2() -> usize {
         scan!(line.bytes() => "{} {} {} {}", op, a, b, c);
         known_codes[&op].apply(&mut registers, a, b, c);
     }
-    return registers[0];
+    registers[0]
 }
 
 const ALL_OP_CODES: &[OpCode] = &[

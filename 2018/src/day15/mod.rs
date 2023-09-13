@@ -205,7 +205,7 @@ impl Caves {
             .min_by_key(|c| (self.units[c].hp, *c))
     }
 
-    fn neighbors<'a>(&'a self, origin: Coordinate) -> impl Iterator<Item = Coordinate> + 'a {
+    fn neighbors(&self, origin: Coordinate) -> impl Iterator<Item = Coordinate> + '_ {
         origin
             .neighbors(self.max)
             .into_iter()
@@ -262,7 +262,7 @@ impl FromStr for Cell {
     type Err = Box<dyn Error>;
 
     fn from_str(s: &str) -> Result<Cell> {
-        match s.as_bytes().get(0) {
+        match s.as_bytes().first() {
             None => err!("cannot deserialize empty string into cell"),
             Some(&b'#') => Ok(Cell::Wall),
             Some(&b'.') => Ok(Cell::Open),
@@ -280,7 +280,7 @@ impl fmt::Display for Caves {
                 write!(f, "{}", cell)?;
             }
             if c.x == self.max.x {
-                write!(f, "\n")?;
+                writeln!(f)?;
             }
         }
         Ok(())
@@ -332,10 +332,10 @@ impl Coordinate {
         if self.x >= 1 {
             coords.push(self.with_x(self.x - 1));
         }
-        if self.x + 1 <= max.x {
+        if self.x < max.x {
             coords.push(self.with_x(self.x + 1));
         }
-        if self.y + 1 <= max.y {
+        if self.y < max.y {
             coords.push(self.with_y(self.y + 1));
         }
         coords
@@ -403,7 +403,7 @@ impl FromStr for Unit {
     type Err = Box<dyn Error>;
 
     fn from_str(s: &str) -> Result<Unit> {
-        let kind = match s.as_bytes().get(0) {
+        let kind = match s.as_bytes().first() {
             None => return err!("cannot deserialize empty string into unit"),
             Some(&b'E') => UnitKind::Elf,
             Some(&b'G') => UnitKind::Goblin,
@@ -433,7 +433,7 @@ mod tests {
     #[test]
     #[ignore = "Life is too short to wait for this test to run, the only thing matters is that it compiles, no more joy or happiness in life"]
     fn test_part1() -> Result<()> {
-        let _ = part1()?;
+        part1()?;
         Ok(())
     }
 }

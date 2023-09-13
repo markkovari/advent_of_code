@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use std::fmt;
-use std::mem;
+
 
 use std::cmp;
 use std::str::FromStr;
@@ -74,7 +74,7 @@ impl FromStr for Track {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.as_bytes().get(0) {
+        match s.as_bytes().first() {
             None => Err("no track available in empty string".to_owned()),
             Some(&b' ') => Ok(Track::Empty),
             Some(&b'|') => Ok(Track::Vertical),
@@ -91,7 +91,7 @@ impl TryFrom<&str> for Track {
     type Error = String;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value.as_bytes().get(0) {
+        match value.as_bytes().first() {
             None => Err("no track available in empty string".to_owned()),
             Some(&b' ') => Ok(Track::Empty),
             Some(&b'|') => Ok(Track::Vertical),
@@ -196,7 +196,7 @@ impl Transport {
 
     fn step(&mut self) -> Result<Vec<Coordinate>, TransportError> {
         let mut crashes = HashSet::new();
-        let mut previous_carts = mem::replace(&mut self.carts, BTreeMap::new());
+        let mut previous_carts = std::mem::take(&mut self.carts);
         for (c, cart) in previous_carts.clone() {
             if crashes.contains(&c) {
                 continue;
@@ -290,7 +290,7 @@ impl fmt::Debug for Transport {
                     write!(f, "{:?}", self.grid.get(c))?;
                 }
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
         Ok(())
     }
@@ -378,7 +378,7 @@ impl FromStr for Cart {
     type Err = String;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        let kind = match value.as_bytes().get(0) {
+        let kind = match value.as_bytes().first() {
             None => return Err("no cart available in empty string".to_owned()),
             Some(&b'^') => CartKind::Up,
             Some(&b'v') => CartKind::Down,
@@ -398,7 +398,7 @@ impl TryFrom<&str> for Cart {
     type Error = String;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let kind = match value.as_bytes().get(0) {
+        let kind = match value.as_bytes().first() {
             None => return Err("no cart available in empty string".to_owned()),
             Some(&b'^') => CartKind::Up,
             Some(&b'v') => CartKind::Down,
@@ -448,7 +448,7 @@ impl Grid {
     }
 
     fn get(&self, c: Coordinate) -> Track {
-        self.tracks.get(&c).map(|&c| c).unwrap_or(Track::Empty)
+        self.tracks.get(&c).copied().unwrap_or(Track::Empty)
     }
 
     fn set(&mut self, c: Coordinate, track: Track) {
@@ -533,7 +533,7 @@ impl fmt::Debug for Grid {
             for x in 0..=self.max_x {
                 write!(f, "{:?}", self.get(Coordinate { x, y }))?;
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
         Ok(())
     }
