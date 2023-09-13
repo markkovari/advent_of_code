@@ -1,8 +1,3 @@
-
-
-
-
-
 use text_io::scan;
 
 fn rule_index(bits: &[bool]) -> usize {

@@ -4,7 +4,7 @@ use std::cmp;
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::error::Error;
 use std::fmt;
-use std::io::{self, Read, Write};
+use std::io::{self, Write};
 use std::result;
 use std::str::FromStr;
 

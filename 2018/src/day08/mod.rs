@@ -1,5 +1,3 @@
-
-
 #[derive(Debug, Default)]
 struct Node {
     metadata: Vec<i32>,

@@ -1,10 +1,10 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
-use std::error::Error;
+
 use std::fmt;
 use std::mem;
-use std::result;
+
+use std::cmp;
 use std::str::FromStr;
-use std::{cmp, io};
 
 #[derive(Debug)]
 enum SolutionError {
@@ -38,7 +38,7 @@ fn part2(content: String) -> Result<(), SolutionError> {
     loop {
         let crashes = transport.step().unwrap();
         if !crashes.is_empty() {
-            let c = crashes[0];
+            let _c = crashes[0];
             // writeln!(io::stdout(), "first crash at: {},{}", c.x, c.y)?;
             break;
         }

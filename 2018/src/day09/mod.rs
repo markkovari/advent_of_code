@@ -1,6 +1,4 @@
-use std::{
-    fmt,
-};
+use std::fmt;
 
 fn play_game(players: &mut [Player], circle: &mut Circle, marbles: u32) {
     let start = circle.max_marble_value() + 1; // 1 for fresh game

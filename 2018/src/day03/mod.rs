@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap},
-    vec,
-};
+use std::{collections::HashMap, vec};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Rule {
