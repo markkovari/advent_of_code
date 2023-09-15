@@ -447,7 +447,7 @@ impl Map {
     }
 
     fn distance_to_farthest_room(&self) -> Distance {
-        return *self.room_distance.values().into_iter().max().unwrap();
+        return *self.room_distance.values().max().unwrap();
     }
 
     fn visit_room(
@@ -600,12 +600,7 @@ fn part2(content: String) -> usize {
     let mut map = Map::new();
     map.parse_directions(directions);
 
-    let num_of_rooms = map
-        .room_distance
-        .values()
-        .into_iter()
-        .filter(|x| *x >= &1000)
-        .count();
+    let num_of_rooms = map.room_distance.values().filter(|x| *x >= &1000).count();
 
     num_of_rooms
 }
@@ -624,7 +619,7 @@ mod tests {
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_part2() {
         let text = include_str!("./example.data").to_owned();
         assert_eq!(part2(text), 0);
