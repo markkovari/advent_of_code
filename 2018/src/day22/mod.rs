@@ -1,6 +1,6 @@
 use itertools::Itertools;
-use std::collections::{HashMap, HashSet, BinaryHeap};
 use std::cmp::Ordering;
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 enum Type {
@@ -17,7 +17,12 @@ fn get_risk(region_type: &Type) -> usize {
     }
 }
 
-fn get_index(pos: (usize, usize), depth: usize, target: (usize, usize), memo: &mut HashMap<(usize, usize), usize>) -> usize {
+fn get_index(
+    pos: (usize, usize),
+    depth: usize,
+    target: (usize, usize),
+    memo: &mut HashMap<(usize, usize), usize>,
+) -> usize {
     if let Some(level) = memo.get(&pos) {
         return *level;
     }
@@ -30,19 +35,30 @@ fn get_index(pos: (usize, usize), depth: usize, target: (usize, usize), memo: &m
     } else if pos.1 == 0 {
         pos.0 * 48271
     } else {
-        get_erosion((pos.0 - 1, pos.1), depth, target, memo) * get_erosion((pos.0, pos.1 - 1), depth, target, memo)
+        get_erosion((pos.0 - 1, pos.1), depth, target, memo)
+            * get_erosion((pos.0, pos.1 - 1), depth, target, memo)
     };
 
     memo.insert(pos, level);
     level
 }
 
-fn get_erosion(pos: (usize, usize), depth: usize, target: (usize, usize), memo: &mut HashMap<(usize, usize), usize>) -> usize {
+fn get_erosion(
+    pos: (usize, usize),
+    depth: usize,
+    target: (usize, usize),
+    memo: &mut HashMap<(usize, usize), usize>,
+) -> usize {
     let index = get_index(pos, depth, target, memo);
     (depth + index) % 20183
 }
 
-fn get_type(pos: (usize, usize), depth: usize, target: (usize, usize), memo: &mut HashMap<(usize, usize), usize>) -> Type {
+fn get_type(
+    pos: (usize, usize),
+    depth: usize,
+    target: (usize, usize),
+    memo: &mut HashMap<(usize, usize), usize>,
+) -> Type {
     let erosion = get_erosion(pos, depth, target, memo);
     match erosion % 3 {
         0 => Type::Rocky,
@@ -69,7 +85,9 @@ struct State {
 
 impl Ord for State {
     fn cmp(&self, other: &Self) -> Ordering {
-        (self.time + self.min_dist).cmp(&(other.time + other.min_dist)).reverse()
+        (self.time + self.min_dist)
+            .cmp(&(other.time + other.min_dist))
+            .reverse()
     }
 }
 
@@ -83,10 +101,19 @@ fn min_dist(pos: (i32, i32), target: (usize, usize)) -> usize {
     ((pos.0 - (target.0 as i32)).abs() + (pos.1 - (target.1 as i32)).abs()) as usize
 }
 
-fn navigate(target: (usize, usize), depth: usize, type_memo: &mut HashMap<(usize, usize), usize>) -> usize {
+fn navigate(
+    target: (usize, usize),
+    depth: usize,
+    type_memo: &mut HashMap<(usize, usize), usize>,
+) -> usize {
     let mut queue: BinaryHeap<State> = BinaryHeap::new();
     let mut seen = HashSet::new();
-    queue.push(State { pos: (0, 0), min_dist: min_dist((0, 0), target), time: 0, equipped: Equipment::Torch });
+    queue.push(State {
+        pos: (0, 0),
+        min_dist: min_dist((0, 0), target),
+        time: 0,
+        equipped: Equipment::Torch,
+    });
 
     while !queue.is_empty() {
         let state = queue.pop().unwrap();
@@ -117,19 +144,54 @@ fn navigate(target: (usize, usize), depth: usize, type_memo: &mut HashMap<(usize
             }
         }
 
-        queue.push(State { pos: (pos.0 - 1, pos.1), min_dist: min_dist((pos.0 - 1, pos.1), target), time: state.time + 1, equipped: state.equipped });
-        queue.push(State { pos: (pos.0 + 1, pos.1), min_dist: min_dist((pos.0 + 1, pos.1), target), time: state.time + 1, equipped: state.equipped.clone() });
-        queue.push(State { pos: (pos.0, pos.1 - 1), min_dist: min_dist((pos.0, pos.1 - 1), target), time: state.time + 1, equipped: state.equipped.clone() });
-        queue.push(State { pos: (pos.0, pos.1 + 1), min_dist: min_dist((pos.0, pos.1 + 1), target), time: state.time + 1, equipped: state.equipped.clone() });
+        queue.push(State {
+            pos: (pos.0 - 1, pos.1),
+            min_dist: min_dist((pos.0 - 1, pos.1), target),
+            time: state.time + 1,
+            equipped: state.equipped,
+        });
+        queue.push(State {
+            pos: (pos.0 + 1, pos.1),
+            min_dist: min_dist((pos.0 + 1, pos.1), target),
+            time: state.time + 1,
+            equipped: state.equipped.clone(),
+        });
+        queue.push(State {
+            pos: (pos.0, pos.1 - 1),
+            min_dist: min_dist((pos.0, pos.1 - 1), target),
+            time: state.time + 1,
+            equipped: state.equipped.clone(),
+        });
+        queue.push(State {
+            pos: (pos.0, pos.1 + 1),
+            min_dist: min_dist((pos.0, pos.1 + 1), target),
+            time: state.time + 1,
+            equipped: state.equipped.clone(),
+        });
 
         if state.equipped != Equipment::Neither {
-            queue.push(State { pos, min_dist: state.min_dist, time: state.time + 7, equipped: Equipment::Neither });
+            queue.push(State {
+                pos,
+                min_dist: state.min_dist,
+                time: state.time + 7,
+                equipped: Equipment::Neither,
+            });
         }
         if state.equipped != Equipment::Torch {
-            queue.push(State { pos, min_dist: state.min_dist, time: state.time + 7, equipped: Equipment::Torch });
+            queue.push(State {
+                pos,
+                min_dist: state.min_dist,
+                time: state.time + 7,
+                equipped: Equipment::Torch,
+            });
         }
         if state.equipped != Equipment::Climbing {
-            queue.push(State { pos, min_dist: state.min_dist, time: state.time + 7, equipped: Equipment::Climbing });
+            queue.push(State {
+                pos,
+                min_dist: state.min_dist,
+                time: state.time + 7,
+                equipped: Equipment::Climbing,
+            });
         }
     }
 
@@ -137,8 +199,21 @@ fn navigate(target: (usize, usize), depth: usize, type_memo: &mut HashMap<(usize
 }
 
 pub fn solve(inputs: Vec<String>) -> (usize, usize) {
-    let depth = inputs[0].split(": ").skip(1).next().unwrap().parse::<usize>().unwrap();
-    let target_vec = inputs[1].split(": ").skip(1).next().unwrap().split(",").map(|w| w.parse::<usize>().unwrap()).collect_vec();
+    let depth = inputs[0]
+        .split(": ")
+        .skip(1)
+        .next()
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+    let target_vec = inputs[1]
+        .split(": ")
+        .skip(1)
+        .next()
+        .unwrap()
+        .split(",")
+        .map(|w| w.parse::<usize>().unwrap())
+        .collect_vec();
     let target = (target_vec[1], target_vec[0]);
 
     let mut memo = HashMap::new();
@@ -153,15 +228,17 @@ pub fn solve(inputs: Vec<String>) -> (usize, usize) {
     (total_risk, part2)
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_part1() {
-        let text = include_str!("./prod.data").lines().map(|l| l.to_owned()).collect_vec();
+        let text = include_str!("./prod.data")
+            .lines()
+            .map(|l| l.to_owned())
+            .collect_vec();
         assert_eq!(solve(text), (6208, 1039));
     }
 }
