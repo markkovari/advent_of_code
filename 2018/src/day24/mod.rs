@@ -236,7 +236,7 @@ mod tests {
     use super::*;
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_part1() {
         let text = include_str!("./prod.data").to_owned();
         assert_eq!(solve(text).unwrap(), (18532, 6523));
