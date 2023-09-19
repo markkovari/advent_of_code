@@ -225,6 +225,47 @@ module Day03 = struct
   let solve = (int_of_float (first first_row second_row),  int_of_float (second first_row second_row))
 end
 
+
+module Day04 = struct
+  let start = 236491
+  let stop = 713787
+  
+  let rec is_sorted : int list -> bool = function
+    | [] | [_] -> true
+    | x :: y :: tl -> x <= y && is_sorted (y :: tl)
+
+  let group p l = 
+    let rec grouping acc = function
+      | [] -> acc
+      | hd::tl ->
+        let l1,l2 = List.partition (p hd) tl in
+        grouping ((hd::l1)::acc) l2  
+    in 
+    grouping [] l
+  let get_groups password = group (fun x y -> x = y) password
+
+  let has_group_of digits amount =  List.exists (fun x -> List.length x = amount) (get_groups digits)
+ 
+  let has_at_least_amount digits amount = 
+    let groups = get_groups digits in
+    List.exists (fun x -> List.length x >= amount) groups
+
+  let get_digits digits = List.map (fun x -> int_of_string (String.make 1 x)) (string_of_int digits |> String.to_seq |> List.of_seq) 
+  let password_correct number = 
+    let digits = get_digits number in
+    is_sorted digits && has_at_least_amount digits 2
+  
+  let passowrd_correct_restricted number = 
+    let digits = get_digits number in
+    is_sorted digits  && has_group_of digits 2
+      
+  let list_of_numbers = List.init (stop -1 - start+1) (fun i -> i + start )
+  let correct_password = List.filter password_correct list_of_numbers
+  let correct_password_restricted = List.filter passowrd_correct_restricted correct_password
+
+  let solve = (List.length correct_password, List.length correct_password_restricted)
+end
+
 let (s1,s2) = Day01.solve
 let () = Printf.printf "Day 1; first: %d second: %d \n" s1 s2
 
@@ -233,3 +274,6 @@ let () = Printf.printf "Day 2; first: %d second: %d \n" s1 s2
 
 let (s1,s2) = Day03.solve
 let () = Printf.printf "Day 3; first: %d second: %d \n" s1 s2
+
+let (s1,s2) = Day04.solve
+let () = Printf.printf "Day 4; first: %d second: %d \n" s1 s2
