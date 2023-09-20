@@ -9,8 +9,6 @@ type computer = {
   out_queue : int Queue.t;
 }
 
-
-
 let read_instructions filename =
   CCIO.(with_in filename read_all)
   |> CCString.rtrim
