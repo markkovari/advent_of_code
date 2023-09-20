@@ -225,7 +225,6 @@ module Day03 = struct
   let solve = (int_of_float (first first_row second_row),  int_of_float (second first_row second_row))
 end
 
-
 module Day04 = struct
   let start = 236491
   let stop = 713787
@@ -266,7 +265,8 @@ module Day04 = struct
   let solve = (List.length correct_password, List.length correct_password_restricted)
 end
 
-module Day05 = struct  let instructions = Intcode.read_instructions "input/5/data"
+module Day05 = struct 
+  let instructions = Intcode.read_instructions "input/5/data"
   let solve ~part instructions =
     let input = if part = 1 then 1 else 5 in
     let ram_size = List.length instructions in
@@ -277,6 +277,58 @@ module Day05 = struct  let instructions = Intcode.read_instructions "input/5/dat
     |> Intcode.get_last_output
   
   let solve =(instructions |> solve ~part:1,instructions |> solve ~part:2)
+end
+
+module RelationMap = CCMap.Make(String)
+
+module Day06 = struct 
+  let parse filename =
+    let add = RelationMap.add in
+    let get = RelationMap.get_or ~default:[]
+    in
+    CCIO.(with_in filename read_lines_l)
+    |> List.map (String.split_on_char ')')
+    |> List.fold_left
+      (fun (p2c, k2p) -> function
+         | [ p; k ] ->
+           let c = p2c |> get p in
+           ( p2c |> add p (k :: c),
+             k2p |> add k p )
+         | _ -> failwith "invalid input")
+      (RelationMap.empty, RelationMap.empty)
+
+  let part_1 p2c =
+    let rec traverse n key =
+      let children = p2c |> RelationMap.get_or ~default:[] key in
+      match children with
+      | [] -> n
+      | _ ->
+        let children_distances = List.map (traverse (n+1)) children in
+        n + List.fold_left (+) 0 children_distances
+    in
+    traverse 0 "COM" 
+
+  let part_2 k2p =
+    let find_all_ancestors =
+      let rec traverse relations acc = function
+        | "COM" -> acc
+        | kid ->
+          let parent = relations |> RelationMap.find kid in
+          traverse relations (parent::acc) parent
+      in
+      traverse k2p []
+    in
+    let rec calc_orbital_transfers you san =
+      match you, san with
+      | x::xs, y::ys when x = y -> calc_orbital_transfers xs ys
+      | _, _ -> List.length you + List.length san
+    in
+    let you = find_all_ancestors "YOU" in
+    let san = find_all_ancestors "SAN" in
+    calc_orbital_transfers you san
+
+  let p2c, k2p = parse "input/6/data"
+  let solve = (p2c |> part_1, k2p |> part_2)
 end
 
 let (s1,s2) = Day01.solve
@@ -293,3 +345,6 @@ let () = Printf.printf "Day 4; first: %d second: %d \n" s1 s2
 
 let (s1,s2) = Day05.solve
 let () = Printf.printf "Day 5; first: %d second: %d \n" s1 s2
+
+let (s1,s2) = Day06.solve
+let () = Printf.printf "Day 6; first: %d second: %d \n" s1 s2
