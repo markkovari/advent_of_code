@@ -266,6 +266,11 @@ module Day04 = struct
   let solve = (List.length correct_password, List.length correct_password_restricted)
 end
 
+module Day05 = struct
+  
+  let solve = (1,1)
+end
+
 let (s1,s2) = Day01.solve
 let () = Printf.printf "Day 1; first: %d second: %d \n" s1 s2
 
@@ -277,3 +282,6 @@ let () = Printf.printf "Day 3; first: %d second: %d \n" s1 s2
 
 let (s1,s2) = Day04.solve
 let () = Printf.printf "Day 4; first: %d second: %d \n" s1 s2
+
+let (s1,s2) = Day05.solve
+let () = Printf.printf "Day 5; first: %d second: %d \n" s1 s2
