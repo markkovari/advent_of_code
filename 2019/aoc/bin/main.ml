@@ -266,9 +266,17 @@ module Day04 = struct
   let solve = (List.length correct_password, List.length correct_password_restricted)
 end
 
-module Day05 = struct
+module Day05 = struct  let instructions = Intcode.read_instructions "input/5/data"
+  let solve ~part instructions =
+    let input = if part = 1 then 1 else 5 in
+    let ram_size = List.length instructions in
+    instructions
+    |> Intcode.initialize_computer ~ram_size
+    |> Intcode.receive input
+    |> Intcode.run_until_halt
+    |> Intcode.get_last_output
   
-  let solve = (1,1)
+  let solve =(instructions |> solve ~part:1,instructions |> solve ~part:2)
 end
 
 let (s1,s2) = Day01.solve

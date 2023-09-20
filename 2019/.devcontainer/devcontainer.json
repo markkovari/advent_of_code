@@ -13,6 +13,7 @@
       }
     },
     "extensions": [
+      "GitHub.copilot",
       "ocamllabs.ocaml-platform",
       "jaredly.reason-vscode",
       "badochov.ocaml-formatter",
