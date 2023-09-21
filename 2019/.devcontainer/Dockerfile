@@ -24,7 +24,7 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then \
 USER opam
 
 RUN opam update && \
-    opam install dune merlin ocaml-lsp-server odoc ocamlformat utop dune-release
+    opam install dune merlin ocaml-lsp-server odoc ocamlformat utop dune-release oseq containers
 
 ENV DEBIAN_FRONTEND=dialog
 

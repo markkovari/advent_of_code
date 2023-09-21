@@ -281,7 +281,7 @@ end
 
 module RelationMap = CCMap.Make(String)
 
-module Day06 = struct 
+module Day06 = struct
   let parse filename =
     let add = RelationMap.add in
     let get = RelationMap.get_or ~default:[]
@@ -331,6 +331,52 @@ module Day06 = struct
   let solve = (p2c |> part_1, k2p |> part_2)
 end
 
+module Day07 = struct
+  let instructions = Intcode.read_instructions "input/7/data"
+  let all_permutations =
+    let rec aux result other = function
+      | [] -> [result]
+      | hd :: tl ->
+        let r = aux (hd :: result) [] (other @ tl) in
+        if tl <> [] then
+          r @ aux result (hd :: other) tl
+        else r
+    in
+    aux [] []
+
+  let create_computers =
+    List.map
+      (fun phase ->
+        instructions
+        |> Intcode.initialize_computer
+        |> Intcode.receive phase)
+  
+  let some_halted =
+    List.exists (fun comp -> Intcode.get_state comp = Intcode.Halted)
+  
+  let rec get_output (score, computers) =
+    if some_halted computers then score
+    else
+      computers
+      |> CCList.fold_map
+        (fun last_output comp ->
+              comp
+              |> Intcode.receive last_output
+              |> Intcode.run_until_halt
+              |> fun comp -> ((Intcode.get_next_output comp), comp) )
+        score
+      |> get_output
+
+  open CCFun
+  let solve =
+    all_permutations
+    %> List.fold_left
+      (fun acc perm ->
+          let computers = create_computers perm in
+          (0, computers) |> get_output |> max acc)
+      0
+  let solve = (CCList.(0 -- 4) |> solve,CCList.(5 -- 9) |> solve)
+end
 let (s1,s2) = Day01.solve
 let () = Printf.printf "Day 1; first: %d second: %d \n" s1 s2
 
@@ -348,3 +394,6 @@ let () = Printf.printf "Day 5; first: %d second: %d \n" s1 s2
 
 let (s1,s2) = Day06.solve
 let () = Printf.printf "Day 6; first: %d second: %d \n" s1 s2
+
+let (s1,s2) = Day07.solve
+let () = Printf.printf "Day 7; first: %d second: %d \n" s1 s2
