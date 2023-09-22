@@ -423,6 +423,20 @@ module Day08 = struct
   let solve = (layers |> part_1, layers |> part_2)
 end
 
+module Day09 = struct
+  
+  open CCFun
+
+  let instructions = Intcode.read_instructions "input/9/data"
+
+  let solve ~part =
+    Intcode.initialize_computer
+    %> Intcode.receive part
+    %> Intcode.run_until_halt
+    %> Intcode.get_next_output
+
+  let solve = (instructions |> solve ~part:1, instructions |> solve ~part:2)
+end
 let (s1,s2) = Day01.solve
 let () = Printf.printf "Day 1; first: %d second: %d \n" s1 s2
 
@@ -446,5 +460,9 @@ let () = Printf.printf "Day 7; first: %d second: %d \n" s1 s2
 
 let (s1,_) = Day08.solve;;
 Day08.part_2(Day08.layers);;
+
 let () = Printf.printf "Day 8; first: %d second:\n" s1
 
+
+let (s1,s2) = Day09.solve
+let () = Printf.printf "Day 9; first: %d second: %d \n" s1 s2
