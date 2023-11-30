@@ -77,9 +77,9 @@ public class Seventh {
       }
 
       System.out.println(
-          "Sixth day: first result " + valids.size());
+          "Seventh day: first result " + valids.size());
       System.out.println(
-          "Sixth day: second result ");
+          "Seventh day: second result ");
     } catch (IOException e) {
       e.printStackTrace();
     }
