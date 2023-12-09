@@ -1,67 +1,106 @@
 package mark.kovari.aoc;
 
-import utils.BFS;
-import utils.BackTracking;
-import utils.InputUtils;
-import utils.Tile;
+import utils.Pair;
+import utils.Utils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static java.lang.Character.isDigit;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 public class TwentyFourth {
 
-    private static List<Tile> findTargetTiles(char[][] map) {
-        List<Tile> tiles = new ArrayList<>();
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
-                if (Character.isDigit(map[i][j])) {
-                    int index = map[i][j] - '0';
-                    while (index >= tiles.size()) {
-                        tiles.add(null);
-                    }
-                    tiles.set(index, new Tile(i, j));
-                }
-            }
+    public Pair<String, String> solve() {
+        try {
+            String[] content = Files.readString(Paths.get("./inputs/24/prod.data")).split(System.lineSeparator());
+            String[] content2 = Files.readString(Paths.get("./inputs/24/prod.data")).split(System.lineSeparator());
+            var stream = Arrays.stream(content);
+            var stream2 = Arrays.stream(content);
+            return new Pair<>(solve(stream, true), solve(stream2, false));
+        } catch (IOException e) {
+            return new Pair<>("", "");
         }
-        return tiles;
     }
 
-    public void solve() {
-        try {
-            char[][] map = InputUtils.readCharMatrix(Paths.get("./inputs/24/prod.data"));
+    private String solve(final Stream<String> input, final boolean first) {
+        final var grid = getGrid(input);
+        final var locations = getLocations(grid);
 
-            var targetTiles = findTargetTiles(map);
-            int targetCount = targetTiles.size();
+        final var distances = locations.values().stream().collect(toMap(identity(), pos -> computeShortestPaths(pos, locations.values(), grid)));
 
-            int[][] dist = new int[targetCount][targetCount];
-            for (int i = 0; i < targetCount; i++) {
-                var startTile = targetTiles.get(i);
-                var result = BFS.run(startTile,
-                        tile -> tile.neighbors(n -> map[n.row()][n.col()] != '#'));
-                for (int j = 0; j < targetCount; j++) {
-                    dist[i][j] = (int) result.get(targetTiles.get(j)).getDist();
-                }
-            }
-            var permutations = BackTracking.findAll(targetCount - 1, BackTracking::distinct);
-            int min1 = Integer.MAX_VALUE;
-            int min2 = Integer.MAX_VALUE;
-            for (int[] order : permutations) {
-                int length = 0;
-                int prev = 0;
-                for (int k : order) {
-                    int next = k + 1;
-                    length += dist[prev][next];
-                    prev = next;
-                }
-                min1 = Math.min(min1, length);
-                min2 = Math.min(min2, length + dist[prev][0]);
-            }
-            System.out.println("TwentyFourth: Part 1: " + min1);
-            System.out.println("TwentyFourth: Part 2: " + min2);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        final var start = locations.remove('0');
+
+        return Utils.itoa(computeShortestPath(start, new HashSet<>(locations.values()), distances, first ? null : start));
+    }
+
+    private int computeShortestPath(final Point src, final Collection<Point> destinations, final Map<Point, Map<Point, Integer>> distances, final Point zero) {
+        if (destinations.isEmpty()) {
+            //if zero!=null, add distance from src to zero
+            return distances.get(src).getOrDefault(zero, 0);
         }
+        int min = Integer.MAX_VALUE;
+        for (final var location : new HashSet<>(destinations)) {
+            destinations.remove(location);
+
+            final int distance = distances.get(src).get(location) + computeShortestPath(location, destinations, distances, zero);
+            if (distance < min) {
+                min = distance;
+            }
+
+            destinations.add(location);
+        }
+        return min;
+    }
+
+    private Map<Character, Point> getLocations(final Character[][] grid) {
+        final Map<Character, Point> locations = new HashMap<>();
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                final var c = grid[i][j];
+                if (isDigit(c)) {
+                    locations.put(c, new Point(i, j));
+                }
+            }
+        }
+        return locations;
+    }
+
+    private Map<Point, Integer> computeShortestPaths(final Point src, final Collection<Point> destinations, final Character[][] grid) {
+        final var queue = new LinkedList<Point>();
+        final var distances = new HashMap<Point, Integer>();
+        //start from source
+        queue.add(src);
+        distances.put(src, 0);
+
+        while (!queue.isEmpty()) {
+            final var curr = queue.remove();
+            for (final var neighbour : getNeighbours(grid, curr)) {
+                if (!distances.containsKey(neighbour)) {
+                    queue.add(neighbour);
+                    distances.put(neighbour, distances.get(curr) + 1);
+                }
+            }
+        }
+
+        distances.keySet().removeIf(k -> !destinations.contains(k));
+
+        return distances;
+    }
+
+    private List<Point> getNeighbours(final Character[][] grid, final Point e) {
+        return Utils.NEIGHBOURS_4.stream().map(n -> new Point(n.getFirst() + e.x, n.getSecond() + e.y)).filter(n -> n.x >= 0 && n.x < grid.length && n.y >= 0 && n.y < grid[0].length).filter(n -> grid[n.x][n.y] != Utils.HASH).toList();
+    }
+
+    private Character[][] getGrid(final Stream<String> input) {
+        return input.map(row -> row.chars().mapToObj(c -> (char) c).toArray(Character[]::new)).toArray(Character[][]::new);
+    }
+
+    private record Point(int x, int y) {
+
     }
 }
