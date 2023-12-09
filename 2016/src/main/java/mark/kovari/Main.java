@@ -1,7 +1,5 @@
 package mark.kovari;
 
-import mark.kovari.aoc.TwentyFourth;
-
 public class Main {
     public static void main(String[] args) {
         // First first = new First();
@@ -48,9 +46,10 @@ public class Main {
         // twentysecond.solve();
         // TwentyThird twentythird = new TwentyThird()Ï;
         // twentythird.solve();
-        TwentyFourth twentyfourth = new TwentyFourth();
-        var pair = twentyfourth.solve();
-        System.out.println(pair);
-
+        // TwentyFourth twentyfourth = new TwentyFourth();
+        // var pair = twentyfourth.solve();
+        // System.out.println(pair);
+        // TwentyFifth tf = new TwentyFifth();
+        // System.out.println(tf.run());
     }
 }
