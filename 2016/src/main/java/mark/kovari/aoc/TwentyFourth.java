@@ -20,7 +20,7 @@ public class TwentyFourth {
             String[] content = Files.readString(Paths.get("./inputs/24/prod.data")).split(System.lineSeparator());
             String[] content2 = Files.readString(Paths.get("./inputs/24/prod.data")).split(System.lineSeparator());
             var stream = Arrays.stream(content);
-            var stream2 = Arrays.stream(content);
+            var stream2 = Arrays.stream(content2);
             return new Pair<>(solve(stream, true), solve(stream2, false));
         } catch (IOException e) {
             return new Pair<>("", "");
