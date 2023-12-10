@@ -9,11 +9,19 @@ type computer = {
   out_queue : int Queue.t;
 }
 
+
 let read_instructions filename =
   CCIO.(with_in filename read_all)
   |> CCString.rtrim
   |> String.split_on_char ','
   |> List.map int_of_string
+
+let read_instructions_int_64 filename =
+  CCIO.(with_in filename read_all)
+  |> CCString.rtrim
+  |> String.split_on_char ','
+  |> List.map int_of_string
+  |> List.map Int64.of_int
 
 
 let read_param param { ram ; ip ; rp ; _ } =

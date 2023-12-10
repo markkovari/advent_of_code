@@ -19,5 +19,12 @@
       "badochov.ocaml-formatter",
       "editorconfig.editorconfig"
     ]
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ocamllabs.ocaml-platform"
+      ]
+    }
   }
 }

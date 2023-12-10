@@ -703,7 +703,30 @@ module Day12 = struct
 end
 
 module Day13 = struct
- 
+
+  let instructions = Intcode.read_instructions "input/13/data" 
+
+  let parse_output output =
+    let rec aux acc = function
+      | [] -> acc
+      | x :: y :: id :: tl -> aux ((x, y, id) :: acc) tl
+      | _ -> failwith "invalid input"
+    in
+    aux [] output
+
+  let part_1 =
+    let open CCFun in
+    instructions
+    |> Intcode.initialize_computer
+    |> Intcode.run_until_halt
+    |> Intcode.get_all_output
+    |> parse_output
+    |> List.filter (fun (_, _, id) -> id = 2)
+    |> List.length
+    
+
+
+  let solve = (part_1 instructions, 2)
 end 
 
 let (s1,s2) = Day01.solve
@@ -747,5 +770,5 @@ let () = Printf.printf "Day 12; first: %d second: %d \n" s1 s2
 
 
 let (s1,s2) = Day13.solve
-let () = Printf.printf "Day 11; first: %d second: %d \n" s1 s2
+let () = Printf.printf "Day 13; first: %d second: %d \n" s1 s2
 
