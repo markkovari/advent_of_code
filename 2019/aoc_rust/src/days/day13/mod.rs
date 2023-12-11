@@ -2,7 +2,6 @@ use std::{collections::HashMap, sync::mpsc::channel};
 
 use crate::utils::Computer;
 
-#[allow(dead_code)]
 pub fn part_1() -> usize {
     let mut c = Computer::from_file("./src/days/day13/input");
     c.run();
@@ -15,7 +14,6 @@ pub fn part_1() -> usize {
 
     map.values().filter(|b| **b == 2).count()
 }
-#[allow(dead_code)]
 pub fn part_2() -> isize {
     let mut c = Computer::from_file("./src/days/day13/input");
     c.p[0] = 2;
