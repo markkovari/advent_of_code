@@ -1,3 +1,4 @@
+// #![allow(dead_code)]
 use std::cmp::Ordering;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
@@ -177,7 +178,6 @@ fn solve() -> (i64, i64) {
     return (part_1, part_2);
 }
 
-#[allow(dead_code)]
 #[inline(always)]
 pub fn dfs<N, FN, NI>(start: N, mut next: FN)
 where
