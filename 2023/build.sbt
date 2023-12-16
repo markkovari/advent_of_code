@@ -1,6 +1,6 @@
 // The simplest possible sbt build file is just one line:
 
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "3.3.1"
 // That is, to create a valid sbt build, all you've got to do is define the
 // version of Scala you'd like your project to use.
 
