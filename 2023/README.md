@@ -1,7 +1,11 @@
-# Run the days with
+# Run tests of the days 
 
 ```bash
-scala-cli run src/main/scala/day02.scala --main-class com.markkovari.adventofcode.day02.part1
+sbt test
 ```
 
-- Soon will add a justfile with params to run the days, but realistocly not going to happen
+## Listening for changes
+
+```bash
+sbt ~test
+```
