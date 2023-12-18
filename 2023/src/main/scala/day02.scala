@@ -1,6 +1,5 @@
 package com.markkovari.adventofcode.day02
 
-
 case class Colors(color: String, count: Int)
 case class Game(id: Int, hands: List[List[Colors]])
 type Summary = Game => Int
