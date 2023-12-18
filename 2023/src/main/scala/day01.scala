@@ -1,4 +1,4 @@
-package com.markkovari.adventofcode
+package com.markkovari.adventofcode.day01
 
 import scala.collection.immutable.HashMap
 import scala.io.Source
