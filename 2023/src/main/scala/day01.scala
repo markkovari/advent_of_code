@@ -3,10 +3,7 @@ package com.markkovari.adventofcode.day01
 import scala.collection.immutable.HashMap
 import scala.io.Source
 
-@main def part1: Unit = println(s"The solution is ${firstResult}")
-@main def part2: Unit = println(s"The solution is ${secondResult}")
-
-private val numbersAsStringsAndValues =
+val numbersAsStringsAndValues =
   HashMap(
     "one" -> 1,
     "two" -> 2,
@@ -19,32 +16,12 @@ private val numbersAsStringsAndValues =
     "nine" -> 9
   )
 
-private def stringStartsStringifiedDigit(text: String): Option[Int] =
+def stringStartsStringifiedDigit(text: String): Option[Int] =
   numbersAsStringsAndValues
     .find { case (key, _) => text.startsWith(key) }
     .map { case (_, value) => value }
 
-private val exampleFilename = "example_1"
-private val exampleFilename2 = "example_2"
-private val valuesFilename = "values"
-
-private val lines =
-  Source.fromFile(s"./src/main/resources/1/${valuesFilename}").getLines
-
-private val linesForSecond =
-  Source.fromFile(s"./src/main/resources/1/${valuesFilename}").getLines
-
-val firstResult =
-  lines
-    .map(line => getFirstAndLastMultipliedTen(getDigits(line)))
-    .sum
-
-val secondResult =
-  linesForSecond
-    .map(line => getFirstAndLastMultipliedTen(getMixedUpDigits(line)))
-    .sum
-
-private def getFirstAndLastMultipliedTen(list: List[Int]): Int =
+def getFirstAndLastMultipliedTen(list: List[Int]): Int =
   list match {
     case a :: Nil       => a * 10 + a
     case a :: b :: Nil  => a * 10 + b
