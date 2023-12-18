@@ -21,4 +21,11 @@ class Day02Tests extends AnyFunSuite {
     assert(result == 2617)
   }
 
+  test("result is the same as in the description part 2") {
+
+    val text = Source.fromFile("./src/main/resources/2/values").mkString
+    val result = part2(text)
+    assert(result == 59795)
+  }
+
 }
