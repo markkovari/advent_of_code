@@ -16,7 +16,7 @@ class Day01Tests extends AnyFunSuite {
 
   test("example result is the same as in the description") {
     val lines =
-      Source.fromFile(s"./src/main/resources/1/${exampleFilename}").getLines
+      Source.fromFile(s"./src/test/resources/1/${exampleFilename}").getLines
 
     val firstResult =
       lines
@@ -27,7 +27,7 @@ class Day01Tests extends AnyFunSuite {
 
   test("result first part") {
     val lines =
-      Source.fromFile(s"./src/main/resources/1/${valuesFilename}").getLines
+      Source.fromFile(s"./src/test/resources/1/${valuesFilename}").getLines
 
     val firstResult =
       lines
@@ -36,7 +36,7 @@ class Day01Tests extends AnyFunSuite {
     assert(firstResult == 54573)
 
     val linesForSecond =
-      Source.fromFile(s"./src/main/resources/1/${valuesFilename}").getLines
+      Source.fromFile(s"./src/test/resources/1/${valuesFilename}").getLines
     val secondResult =
       linesForSecond
         .map(line => getFirstAndLastMultipliedTen(getMixedUpDigits(line)))
