@@ -17,7 +17,6 @@ def parseCard(input: String): Card =
     case s"Card ${id}: ${numbers} | ${winningNumbers}" =>
       Card(
         id.trim().toInt,
-        // Sould be able to do this with a regex, but I can't figure it out right now :| by "whitespaces""
         numbers.split(" ").filter(!_.isEmpty).map(_.toInt).toList,
         winningNumbers.split(" ").filter(!_.isEmpty).map(_.toInt).toList
       )
