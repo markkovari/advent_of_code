@@ -1,7 +1,6 @@
 package com.markkovari.adventofcode.day01
 
 import scala.collection.immutable.HashMap
-import scala.io.Source
 
 val numbersAsStringsAndValues =
   HashMap(
@@ -16,7 +15,7 @@ val numbersAsStringsAndValues =
     "nine" -> 9
   )
 
-def stringStartsStringifiedDigit(text: String): Option[Int] =
+def stringStartsStringifyDigit(text: String): Option[Int] =
   numbersAsStringsAndValues
     .find { case (key, _) => text.startsWith(key) }
     .map { case (_, value) => value }
@@ -32,7 +31,7 @@ def getFirstAndLastMultipliedTen(list: List[Int]): Int =
 def getMixedUpDigits(of: String): List[Int] = of match {
   case "" => List()
   case other =>
-    stringStartsStringifiedDigit(other) match {
+    stringStartsStringifyDigit(other) match {
       case Some(value) => value :: getMixedUpDigits(other.splitAt(1)._2)
       case None =>
         val (head, tail) = other.splitAt(1)
