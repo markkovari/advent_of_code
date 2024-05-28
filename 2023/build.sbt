@@ -24,7 +24,7 @@ version := "1.0"
 // You can define other libraries as dependencies in your build like this:
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "3.2.9" % Test
+  "org.scalatest" %% "scalatest" % "3.2.18" % Test
 )
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
