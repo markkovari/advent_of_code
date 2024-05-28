@@ -4,47 +4,44 @@ import com.markkovari.adventofcode.day01.{getDigits, getFirstAndLastMultipliedTe
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.io.Source
-import scala.util.Using
 
 class Day01Tests extends AnyFunSuite {
-
-  private val exampleFilename = "example_1"
-  private val exampleFilename2 = "example_2"
-  private val valuesFilename = "values"
-
   test("example result is the same as in the description") {
-    Using(Source.fromFile(s"./src/test/resources/1/${exampleFilename}")) {
-      source =>
-        val lines = source.getLines
-        val firstResult =
-          lines
-            .map(line => getFirstAndLastMultipliedTen(getDigits(line)))
-            .sum
-        assert(firstResult == 101)
-    }
+    val source = Source.fromFile(s"./src/test/resources/1/example_1")
+
+    val lines = source.getLines
+
+    val firstResult =
+      lines
+        .map(line => getFirstAndLastMultipliedTen(getDigits(line)))
+        .sum
+    assert(firstResult == 142)
+    source.close()
   }
 
   test("result first part") {
-    Using(Source.fromFile(s"./src/test/resources/1/${valuesFilename}")) {
+    val source = Source.fromFile(s"./src/test/resources/1/values")
 
-      source =>
-        val lines = source.getLines
+    val lines = source.getLines
 
-        val firstResult =
-          lines
-            .map(line => getFirstAndLastMultipliedTen(getDigits(line)))
-            .sum
-        assert(firstResult == 54573)
+    val firstResult =
+      lines
+        .map(line => getFirstAndLastMultipliedTen(getDigits(line)))
+        .sum
+    assert(firstResult == 54573)
 
-      val secondLines = source.getLines
-      val secondResult =
-        secondLines
-          .map(line => getFirstAndLastMultipliedTen(getMixedUpDigits(line)))
-          .sum
+    source.close()
 
-      assert(secondResult == 54591)
-    }
+    val resource = Source.fromFile(s"./src/test/resources/1/values")
 
+    val linesForSecond = resource.getLines
+    val secondResult =
+      linesForSecond
+        .map(line => getFirstAndLastMultipliedTen(getMixedUpDigits(line)))
+        .sum
+
+    assert(secondResult == 54591)
+    resource.close()
   }
 
 }
