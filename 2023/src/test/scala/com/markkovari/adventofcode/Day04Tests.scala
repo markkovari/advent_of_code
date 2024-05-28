@@ -1,9 +1,9 @@
 package com.markkovari.adventofcode
 
+import com.markkovari.adventofcode.day04.*
 import org.scalatest.funsuite.AnyFunSuite
+
 import scala.io.Source
-import scala.collection.immutable.HashMap
-import day04._
 
 class Day04Tests extends AnyFunSuite {
 

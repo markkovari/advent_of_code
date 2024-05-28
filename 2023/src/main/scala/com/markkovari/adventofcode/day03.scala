@@ -4,18 +4,18 @@ import scala.util.matching.Regex.Match
 
 case class Detail(content: String, x: Int, y: Int)
 
-case class Coord(x: Int, y: Int):
-  def within(start: Coord, end: Coord) =
+case class Coordinate(x: Int, y: Int):
+  def within(start: Coordinate, end: Coordinate) =
     if y < start.y || y > end.y then false
     else if x < start.x || x > end.x then false
     else true
 
-case class PartNumber(value: Int, start: Coord, end: Coord)
+case class PartNumber(value: Int, start: Coordinate, end: Coordinate)
 
-case class Symbol(sym: String, pos: Coord):
+case class Symbol(sym: String, pos: Coordinate):
   def neighborOf(number: PartNumber) = pos.within(
-    Coord(number.start.x - 1, number.start.y - 1),
-    Coord(number.end.x + 1, number.end.y + 1)
+    Coordinate(number.start.x - 1, number.start.y - 1),
+    Coordinate(number.end.x + 1, number.end.y + 1)
   )
 
 object IsInt:
@@ -33,8 +33,8 @@ def findPartsAndSymbols(
         .findAllMatchIn(line)
         .map:
           case m @ IsInt(nb) =>
-            PartNumber(nb, Coord(m.start, i), Coord(m.end - 1, i))
-          case s => Symbol(s.matched, Coord(s.start, i))
+            PartNumber(nb, Coordinate(m.start, i), Coordinate(m.end - 1, i))
+          case s => Symbol(s.matched, Coordinate(s.start, i))
 
 def part1(input: String) =
   val all = findPartsAndSymbols(input)

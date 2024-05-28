@@ -1,7 +1,5 @@
 package com.markkovari.adventofcode.day05
 
-import scala.util.matching.Regex.Match
-
 final case class Resource(start: Long, end: Long, kind: ResourceKind)
 
 enum ResourceKind:
@@ -98,12 +96,10 @@ object Seeds:
         .split(" ")
         .flatMap(_.toLongOption)
 
-  // parse seeds without range
   def parseWithoutRange(line: String): Seq[Resource] =
     parseSeedsRaw(line).map: start =>
       Resource(start, start, ResourceKind.Seed)
 
-  // parse seeds with range
   def parse(line: String): Seq[Resource] =
     parseSeedsRaw(line)
       .grouped(2)
