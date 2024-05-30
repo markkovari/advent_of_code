@@ -75,3 +75,12 @@ libraryDependencies ++= Seq(
 
 // To learn more about multi-project builds, head over to the official sbt
 // documentation at http://www.scala-sbt.org/documentation.html
+
+//increase the memory available to the JVM
+javacOptions ++= Seq(
+  "-Xms5G",
+  "-Xmx10G",
+  "-XX:MaxMetaspaceSize=1024m",
+  "-XX:ParallelGCThreads=16",
+  "-XX:+ExitOnOutOfMemoryError"
+)
