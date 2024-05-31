@@ -1,6 +1,6 @@
 package com.markkovari.adventofcode
 
-import com.markkovari.adventofcode.day07.{part1, part2}
+import com.markkovari.adventofcode.day07.*
 import org.scalatest.funsuite.AnyFunSuite
 
 class Day07Tests extends AnyFunSuite {
