@@ -8,7 +8,7 @@ func TestExample(t *testing.T) {
 		t.Fatalf("Error reading file: %v", err)
 	}
 	left, right = sortInput(left, right)
-	distances := getDisances(left, right)
+	distances := getDistances(left, right)
 	distanceSum := sumDistances(distances)
 	if distanceSum != 11 {
 		t.Fatalf("Expected 11, got %d", distanceSum)
@@ -21,7 +21,7 @@ func TestInput(t *testing.T) {
 		t.Fatalf("Error reading file: %v", err)
 	}
 	left, right = sortInput(left, right)
-	distances := getDisances(left, right)
+	distances := getDistances(left, right)
 	distanceSum := sumDistances(distances)
 	if distanceSum != 1970720 {
 		t.Fatalf("Expected 1970720, got %d", distanceSum)

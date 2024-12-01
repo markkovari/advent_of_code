@@ -41,7 +41,7 @@ func sortInput(left, right []int64) ([]int64, []int64) {
 	return left, right
 }
 
-func getDisances(left, right []int64) []int64 {
+func getDistances(left, right []int64) []int64 {
 	distances := make([]int64, 0)
 	for i := 0; i < len(left); i++ {
 		d := int64(math.Abs(float64(right[i] - left[i])))
