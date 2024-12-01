@@ -41,6 +41,16 @@ func sortInput(left, right []int64) ([]int64, []int64) {
 	return left, right
 }
 
+func getDistancesWithSimilarity(left, right []int64) []int64 {
+	similarity := getSimilarity(right)
+	distances := make([]int64, 0)
+	for i := 0; i < len(left); i++ {
+		value := left[i] * int64(similarity[left[i]])
+		distances = append(distances, value)
+	}
+	return distances
+}
+
 func getDistances(left, right []int64) []int64 {
 	distances := make([]int64, 0)
 	for i := 0; i < len(left); i++ {
@@ -56,4 +66,17 @@ func sumDistances(distances []int64) int {
 		sum += int(distance)
 	}
 	return sum
+}
+
+func getSimilarity(numbers []int64) map[int64]int {
+	similarity := make(map[int64]int)
+	for _, number := range numbers {
+		if _, ok := similarity[number]; ok {
+			similarity[number]++
+		} else {
+			similarity[number] = 1
+		}
+	}
+
+	return similarity
 }

@@ -15,6 +15,18 @@ func TestExample(t *testing.T) {
 	}
 }
 
+func TestExampleSecond(t *testing.T) {
+	left, right, err := readFile("../data/01/example")
+	if err != nil {
+		t.Fatalf("Error reading file: %v", err)
+	}
+	distances := getDistancesWithSimilarity(left, right)
+	distanceSum := sumDistances(distances)
+	if distanceSum != 31 {
+		t.Fatalf("Expected 31, got %d", distanceSum)
+	}
+}
+
 func TestInput(t *testing.T) {
 	left, right, err := readFile("../data/01/input")
 	if err != nil {
@@ -25,5 +37,17 @@ func TestInput(t *testing.T) {
 	distanceSum := sumDistances(distances)
 	if distanceSum != 1970720 {
 		t.Fatalf("Expected 1970720, got %d", distanceSum)
+	}
+}
+
+func TestInputSecond(t *testing.T) {
+	left, right, err := readFile("../data/01/input")
+	if err != nil {
+		t.Fatalf("Error reading file: %v", err)
+	}
+	distances := getDistancesWithSimilarity(left, right)
+	distanceSum := sumDistances(distances)
+	if distanceSum != 17191599 {
+		t.Fatalf("Expected 17191599, got %d", distanceSum)
 	}
 }
