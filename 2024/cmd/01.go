@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func readFile(path string) ([]int64, []int64, error) {
+func read01File(path string) ([]int64, []int64, error) {
 	dat, err := os.ReadFile(path)
 	if err != nil {
 		return nil, nil, err
