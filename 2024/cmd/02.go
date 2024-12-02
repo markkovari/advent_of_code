@@ -44,7 +44,7 @@ func countSafeLevels(levels [][]int) int {
 }
 
 func isLevelSafe(row []int) bool {
-	if len(row) < 3 {
+	if len(row) < 2 {
 		return false
 	}
 	increasing := row[0] < row[1]
@@ -61,4 +61,34 @@ func isLevelSafe(row []int) bool {
 		}
 	}
 	return true
+}
+
+func isLevelSafeTolerate(row []int) bool {
+	for i := 0; i < len(row); i++ {
+		if isLevelSafe(skipAtFrom(i, row)) {
+			return true
+		}
+	}
+	return false
+}
+
+func countSafeLevelsTolerate(levels [][]int) int {
+	count := 0
+	for _, row := range levels {
+		if isLevelSafeTolerate(row) {
+			count++
+		}
+	}
+	return count
+}
+
+func skipAtFrom(index int, elements []int) []int {
+	newElements := make([]int, 0)
+	for i := range len(elements) {
+		if i == index {
+			continue
+		}
+		newElements = append(newElements, elements[i])
+	}
+	return newElements
 }
