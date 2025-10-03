@@ -1,6 +1,7 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 const expect = std.testing.expect;
+const expectEqual = std.testing.expectEqual;
 
 pub fn read_file(path: []const u8, allocator: Allocator) anyerror![]u8 {
     return try std.fs.cwd().readFileAlloc(
@@ -100,17 +101,51 @@ pub fn get_number_pairs_of_lines(
     return pairs;
 }
 
-fn get_solution(content: []const u8) anyerror!u32 {
-    _ = content;
-    return 11;
+fn get_solution(allocator: Allocator, content: []const u8) anyerror!u32 {
+    // Parse pairs
+    var pairs = try get_number_pairs_of_lines(allocator, content);
+    defer pairs.deinit(allocator);
+
+    // Create left and right arrays
+    var left: std.ArrayList(u32) = .{};
+    defer left.deinit(allocator);
+    var right: std.ArrayList(u32) = .{};
+    defer right.deinit(allocator);
+
+    // Populate left and right arrays
+    for (pairs.items) |pair| {
+        try left.append(allocator, pair[0]);
+        try right.append(allocator, pair[1]);
+    }
+
+    // Sort both arrays
+    std.mem.sort(u32, left.items, {}, std.sort.asc(u32));
+    std.mem.sort(u32, right.items, {}, std.sort.asc(u32));
+
+    // Calculate sum of absolute differences
+    var sum: u32 = 0;
+    for (left.items, right.items) |l, r| {
+        const diff = if (l > r) l - r else r - l;
+        sum += diff;
+    }
+
+    return sum;
 }
 
 test "test example is 11" {
     const ta = std.testing.allocator;
     const content = try read_file("./data/01/example", ta);
     defer ta.free(content);
-    const solution = try get_solution(content);
+    const solution = try get_solution(ta, content);
     try expect(solution == 11);
+}
+
+test "test inputs solution is is 1970720" {
+    const ta = std.testing.allocator;
+    const content = try read_file("./data/01/input", ta);
+    defer ta.free(content);
+    const solution = try get_solution(ta, content);
+    try expectEqual(solution, 1970720);
 }
 
 test "read numbers of a line" {
