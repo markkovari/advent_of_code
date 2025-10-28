@@ -28,7 +28,18 @@ jobs:
       - name: Install Rust Nightly for 2021/_4
         uses: dtolnay/rust-toolchain@nightly
         if: ${{ matrix.project == '2021/_4' }}
+      - name: Install cargo-nextest
+        run: cargo install cargo-nextest
+      - name: Build 2015 binary
+        if: ${{ matrix.project == '2015' }}
+        run: cargo build --release
+        working-directory: ${{ matrix.project }}
+      - name: Run Rust tests in 2015 with cargo-nextest
+        if: ${{ matrix.project == '2015' }}
+        run: cargo nextest run
+        working-directory: ${{ matrix.project }}
       - name: Run Rust tests in ${{ matrix.project }}
+        if: ${{ matrix.project != '2015' }}
         run: cargo test
         working-directory: ${{ matrix.project }}
 
