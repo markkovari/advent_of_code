@@ -28,8 +28,8 @@ jobs:
       - name: Install Rust Nightly for 2021/_4
         uses: dtolnay/rust-toolchain@nightly
         if: ${{ matrix.project == '2021/_4' }}
-      - name: Install cargo-nextest
-        run: cargo install cargo-nextest
+      - name: Set up cargo-nextest
+        uses: nextest-rs/setup-nextest@v1
       - name: Build 2015 binary
         if: ${{ matrix.project == '2015' }}
         run: cargo build --release
