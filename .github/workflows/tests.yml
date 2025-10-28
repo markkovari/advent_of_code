@@ -1,0 +1,96 @@
+name: Advent of Code Tests
+
+on: [push, pull_request]
+
+jobs:
+  rust_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - 2015
+          - 2018
+          - 2019/aoc_rust
+          - 2020/01
+          - 2021/_1
+          - 2021/_2
+          - 2021/_3
+          - 2021/_4
+          - 2021/_5
+          - 2021/_6
+          - 2021/_7
+          - 2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+        if: ${{ matrix.project != '2021/_4' }}
+      - name: Install Rust Nightly for 2021/_4
+        uses: dtolnay/rust-toolchain@nightly
+        if: ${{ matrix.project == '2021/_4' }}
+      - name: Set up cargo-nextest
+        uses: taiki-e/install-action@nextest
+      - name: Build 2015 binary
+        if: ${{ matrix.project == '2015' }}
+        run: cargo build --release
+        working-directory: ${{ matrix.project }}
+      - name: Run Rust tests in 2015 with cargo-nextest
+        if: ${{ matrix.project == '2015' }}
+        run: cargo nextest run
+        working-directory: ${{ matrix.project }}
+      - name: Run Rust tests in ${{ matrix.project }}
+        if: ${{ matrix.project != '2015' }}
+        run: cargo test
+        working-directory: ${{ matrix.project }}
+
+  go_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - 2017
+          - 2019/go
+          - 2020/02
+          - 2024/golang
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.18'
+      - name: Run Go tests in 2017
+        if: ${{ matrix.project == '2017' }}
+        run: go test ./...
+        working-directory: 2017
+      - name: Run Go tests in 2019/go
+        if: ${{ matrix.project == '2019/go' }}
+        run: go test ./cmd/...
+        working-directory: 2019/go
+      - name: Run Go tests in 2020/02
+        if: ${{ matrix.project == '2020/02' }}
+        run: go test ./...
+        working-directory: 2020/02
+      - name: Run Go tests in 2024/golang
+        if: ${{ matrix.project == '2024/golang' }}
+        run: go test ./cmd/...
+        working-directory: 2024/golang
+
+  csharp_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - 2021/cs/1
+          - 2021/cs/2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Restore dependencies for ${{ matrix.project }}
+        run: dotnet restore
+        working-directory: ${{ matrix.project }}
+      - name: Run C# tests in ${{ matrix.project }}
+        run: dotnet test
+        working-directory: ${{ matrix.project }}

@@ -24,7 +24,8 @@ Due to the polyglot nature of this repository, build and test commands are speci
 
 ### Rust Projects
 
-For Rust projects (identified by `Cargo.toml`):
+For Rust projects (identified by `Cargo.toml`), you might need `libclang` development headers installed on your system for some dependencies.
+
 - **Build**: `cargo build`
 - **Run**: `cargo run`
 - **Test**: `cargo test`
