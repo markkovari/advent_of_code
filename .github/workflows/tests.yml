@@ -22,8 +22,12 @@ jobs:
           - 2022
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust
+      - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
+        if: ${{ matrix.project != '2021/_4' }}
+      - name: Install Rust Nightly for 2021/_4
+        uses: dtolnay/rust-toolchain@nightly
+        if: ${{ matrix.project == '2021/_4' }}
       - name: Run Rust tests in ${{ matrix.project }}
         run: cargo test
         working-directory: ${{ matrix.project }}
@@ -43,9 +47,22 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '^1.18'
-      - name: Run Go tests in ${{ matrix.project }}
+      - name: Run Go tests in 2017
+        if: ${{ matrix.project == '2017' }}
         run: go test ./...
-        working-directory: ${{ matrix.project }}
+        working-directory: 2017
+      - name: Run Go tests in 2019/go
+        if: ${{ matrix.project == '2019/go' }}
+        run: go test ./cmd/...
+        working-directory: 2019/go
+      - name: Run Go tests in 2020/02
+        if: ${{ matrix.project == '2020/02' }}
+        run: go test ./...
+        working-directory: 2020/02
+      - name: Run Go tests in 2024/golang
+        if: ${{ matrix.project == '2024/golang' }}
+        run: go test ./cmd/...
+        working-directory: 2024/golang
 
   csharp_tests:
     runs-on: ubuntu-latest
