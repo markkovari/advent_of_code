@@ -1,7 +1,8 @@
-use crate::{Excercise, Solvable};
+use crate::{Exercise, Solvable};
+use rayon::prelude::*;
 
 struct SixthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 type Grid = [[bool; 1000]; 1000];
@@ -45,26 +46,18 @@ fn apply_increasing_instructions(instructions: Vec<Instruction>, grid: &mut Grid
     }
 }
 
-fn count_lit(grid: &Grid) -> i32 {
-    let mut count = 0;
-    for x in 0..1000 {
-        for y in 0..1000 {
-            if grid[x][y] {
-                count += 1;
-            }
-        }
-    }
-    count
+fn count_lit(grid: &Grid) -> i64 {
+    grid.par_iter()
+        .flat_map(|row| row.par_iter())
+        .filter(|&&cell| cell)
+        .count() as i64
 }
 
-fn count_brigthness(grid: &GridAmbient) -> i32 {
-    let mut count: i32 = 0;
-    for x in 0..1000 {
-        for y in 0..1000 {
-            count += grid[x][y] as i32;
-        }
-    }
-    count
+fn count_brigthness(grid: &GridAmbient) -> i64 {
+    grid.par_iter()
+        .flat_map(|row| row.par_iter())
+        .map(|&cell| cell as i64)
+        .sum()
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
@@ -129,23 +122,23 @@ impl TryFrom<&str> for Point {
 }
 
 impl Solvable for SixthDay {
-    fn solve_first(&self, is_prod: bool) -> i32 {
+    fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
 
-    fn first(&self, content: String) -> i32 {
+    fn first(&self, content: &str) -> i64 {
         let instructions = content
             .lines()
             .map(|line| Instruction::try_from(line).unwrap())
@@ -155,7 +148,7 @@ impl Solvable for SixthDay {
         count_lit(&grid)
     }
 
-    fn second(&self, content: String) -> i32 {
+    fn second(&self, content: &str) -> i64 {
         let instructions = content
             .lines()
             .map(|line| Instruction::try_from(line).unwrap())
@@ -169,8 +162,8 @@ impl Solvable for SixthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("6_test.txt");
-    const PROD: &str = include_str!("6_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/6_test.txt");
+    const PROD: &str = include_str!("inputs/6_prod.txt");
 
     #[test]
     fn instruction() {
@@ -181,8 +174,8 @@ mod tests {
     }
     #[test]
     fn first_test() {
-        let mut first_excersise = SixthDay {
-            exercise: Excercise {
+        let mut first_exercise = SixthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -191,18 +184,18 @@ mod tests {
         let expected_example = 998996;
         let expected_prod = 569999;
 
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
-        first_excersise.exercise.example =
+        first_exercise.exercise.example =
             String::from("turn on 0,0 through 0,0\ntoggle 0,0 through 999,999\n");
 
         let expected_example = 2000001;
         let expected_prod = 17836115;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

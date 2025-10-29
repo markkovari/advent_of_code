@@ -1,17 +1,13 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Debug,
-    ops::AddAssign,
-};
+use std::{collections::HashSet, fmt::Debug};
 
 use iter_tools::Itertools;
 
-use crate::{Excercise, Solvable};
+use crate::Exercise;
 // use iter_tools::{dependency::itertools::Product, Itertools};
 // use regex::Regex;
 
 struct NineteenthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -34,14 +30,14 @@ impl TryFrom<&str> for Rule {
     }
 }
 
-fn read_rules(content: String) -> Vec<Rule> {
+fn read_rules(content: &str) -> Vec<Rule> {
     content
         .lines()
         .map(|line| Rule::try_from(line).unwrap())
         .collect()
 }
 
-fn apply(replacements: &Vec<Rule>, puzzle: &str) -> HashSet<String> {
+fn apply(replacements: &[Rule], puzzle: &str) -> HashSet<String> {
     let mut mols: HashSet<String> = HashSet::new();
     for Rule { from, to } in replacements.iter() {
         for res in variants(puzzle, from, to) {
@@ -64,7 +60,7 @@ trait SingleReplacements {
     fn single_replacements(&self, from: &str, to: &str) -> Vec<String>;
 }
 
-impl<'a> SingleReplacements for &'a str {
+impl SingleReplacements for &str {
     fn single_replacements(&self, from: &str, to: &str) -> Vec<String> {
         let mut results = Vec::new();
         for (start, part) in self.match_indices(from) {
@@ -98,27 +94,27 @@ fn find_production(replacements: &Vec<Rule>, input: String, depth: usize) -> Opt
 impl NineteenthDay {
     fn solve_first(&self, is_prod: bool, starting: String) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned(), starting)
+            self.first(&self.exercise.content, starting)
         } else {
-            self.first(self.exercise.example.to_owned(), starting)
+            self.first(&self.exercise.example, starting)
         }
     }
 
     fn solve_second(&self, is_prod: bool, starting: String) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned(), starting)
+            self.second(&self.exercise.content, starting)
         } else {
-            self.second(self.exercise.example.to_owned(), starting)
+            self.second(&self.exercise.example, starting)
         }
     }
 
-    fn first(&self, content: String, starting: String) -> i64 {
+    fn first(&self, content: &str, starting: String) -> i64 {
         let rules = read_rules(content);
         let mols = apply(&rules, &starting);
         mols.len() as i64
     }
 
-    fn second(&self, content: String, starting: String) -> i64 {
+    fn second(&self, content: &str, starting: String) -> i64 {
         let rules = read_rules(content);
 
         find_production(&rules, starting, 0).unwrap() as i64
@@ -128,8 +124,8 @@ impl NineteenthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("19_test.txt");
-    const PROD: &str = include_str!("19_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/19_test.txt");
+    const PROD: &str = include_str!("inputs/19_prod.txt");
 
     #[test]
     fn first_test() {
@@ -141,8 +137,8 @@ H => OH
 O => HH"
             .to_owned();
 
-        let mut first_excersise = NineteenthDay {
-            exercise: Excercise {
+        let mut first_exercise = NineteenthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -150,15 +146,15 @@ O => HH"
 
         let expected_example = 7;
         let expected_prod = 518;
-        let result_example = first_excersise.solve_first(false, "HOHOHO".to_owned());
-        let result_prod = first_excersise.solve_first(true, BASE.clone());
+        let result_example = first_exercise.solve_first(false, "HOHOHO".to_owned());
+        let result_prod = first_exercise.solve_first(true, BASE.clone());
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 3;
         let expected_prod = 200;
-        let result_example = first_excersise.second(example_second, "HOH".to_owned());
-        let result_prod = first_excersise.solve_second(true, BASE);
+        let result_example = first_exercise.second(&example_second, "HOH".to_owned());
+        let result_prod = first_exercise.solve_second(true, BASE);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

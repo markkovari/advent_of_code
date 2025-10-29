@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{Excercise, Solvable};
+use crate::{Exercise, Solvable};
 
 type Position = (i32, i32);
 
@@ -49,7 +49,7 @@ impl Santa {
 }
 
 struct ThirdDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 fn get_visited_multiple_times(first: Santa, second: Santa) -> usize {
@@ -64,30 +64,30 @@ fn get_visited_multiple_times(first: Santa, second: Santa) -> usize {
 }
 
 impl Solvable for ThirdDay {
-    fn solve_first(&self, is_prod: bool) -> i32 {
+    fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
-    fn first(&self, content: String) -> i32 {
+    fn first(&self, content: &str) -> i64 {
         let mut santa = Santa::new();
         for direction in content.chars() {
             santa.move_to(direction);
         }
-        santa.get_visited_multiple() as i32
+        santa.get_visited_multiple() as i64
     }
 
-    fn second(&self, content: String) -> i32 {
+    fn second(&self, content: &str) -> i64 {
         let mut santa = Santa::new();
         let mut robo_santa = Santa::new();
         for direction in content.chars().enumerate() {
@@ -97,20 +97,20 @@ impl Solvable for ThirdDay {
                 robo_santa.move_to(direction.1);
             }
         }
-        get_visited_multiple_times(santa, robo_santa) as i32
+        get_visited_multiple_times(santa, robo_santa) as i64
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("3_test.txt");
-    const PROD: &str = include_str!("3_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/3_test.txt");
+    const PROD: &str = include_str!("inputs/3_prod.txt");
 
     #[test]
     fn first_test() {
-        let first_excersise = ThirdDay {
-            exercise: Excercise {
+        let first_exercise = ThirdDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -119,15 +119,15 @@ mod tests {
         let expected_example = 4;
         let expected_prod = 2572;
 
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 3;
         let expected_prod = 2631;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

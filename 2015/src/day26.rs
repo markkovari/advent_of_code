@@ -1,4 +1,4 @@
-pub fn first(content: String) -> i32 {
+pub fn first(_content: String) -> i32 {
     // Solution for part 1 of Day 26
     0
 }
@@ -12,7 +12,7 @@ pub fn solve_first(is_prod: bool) -> i32 {
     first(content.to_string())
 }
 
-pub fn second(content: String) -> i32 {
+pub fn second(_content: String) -> i32 {
     // Solution for part 2 of Day 26
     0
 }

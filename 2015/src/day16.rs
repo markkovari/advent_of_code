@@ -1,11 +1,11 @@
-use std::{collections::HashMap, ops::AddAssign};
+use std::collections::HashMap;
 
-use crate::{Excercise, Solvable};
-use iter_tools::{dependency::itertools::Product, Itertools};
+use crate::Exercise;
+use iter_tools::Itertools;
 use regex::Regex;
 
 struct SixteenthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 struct Sue {
@@ -18,7 +18,7 @@ impl TryFrom<&str> for Sue {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let re = Regex::new(r"^Sue (?P<name>\d+): (?P<items>.+)$");
 
-        if !re.is_ok() {
+        if re.is_err() {
             return Err("Regex is not valid");
         }
         let caps = re.unwrap().captures(value).unwrap();
@@ -51,21 +51,21 @@ fn get_search_elements() -> HashMap<String, i64> {
 impl SixteenthDay {
     fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
     fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
 
-    fn first(&self, content: String) -> i64 {
+    fn first(&self, content: &str) -> i64 {
         let search = get_search_elements();
         let sues = content
             .lines()
@@ -86,7 +86,7 @@ impl SixteenthDay {
         -1
     }
 
-    fn second(&self, content: String) -> i64 {
+    fn second(&self, content: &str) -> i64 {
         let search = get_search_elements();
         let sues = content
             .lines()
@@ -117,13 +117,13 @@ impl SixteenthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("16_test.txt");
-    const PROD: &str = include_str!("16_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/16_test.txt");
+    const PROD: &str = include_str!("inputs/16_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = SixteenthDay {
-            exercise: Excercise {
+        let mut first_exercise = SixteenthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -131,15 +131,15 @@ mod tests {
 
         // let expected_example = 62842880;
         let expected_prod = 103;
-        // let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        // let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         // assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         // let expected_example = 57600000;
         let expected_prod = 405;
-        // let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        // let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         // assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

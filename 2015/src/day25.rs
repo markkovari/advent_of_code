@@ -1,19 +1,10 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{
-    cmp,
-    collections::{BTreeSet, HashMap, HashSet},
-    fmt::Debug,
-    ops::AddAssign,
-    vec,
-};
 
-use iter_tools::Itertools;
-
-use crate::{Excercise, Solvable};
+use crate::Exercise;
 
 struct TwentyFifthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 struct DiagonalIterator {
@@ -45,11 +36,11 @@ impl Iterator for DiagonalIterator {
 
 impl TwentyFifthDay {
     fn solve_first(&self, input: &str) -> usize {
-        self.first(&input)
+        self.first(input)
     }
 
     fn solve_second(&self, input: &str) -> usize {
-        self.second(&input)
+        self.second(input)
     }
 
     fn first(&self, input: &str) -> usize {
@@ -104,13 +95,13 @@ impl TwentyFifthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("25_prod.txt");
-    const PROD: &str = include_str!("25_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/25_prod.txt");
+    const PROD: &str = include_str!("inputs/25_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = TwentyFifthDay {
-            exercise: Excercise {
+        let mut first_exercise = TwentyFifthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -118,15 +109,15 @@ mod tests {
 
         let expected_example = 2650453;
         let expected_prod = 2650453;
-        let result_example = first_excersise.first(PROD);
-        let result_prod = first_excersise.first(PROD);
+        let result_example = first_exercise.first(PROD);
+        let result_prod = first_exercise.first(PROD);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 2650453;
         let expected_prod = 2650453;
-        let result_example = first_excersise.second(PROD);
-        let result_prod = first_excersise.second(PROD);
+        let result_example = first_exercise.second(PROD);
+        let result_prod = first_exercise.second(PROD);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

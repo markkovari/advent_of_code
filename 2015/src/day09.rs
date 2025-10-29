@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
 use iter_tools::Itertools;
+use rayon::prelude::*;
 
-use crate::{Excercise, Solvable};
+use crate::{Exercise, Solvable};
 
 struct NinthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 struct Distance {
@@ -60,6 +61,7 @@ fn lengths(routes: &RoutesMap) -> Vec<usize> {
     routes
         .keys()
         .permutations(routes.keys().len())
+        .par_bridge()
         .map(|permutation| {
             let mut length = 0;
             for route in permutation.windows(2) {
@@ -72,7 +74,7 @@ fn lengths(routes: &RoutesMap) -> Vec<usize> {
         .collect()
 }
 
-fn read_content(content: String) -> Vec<Distance> {
+fn read_content(content: &str) -> Vec<Distance> {
     content
         .lines()
         .map(|line| Distance::try_from(line).unwrap())
@@ -80,36 +82,42 @@ fn read_content(content: String) -> Vec<Distance> {
 }
 
 impl Solvable for NinthDay {
-    fn solve_first(&self, is_prod: bool) -> i32 {
+    fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
 
-    fn first(&self, content: String) -> i32 {
-        lengths(&evaluate_paths(read_content(content))).iter().min().unwrap().clone() as i32
+    fn first(&self, content: &str) -> i64 {
+        *lengths(&evaluate_paths(read_content(content)))
+            .iter()
+            .min()
+            .unwrap() as i64
     }
 
-    fn second(&self, content: String) -> i32 {
-        lengths(&evaluate_paths(read_content(content))).iter().max().unwrap().clone() as i32
+    fn second(&self, content: &str) -> i64 {
+        *lengths(&evaluate_paths(read_content(content)))
+            .iter()
+            .max()
+            .unwrap() as i64
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("9_test.txt");
-    const PROD: &str = include_str!("9_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/9_test.txt");
+    const PROD: &str = include_str!("inputs/9_prod.txt");
 
     #[test]
     fn test_distance_parse() {
@@ -121,8 +129,8 @@ mod tests {
 
     #[test]
     fn first_test() {
-        let mut first_excersise = NinthDay {
-            exercise: Excercise {
+        let mut first_exercise = NinthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -131,15 +139,15 @@ mod tests {
         let expected_example = 605;
         let expected_prod = 117;
 
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 982;
         let expected_prod = 909;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

@@ -1,11 +1,12 @@
-use std::{collections::HashMap, fmt::Debug, ops::AddAssign};
+use std::{collections::HashMap, fmt::Debug};
 
-use crate::{Excercise, Solvable};
+use crate::Exercise;
+use rayon::prelude::*;
 // use iter_tools::{dependency::itertools::Product, Itertools};
 // use regex::Regex;
 
 struct EightteenthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone)]
@@ -29,7 +30,7 @@ fn stringify_grid(grid: &Grid) -> String {
     let mut string = String::new();
     let mut max_x = 0;
     let mut max_y = 0;
-    for (pos, _) in grid {
+    for pos in grid.keys() {
         if pos.0 > max_x {
             max_x = pos.0;
         }
@@ -50,7 +51,7 @@ fn stringify_grid(grid: &Grid) -> String {
     string
 }
 
-fn read_grid(content: String) -> Grid {
+fn read_grid(content: &str) -> Grid {
     let mut grid: Grid = HashMap::new();
     for (y, line) in content.lines().enumerate() {
         for (x, cell) in line.chars().enumerate() {
@@ -77,29 +78,29 @@ fn get_neighbors(grid: &Grid, x: i64, y: i64) -> Vec<Cell> {
 }
 
 fn evolve(grid: &Grid) -> Grid {
-    let mut new_grid: Grid = HashMap::new();
-    for (pos, cell) in grid {
-        let neighbors = get_neighbors(grid, pos.0, pos.1);
-        let alive_neighbors = neighbors.iter().filter(|e| **e == Cell::Alive).count();
-        let new_cell = match cell {
-            Cell::Alive => {
-                if alive_neighbors == 2 || alive_neighbors == 3 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
+    grid.par_iter()
+        .map(|(pos, cell)| {
+            let neighbors = get_neighbors(grid, pos.0, pos.1);
+            let alive_neighbors = neighbors.iter().filter(|e| **e == Cell::Alive).count();
+            let new_cell = match cell {
+                Cell::Alive => {
+                    if alive_neighbors == 2 || alive_neighbors == 3 {
+                        Cell::Alive
+                    } else {
+                        Cell::Dead
+                    }
                 }
-            }
-            Cell::Dead => {
-                if alive_neighbors == 3 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
+                Cell::Dead => {
+                    if alive_neighbors == 3 {
+                        Cell::Alive
+                    } else {
+                        Cell::Dead
+                    }
                 }
-            }
-        };
-        new_grid.insert(*pos, new_cell);
-    }
-    new_grid
+            };
+            (*pos, new_cell)
+        })
+        .collect()
 }
 
 fn setup_corner(grid: &mut Grid) -> &Grid {
@@ -115,21 +116,21 @@ fn setup_corner(grid: &mut Grid) -> &Grid {
 impl EightteenthDay {
     fn solve_first(&self, is_prod: bool, amount: usize) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned(), amount)
+            self.first(&self.exercise.content, amount)
         } else {
-            self.first(self.exercise.example.to_owned(), amount)
+            self.first(&self.exercise.example, amount)
         }
     }
 
     fn solve_second(&self, is_prod: bool, amount: u64) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned(), amount)
+            self.second(&self.exercise.content, amount)
         } else {
-            self.second(self.exercise.example.to_owned(), amount)
+            self.second(&self.exercise.example, amount)
         }
     }
 
-    fn first(&self, content: String, amount: usize) -> i64 {
+    fn first(&self, content: &str, amount: usize) -> i64 {
         let mut grid = read_grid(content);
         for _ in 0..amount {
             grid = evolve(&grid);
@@ -137,7 +138,7 @@ impl EightteenthDay {
         grid.values().filter(|e| **e == Cell::Alive).count() as i64
     }
 
-    fn second(&self, content: String, amount: u64) -> i64 {
+    fn second(&self, content: &str, amount: u64) -> i64 {
         let mut grid = read_grid(content);
         for _ in 0..amount {
             setup_corner(&mut grid);
@@ -151,13 +152,13 @@ impl EightteenthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("18_test.txt");
-    const PROD: &str = include_str!("18_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/18_test.txt");
+    const PROD: &str = include_str!("inputs/18_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = EightteenthDay {
-            exercise: Excercise {
+        let mut first_exercise = EightteenthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -165,8 +166,8 @@ mod tests {
 
         let expected_example = 4;
         let expected_prod = 1061;
-        let result_example = first_excersise.solve_first(false, 4);
-        let result_prod = first_excersise.solve_first(true, 100);
+        let result_example = first_exercise.solve_first(false, 4);
+        let result_prod = first_exercise.solve_first(true, 100);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
@@ -181,8 +182,8 @@ mod tests {
 ####..",
         );
 
-        let result_example = first_excersise.second(new_example, 5);
-        let result_prod = first_excersise.solve_second(true, 100);
+        let result_example = first_exercise.second(&new_example, 5);
+        let result_prod = first_exercise.solve_second(true, 100);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }
