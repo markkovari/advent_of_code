@@ -10,25 +10,101 @@ on:
       - main
 
 jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      rust_projects: ${{ steps.filter.outputs.rust_projects }}
+      go_projects: ${{ steps.filter.outputs.go_projects }}
+      csharp_projects: ${{ steps.filter.outputs.csharp_projects }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect changed projects
+        id: filter
+        run: |
+          # Get changed files
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+          else
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Define all projects
+          ALL_RUST_PROJECTS=("2015" "2018" "2019/aoc_rust" "2020/01" "2021/_1" "2021/_2" "2021/_3" "2021/_4" "2021/_5" "2021/_6" "2021/_7" "2022")
+          ALL_GO_PROJECTS=("2017" "2019/go" "2020/02" "2024/golang")
+          ALL_CSHARP_PROJECTS=("2021/cs/1" "2021/cs/2")
+
+          # Check for workflow changes - if workflow changed, run all tests
+          if echo "$CHANGED_FILES" | grep -q "^.github/workflows/tests.yml"; then
+            echo "Workflow changed, running all tests"
+            RUST_PROJECTS=$(printf '%s\n' "${ALL_RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            GO_PROJECTS=$(printf '%s\n' "${ALL_GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            CSHARP_PROJECTS=$(printf '%s\n' "${ALL_CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
+          else
+            # Detect Rust projects
+            RUST_PROJECTS=()
+            for project in "${ALL_RUST_PROJECTS[@]}"; do
+              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then
+                RUST_PROJECTS+=("$project")
+              fi
+            done
+
+            # Detect Go projects
+            GO_PROJECTS=()
+            for project in "${ALL_GO_PROJECTS[@]}"; do
+              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then
+                GO_PROJECTS+=("$project")
+              fi
+            done
+
+            # Detect C# projects
+            CSHARP_PROJECTS=()
+            for project in "${ALL_CSHARP_PROJECTS[@]}"; do
+              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then
+                CSHARP_PROJECTS+=("$project")
+              fi
+            done
+
+            if [ ${#RUST_PROJECTS[@]} -eq 0 ]; then
+              RUST_PROJECTS="[]"
+            else
+              RUST_PROJECTS=$(printf '%s\n' "${RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            fi
+
+            if [ ${#GO_PROJECTS[@]} -eq 0 ]; then
+              GO_PROJECTS="[]"
+            else
+              GO_PROJECTS=$(printf '%s\n' "${GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            fi
+
+            if [ ${#CSHARP_PROJECTS[@]} -eq 0 ]; then
+              CSHARP_PROJECTS="[]"
+            else
+              CSHARP_PROJECTS=$(printf '%s\n' "${CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            fi
+          fi
+
+          echo "rust_projects=$RUST_PROJECTS" >> $GITHUB_OUTPUT
+          echo "go_projects=$GO_PROJECTS" >> $GITHUB_OUTPUT
+          echo "csharp_projects=$CSHARP_PROJECTS" >> $GITHUB_OUTPUT
+
+          echo "Rust projects to test: $RUST_PROJECTS"
+          echo "Go projects to test: $GO_PROJECTS"
+          echo "C# projects to test: $CSHARP_PROJECTS"
+
   rust_tests:
+    needs: detect_changes
+    if: needs.detect_changes.outputs.rust_projects != '[]'
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
-        project:
-          - 2015
-          - 2018
-          - 2019/aoc_rust
-          - 2020/01
-          - 2021/_1
-          - 2021/_2
-          - 2021/_3
-          - 2021/_4
-          - 2021/_5
-          - 2021/_6
-          - 2021/_7
-          - 2022
+        project: ${{ fromJson(needs.detect_changes.outputs.rust_projects) }}
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust Stable
@@ -53,16 +129,14 @@ jobs:
         working-directory: ${{ matrix.project }}
 
   go_tests:
+    needs: detect_changes
+    if: needs.detect_changes.outputs.go_projects != '[]'
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
-        project:
-          - 2017
-          - 2019/go
-          - 2020/02
-          - 2024/golang
+        project: ${{ fromJson(needs.detect_changes.outputs.go_projects) }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go
@@ -87,14 +161,14 @@ jobs:
         working-directory: 2024/golang
 
   csharp_tests:
+    needs: detect_changes
+    if: needs.detect_changes.outputs.csharp_projects != '[]'
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
-        project:
-          - 2021/cs/1
-          - 2021/cs/2
+        project: ${{ fromJson(needs.detect_changes.outputs.csharp_projects) }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up .NET
