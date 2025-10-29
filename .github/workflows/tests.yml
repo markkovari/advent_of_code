@@ -69,9 +69,23 @@ jobs:
               fi
             done
 
-            RUST_PROJECTS=$(printf '%s\n' "${RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            GO_PROJECTS=$(printf '%s\n' "${GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            CSHARP_PROJECTS=$(printf '%s\n' "${CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            if [ ${#RUST_PROJECTS[@]} -eq 0 ]; then
+              RUST_PROJECTS="[]"
+            else
+              RUST_PROJECTS=$(printf '%s\n' "${RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            fi
+
+            if [ ${#GO_PROJECTS[@]} -eq 0 ]; then
+              GO_PROJECTS="[]"
+            else
+              GO_PROJECTS=$(printf '%s\n' "${GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            fi
+
+            if [ ${#CSHARP_PROJECTS[@]} -eq 0 ]; then
+              CSHARP_PROJECTS="[]"
+            else
+              CSHARP_PROJECTS=$(printf '%s\n' "${CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            fi
           fi
 
           echo "rust_projects=$RUST_PROJECTS" >> $GITHUB_OUTPUT
