@@ -1,4 +1,3 @@
-#![feature(drain_filter)]
 use std::num::ParseIntError;
 use std::str::FromStr;
 
@@ -129,12 +128,8 @@ fn main() {
     let mut found_table_indicies: Vec<usize> = vec![];
     // let tables_length = tables.len();
     for number in choosen_numbers.0 {
-        tables = tables
-            .drain_filter(|table| {
-                table.toggle(number);
-                table.found_full()
-            })
-            .collect();
+        tables.iter_mut().for_each(|table| table.toggle(number));
+        tables.retain(|table| !table.found_full());
         // tables.retain(|table| (*table).found_full())
     }
     // tables.retain(|table| {
