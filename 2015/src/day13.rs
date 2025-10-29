@@ -1,11 +1,12 @@
 use std::{collections::HashMap, ops::AddAssign};
 
-use crate::{Excercise, Solvable};
+use crate::Exercise;
 use iter_tools::Itertools;
+use rayon::prelude::*;
 use regex::Regex;
 
 struct ThirteenthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 #[derive(Debug, Clone)]
@@ -37,7 +38,7 @@ impl TryFrom<&str> for Relation {
             .unwrap();
 
         let to = caps.name("to").ok_or("No to")?.as_str().to_owned();
-        happiness = signum * happiness;
+        happiness *= signum;
         Ok(Relation {
             from,
             to,
@@ -46,7 +47,7 @@ impl TryFrom<&str> for Relation {
     }
 }
 
-fn read_relations(content: String) -> Vec<Relation> {
+fn read_relations(content: &str) -> Vec<Relation> {
     let mut result = Vec::new();
     for line in content.lines() {
         result.push(Relation::try_from(line).unwrap());
@@ -96,37 +97,36 @@ fn calc_happiness(sitting: &SittingMap, order: &Vec<&String>) -> i32 {
 }
 
 impl ThirteenthDay {
-    fn solve_first(&self, is_prod: bool) -> i32 {
+    fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
 
-    fn first(&self, content: String) -> i32 {
+    fn first(&self, content: &str) -> i64 {
         let relations = evaluate_sitting(read_relations(content));
         let people: Vec<String> = relations.keys().map(|k| k.to_owned()).collect();
-        let mut max_happiness = 0;
         let amount = people.len();
-        for permutation in people.iter().permutations(amount) {
-            let happiness = calc_happiness(&relations, &permutation);
-            if happiness > max_happiness {
-                max_happiness = happiness;
-            }
-        }
-        max_happiness
+        people
+            .iter()
+            .permutations(amount)
+            .par_bridge()
+            .map(|permutation| calc_happiness(&relations, &permutation) as i64)
+            .max()
+            .unwrap_or(0)
     }
 
-    fn second(&self, content: String) -> i32 {
+    fn second(&self, content: &str) -> i64 {
         let me = "me".to_owned();
         let withoutme = read_relations(content);
         let mut relations = evaluate_sitting(withoutme);
@@ -138,29 +138,28 @@ impl ThirteenthDay {
                 .unwrap()
                 .insert("me".to_owned(), 0);
             relations
-                .get_mut(&"me".to_owned())
+                .get_mut("me")
                 .unwrap()
                 .insert(name.clone(), 0);
         }
 
         let people: Vec<String> = relations.keys().map(|k| k.to_owned()).collect();
-        let mut max_happiness = 0;
         let amount = people.len();
-        for permutation in people.iter().permutations(amount) {
-            let happiness = calc_happiness(&relations, &permutation);
-            if happiness > max_happiness {
-                max_happiness = happiness;
-            }
-        }
-        max_happiness
+        people
+            .iter()
+            .permutations(amount)
+            .par_bridge()
+            .map(|permutation| calc_happiness(&relations, &permutation) as i64)
+            .max()
+            .unwrap_or(0)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("13_test.txt");
-    const PROD: &str = include_str!("13_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/13_test.txt");
+    const PROD: &str = include_str!("inputs/13_prod.txt");
 
     #[test]
     fn test_relation() {
@@ -181,8 +180,8 @@ mod tests {
 
     #[test]
     fn first_test() {
-        let mut first_excersise = ThirteenthDay {
-            exercise: Excercise {
+        let mut first_exercise = ThirteenthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -190,15 +189,15 @@ mod tests {
 
         let expected_example = 330;
         let expected_prod = 709;
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 286;
         let expected_prod = 668;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

@@ -1,19 +1,13 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{
-    cmp,
-    collections::{BTreeSet, HashMap, HashSet},
-    fmt::Debug,
-    ops::AddAssign,
-    vec,
-};
+use std::{cmp, fmt::Debug, vec};
 
 use iter_tools::Itertools;
 
-use crate::{Excercise, Solvable};
+use crate::Exercise;
 
 struct TwentyFirstDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -109,10 +103,10 @@ impl Fighter {
         let total_armor = self.armor + equipped_items.iter().map(|&i| i.armor).sum::<i32>();
 
         let damage_done = cmp::max(total_damage - other.armor, 1);
-        let turns_till_kill = (other.hit_points as f32 / damage_done as f32).ceil() as i32;
+        let turns_till_kill = (other.hit_points as f32 / damage_done as f32).ceil() as i64;
 
         let damage_done = cmp::max(other.damage - total_armor, 1);
-        let turns_till_dead = (self.hit_points as f32 / damage_done as f32).ceil() as i32;
+        let turns_till_dead = (self.hit_points as f32 / damage_done as f32).ceil() as i64;
 
         turns_till_kill <= turns_till_dead
     }
@@ -120,11 +114,11 @@ impl Fighter {
 
 impl TwentyFirstDay {
     fn solve_first(&self, input: &str) -> usize {
-        self.first(&input)
+        self.first(input)
     }
 
     fn solve_second(&self, input: &str) -> usize {
-        self.second(&input)
+        self.second(input)
     }
 
     fn first(&self, input: &str) -> usize {
@@ -155,13 +149,13 @@ impl TwentyFirstDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("21_test.txt");
-    const PROD: &str = include_str!("21_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/21_test.txt");
+    const PROD: &str = include_str!("inputs/21_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = TwentyFirstDay {
-            exercise: Excercise {
+        let mut first_exercise = TwentyFirstDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -169,15 +163,15 @@ mod tests {
 
         let expected_example = 78;
         let expected_prod = 78;
-        let result_example = first_excersise.first(PROD);
-        let result_prod = first_excersise.first(PROD);
+        let result_example = first_exercise.first(PROD);
+        let result_prod = first_exercise.first(PROD);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 148;
         let expected_prod = 148;
-        let result_example = first_excersise.second(PROD);
-        let result_prod = first_excersise.second(PROD);
+        let result_example = first_exercise.second(PROD);
+        let result_prod = first_exercise.second(PROD);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

@@ -1,17 +1,7 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Debug,
-    ops::AddAssign,
-};
-
-use iter_tools::Itertools;
-
-use crate::{Excercise, Solvable};
-// use iter_tools::{dependency::itertools::Product, Itertools};
-// use regex::Regex;
+use crate::{Exercise, Solvable};
 
 struct TwentiethDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 fn presents_at1(house_nr: usize) -> usize {
@@ -27,9 +17,8 @@ fn presents_at2(until: usize) -> usize {
 }
 
 fn divisors(until: usize) -> Vec<usize> {
-    let small_divisors: Vec<usize> = Vec::from_iter(1..((until as f64).sqrt() as usize + 1))
-        .into_iter()
-        .filter(|i| until % *i == 0)
+    let small_divisors: Vec<usize> = (1..((until as f64).sqrt() as usize + 1))
+        .filter(|i| until.is_multiple_of(*i))
         .collect();
 
     let large_divisors: Vec<usize> = small_divisors
@@ -40,28 +29,30 @@ fn divisors(until: usize) -> Vec<usize> {
     [small_divisors, large_divisors].concat()
 }
 
-impl TwentiethDay {
-    fn solve_first(&self, until: usize) -> usize {
-        self.first(&until)
+impl Solvable for TwentiethDay {
+    fn solve_first(&self, _is_prod: bool) -> i64 {
+        self.first("36000000")
     }
 
-    fn solve_second(&self, until: usize) -> usize {
-        self.second(&until)
+    fn solve_second(&self, _is_prod: bool) -> i64 {
+        self.second("36000000")
     }
 
-    fn first(&self, input: &usize) -> usize {
+    fn first(&self, input: &str) -> i64 {
+        let target: usize = input.trim().parse().unwrap_or(36000000);
         for house_nr in 1..usize::MAX {
-            if presents_at1(house_nr) >= *input {
-                return house_nr;
+            if presents_at1(house_nr) >= target {
+                return house_nr as i64;
             }
         }
         0
     }
 
-    fn second(&self, until: &usize) -> usize {
+    fn second(&self, input: &str) -> i64 {
+        let target: usize = input.trim().parse().unwrap_or(36000000);
         for house_nr in 1..usize::MAX {
-            if presents_at2(house_nr) >= *until {
-                return house_nr;
+            if presents_at2(house_nr) >= target {
+                return house_nr as i64;
             }
         }
         0
@@ -71,13 +62,13 @@ impl TwentiethDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("19_test.txt");
-    const PROD: &str = include_str!("19_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/19_test.txt");
+    const PROD: &str = include_str!("inputs/19_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = TwentiethDay {
-            exercise: Excercise {
+        let first_exercise = TwentiethDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -85,15 +76,15 @@ mod tests {
 
         let expected_example = 4;
         let expected_prod = 831600;
-        let result_example = first_excersise.first(&70);
-        let result_prod = first_excersise.first(&36000000);
+        let result_example = first_exercise.first("70");
+        let result_prod = first_exercise.first("36000000");
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 4;
         let expected_prod = 884520;
-        let result_example = first_excersise.second(&70);
-        let result_prod = first_excersise.second(&36000000);
+        let result_example = first_exercise.second("70");
+        let result_prod = first_exercise.second("36000000");
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

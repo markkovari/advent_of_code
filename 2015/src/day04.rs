@@ -1,27 +1,27 @@
-use crate::{Excercise, Solvable};
+use crate::{Exercise, Solvable};
 use md5;
 
 struct FourthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 impl Solvable for FourthDay {
-    fn solve_first(&self, is_prod: bool) -> i32 {
+    fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
-    fn first(&self, content: String) -> i32 {
+    fn first(&self, content: &str) -> i64 {
         let mut counter = 0;
         loop {
             let data = format!("{}{}", content, counter);
@@ -34,7 +34,7 @@ impl Solvable for FourthDay {
         }
     }
 
-    fn second(&self, content: String) -> i32 {
+    fn second(&self, content: &str) -> i64 {
         let mut counter = 0;
         loop {
             let data = format!("{}{}", content, counter);
@@ -51,14 +51,14 @@ impl Solvable for FourthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("4_test.txt");
-    const PROD: &str = include_str!("4_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/4_test.txt");
+    const PROD: &str = include_str!("inputs/4_prod.txt");
 
     #[test]
     #[ignore = "Takes too long"]
     fn first_test() {
-        let first_excersise = FourthDay {
-            exercise: Excercise {
+        let first_exercise = FourthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -67,15 +67,15 @@ mod tests {
         let expected_example = 1048970;
         let expected_prod = 346386;
 
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 5714438;
         let expected_prod = 9958218;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

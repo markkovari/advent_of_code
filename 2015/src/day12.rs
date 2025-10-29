@@ -1,8 +1,8 @@
-use crate::{Excercise, Solvable};
+use crate::Exercise;
 use serde_json::Value;
 
 struct TwelvfthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 fn count_value(value: &Value) -> i32 {
@@ -30,43 +30,43 @@ fn skip_red(value: &Value) -> i32 {
 }
 
 impl TwelvfthDay {
-    fn solve_first(&self, is_prod: bool) -> i32 {
+    fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
 
-    fn first(&self, content: String) -> i32 {
-        let value: Value = serde_json::from_str(&content).unwrap();
-        count_value(&value) as i32
+    fn first(&self, content: &str) -> i64 {
+        let value: Value = serde_json::from_str(content).unwrap();
+        count_value(&value) as i64
     }
 
-    fn second(&self, content: String) -> i32 {
-        let value: Value = serde_json::from_str(&content).unwrap();
-        skip_red(&value) as i32
+    fn second(&self, content: &str) -> i64 {
+        let value: Value = serde_json::from_str(content).unwrap();
+        skip_red(&value) as i64
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("12_test.txt");
-    const PROD: &str = include_str!("12_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/12_test.txt");
+    const PROD: &str = include_str!("inputs/12_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = TwelvfthDay {
-            exercise: Excercise {
+        let mut first_exercise = TwelvfthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -75,16 +75,16 @@ mod tests {
         let expected_example = 3;
         let expected_prod = 156366;
 
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 3;
         let expected_prod = 96852;
 
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }
