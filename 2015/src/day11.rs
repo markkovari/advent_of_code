@@ -1,7 +1,7 @@
-use crate::{Excercise, Solvable};
+use crate::Exercise;
 
 struct EleventhDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 fn increment(character: char) -> char {
@@ -11,7 +11,7 @@ fn increment(character: char) -> char {
     }
 }
 
-fn has_two_non_overlapping_pairs(password: &mut String) -> bool {
+fn has_two_non_overlapping_pairs(password: &mut str) -> bool {
     let mut pairs = 0;
     let mut index = 0;
     loop {
@@ -30,8 +30,7 @@ fn has_two_non_overlapping_pairs(password: &mut String) -> bool {
     pairs >= 2
 }
 
-
-fn is_valid_password(password: &mut String) -> bool {
+fn is_valid_password(password: &mut str) -> bool {
     let mut triples = 0;
     for window in password.chars().collect::<Vec<char>>().windows(3) {
         if window[0] == 'i' || window[0] == 'o' || window[0] == 'l' {
@@ -48,7 +47,7 @@ fn is_valid_password(password: &mut String) -> bool {
         }
     }
     if !has_two_non_overlapping_pairs(password) {
-       return false;
+        return false;
     }
 
     triples >= 1
@@ -84,17 +83,17 @@ fn increment_password(password: String) -> String {
 impl EleventhDay {
     fn solve_first(&self, is_prod: bool) -> String {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(self.exercise.content.clone())
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(self.exercise.example.clone())
         }
     }
 
     fn solve_second(&self, is_prod: bool) -> String {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(self.exercise.content.clone())
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(self.exercise.example.clone())
         }
     }
 
@@ -102,7 +101,7 @@ impl EleventhDay {
         create_new_password(content)
     }
 
-    fn second(&self, content: String) -> String {
+    fn second(&self, _content: String) -> String {
         "asd".to_owned()
     }
 }
@@ -110,8 +109,8 @@ impl EleventhDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("11_test.txt");
-    const PROD: &str = include_str!("11_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/11_test.txt");
+    const PROD: &str = include_str!("inputs/11_prod.txt");
 
     #[test]
     fn test_valid_password() {
@@ -120,10 +119,10 @@ mod tests {
     }
 
     #[test]
-    #[ignore="Takes too long"]
+    #[ignore = "Takes too long"]
     fn first_test() {
-        let mut first_excersise = EleventhDay {
-            exercise: Excercise {
+        let mut first_exercise = EleventhDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -132,8 +131,8 @@ mod tests {
         let expected_example = "abcdffaa";
         let expected_prod = "hxbxxyzz";
 
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 

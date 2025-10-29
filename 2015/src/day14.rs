@@ -1,11 +1,11 @@
-use std::{collections::HashMap, ops::AddAssign};
+use std::collections::HashMap;
 
-use crate::{Excercise, Solvable};
-use iter_tools::Itertools;
+use crate::Exercise;
+use rayon::prelude::*;
 use regex::Regex;
 
 struct FourteenthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 struct Raindeer {
@@ -63,7 +63,7 @@ impl TryFrom<&str> for Raindeer {
 
 fn highest_distance(raindeer: Vec<Raindeer>, duration: usize) -> usize {
     raindeer
-        .iter()
+        .par_iter()
         .map(|r| r.distance(duration as i32))
         .max()
         .unwrap() as usize
@@ -91,53 +91,53 @@ fn highest_score(raindeer: Vec<Raindeer>, duration: usize) -> usize {
 }
 
 impl FourteenthDay {
-    fn solve_first(&self, is_prod: bool, duration: usize) -> i32 {
+    fn solve_first(&self, is_prod: bool, duration: usize) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned(), duration)
+            self.first(&self.exercise.content, duration)
         } else {
-            self.first(self.exercise.example.to_owned(), duration)
+            self.first(&self.exercise.example, duration)
         }
     }
 
-    fn solve_second(&self, is_prod: bool, duration: usize) -> i32 {
+    fn solve_second(&self, is_prod: bool, duration: usize) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned(), duration)
+            self.second(&self.exercise.content, duration)
         } else {
-            self.second(self.exercise.example.to_owned(), duration)
+            self.second(&self.exercise.example, duration)
         }
     }
 
-    fn first(&self, content: String, duration: usize) -> i32 {
+    fn first(&self, content: &str, duration: usize) -> i64 {
         highest_distance(
             content
                 .lines()
                 .map(|line| Raindeer::try_from(line).unwrap())
                 .collect(),
             duration,
-        ) as i32
+        ) as i64
     }
 
-    fn second(&self, content: String, duration: usize) -> i32 {
+    fn second(&self, content: &str, duration: usize) -> i64 {
         highest_score(
             content
                 .lines()
                 .map(|line| Raindeer::try_from(line).unwrap())
                 .collect(),
             duration,
-        ) as i32
+        ) as i64
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("14_test.txt");
-    const PROD: &str = include_str!("14_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/14_test.txt");
+    const PROD: &str = include_str!("inputs/14_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = FourteenthDay {
-            exercise: Excercise {
+        let mut first_exercise = FourteenthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -145,15 +145,15 @@ mod tests {
 
         let expected_example = 1120;
         let expected_prod = 2655;
-        let result_example = first_excersise.solve_first(false, 1000);
-        let result_prod = first_excersise.solve_first(true, 2503);
+        let result_example = first_exercise.solve_first(false, 1000);
+        let result_prod = first_exercise.solve_first(true, 2503);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 689;
         let expected_prod = 1059;
-        let result_example = first_excersise.solve_second(false, 1000);
-        let result_prod = first_excersise.solve_second(true, 2503);
+        let result_example = first_exercise.solve_second(false, 1000);
+        let result_prod = first_exercise.solve_second(true, 2503);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

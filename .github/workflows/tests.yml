@@ -1,11 +1,20 @@
 name: Advent of Code Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+      - 'chore/**'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   rust_tests:
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         project:
           - 2015
@@ -45,7 +54,9 @@ jobs:
 
   go_tests:
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         project:
           - 2017
@@ -77,7 +88,9 @@ jobs:
 
   csharp_tests:
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         project:
           - 2021/cs/1

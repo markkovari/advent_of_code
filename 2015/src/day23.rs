@@ -1,19 +1,11 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{
-    cmp,
-    collections::{BTreeSet, HashMap, HashSet},
-    fmt::Debug,
-    ops::AddAssign,
-    vec,
-};
+use std::fmt::Debug;
 
-use iter_tools::Itertools;
-
-use crate::{Excercise, Solvable};
+use crate::Exercise;
 
 struct TwentyThirdDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
@@ -124,7 +116,7 @@ impl Computer {
                     self.pc += offset.0 - 1;
                 }
                 Instruction::JumpIfEven(r, offset) => {
-                    if self.get(*r) % 2 == 0 {
+                    if self.get(*r).is_multiple_of(2) {
                         self.pc += offset.0 - 1;
                     }
                 }
@@ -142,18 +134,15 @@ impl Computer {
 
 impl TwentyThirdDay {
     fn solve_first(&self, input: &str) -> usize {
-        self.first(&input)
+        self.first(input)
     }
 
     fn solve_second(&self, input: &str) -> usize {
-        self.second(&input)
+        self.second(input)
     }
 
     fn first(&self, input: &str) -> usize {
-        let instructions = input
-            .lines()
-            .map(|l| Instruction::parse(l))
-            .collect::<Vec<_>>();
+        let instructions = input.lines().map(Instruction::parse).collect::<Vec<_>>();
 
         let mut computer = Computer::new();
 
@@ -163,10 +152,7 @@ impl TwentyThirdDay {
     }
 
     fn second(&self, input: &str) -> usize {
-        let instructions = input
-            .lines()
-            .map(|l| Instruction::parse(l))
-            .collect::<Vec<_>>();
+        let instructions = input.lines().map(Instruction::parse).collect::<Vec<_>>();
 
         let mut computer = Computer::new();
         computer.set(Register::A, 1);
@@ -182,13 +168,13 @@ mod tests {
     use std::f32::consts::E;
 
     use super::*;
-    const EXAMPLE: &str = include_str!("23_test.txt");
-    const PROD: &str = include_str!("23_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/23_test.txt");
+    const PROD: &str = include_str!("inputs/23_prod.txt");
 
     #[test]
     fn first_test() {
-        let mut first_excersise = TwentyThirdDay {
-            exercise: Excercise {
+        let mut first_exercise = TwentyThirdDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -196,15 +182,15 @@ mod tests {
 
         let expected_example = 170;
         let expected_prod = 170;
-        let result_example = first_excersise.first(PROD);
-        let result_prod = first_excersise.first(PROD);
+        let result_example = first_exercise.first(PROD);
+        let result_prod = first_exercise.first(PROD);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 247;
         let expected_prod = 247;
-        let result_example = first_excersise.second(PROD);
-        let result_prod = first_excersise.second(PROD);
+        let result_example = first_exercise.second(PROD);
+        let result_prod = first_exercise.second(PROD);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

@@ -1,11 +1,9 @@
-use std::{collections::HashMap, ops::AddAssign};
-
-use crate::{Excercise, Solvable};
-use iter_tools::{dependency::itertools::Product, Itertools};
+use crate::{Exercise, Solvable};
+use rayon::prelude::*;
 use regex::Regex;
 
 struct FifteenthDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 struct Ingredient {
@@ -80,7 +78,7 @@ fn cookie_score(ingredients: &[Ingredient], ratios: &[i64]) -> u64 {
     Product::product(scores.iter().map(|s| if *s > 0 { *s as u64 } else { 0 }))
 }
 
-fn parse_ingredients(content: String) -> Vec<Ingredient> {
+fn parse_ingredients(content: &str) -> Vec<Ingredient> {
     content
         .lines()
         .map(|line| Ingredient::try_from(line).unwrap())
@@ -88,35 +86,46 @@ fn parse_ingredients(content: String) -> Vec<Ingredient> {
 }
 
 fn best_cookie_score1(ingredients: &[Ingredient]) -> u64 {
-    let mut best = 0;
-    for a in 1..100 {
-        for b in 1..100 - a {
-            for c in 1..100 - (a + b) {
-                let d = 100 - a - b - c;
-                let score = cookie_score(ingredients, &[a, b, c, d]);
-                if score > best {
-                    best = score
-                }
-            }
-        }
-    }
-    best
+    (1..100)
+        .into_par_iter()
+        .flat_map(|a| {
+            (1..100 - a)
+                .into_par_iter()
+                .flat_map(move |b| {
+                    (1..100 - (a + b))
+                        .into_par_iter()
+                        .map(move |c| {
+                            let d = 100 - a - b - c;
+                            cookie_score(ingredients, &[a, b, c, d])
+                        })
+                })
+        })
+        .max()
+        .unwrap_or(0)
 }
 
 fn best_cookie_score2(ingredients: &[Ingredient]) -> u64 {
-    let mut best = 0;
-    for a in 1..100i64 {
-        for b in 1..100i64 - a {
-            for c in 1..100i64 - (a + b) {
-                let d = 100i64 - a - b - c;
-                let score = cookie_score(ingredients, &[a, b, c, d]);
-                if score > best && cookie_calories(ingredients, &[a, b, c, d]) == 500 {
-                    best = score
-                }
-            }
-        }
-    }
-    best
+    (1..100i64)
+        .into_par_iter()
+        .flat_map(|a| {
+            (1..100i64 - a)
+                .into_par_iter()
+                .flat_map(move |b| {
+                    (1..100i64 - (a + b))
+                        .into_par_iter()
+                        .filter_map(move |c| {
+                            let d = 100i64 - a - b - c;
+                            let ratios = [a, b, c, d];
+                            if cookie_calories(ingredients, &ratios) == 500 {
+                                Some(cookie_score(ingredients, &ratios))
+                            } else {
+                                None
+                            }
+                        })
+                })
+        })
+        .max()
+        .unwrap_or(0)
 }
 
 fn cookie_calories(ingredients: &[Ingredient], ratios: &[i64]) -> i64 {
@@ -127,29 +136,29 @@ fn cookie_calories(ingredients: &[Ingredient], ratios: &[i64]) -> i64 {
     calories
 }
 
-impl FifteenthDay {
+impl Solvable for FifteenthDay {
     fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
     fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
 
-    fn first(&self, content: String) -> i64 {
+    fn first(&self, content: &str) -> i64 {
         let ingredients = parse_ingredients(content);
         best_cookie_score1(&ingredients) as i64
     }
 
-    fn second(&self, content: String) -> i64 {
+    fn second(&self, content: &str) -> i64 {
         let ingredients = parse_ingredients(content);
         best_cookie_score2(&ingredients) as i64
     }
@@ -158,12 +167,12 @@ impl FifteenthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("15_test.txt");
-    const PROD: &str = include_str!("15_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/15_test.txt");
+    const PROD: &str = include_str!("inputs/15_prod.txt");
 
     #[test]
     fn parse_ingredients_fn() {
-        let ingredients = parse_ingredients(String::from(EXAMPLE));
+        let ingredients = parse_ingredients(EXAMPLE);
         assert_eq!(ingredients.len(), 2);
         assert_eq!(ingredients[0].name, "Butterscotch");
         assert_eq!(ingredients[0].capacity, -1);
@@ -182,8 +191,8 @@ mod tests {
 
     #[test]
     fn first_test() {
-        let mut first_excersise = FifteenthDay {
-            exercise: Excercise {
+        let first_exercise = FifteenthDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -191,15 +200,15 @@ mod tests {
 
         // let expected_example = 62842880;
         let expected_prod = 13882464;
-        // let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        // let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         // assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         // let expected_example = 57600000;
         let expected_prod = 11171160;
-        // let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        // let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         // assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }

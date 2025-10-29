@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use crate::{Excercise, Solvable};
+use crate::{Exercise, Solvable};
 
 struct SeventhDay {
-    exercise: Excercise,
+    exercise: Exercise,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -75,188 +75,131 @@ impl TryFrom<&str> for Instruction {
     }
 }
 
-fn parse_instructions(content: String) -> Vec<Instruction> {
+fn parse_instructions(content: &str) -> Vec<Instruction> {
     content
         .lines()
         .map(|line| Instruction::try_from(line).unwrap())
         .collect::<Vec<Instruction>>()
 }
 
+/// Helper to resolve a value that might be either a number or a reference
+fn resolve_operand(operand: &str, values: &HashMap<String, u16>) -> Option<u16> {
+    operand
+        .parse::<u16>()
+        .ok()
+        .or_else(|| values.get(operand).copied())
+}
+
+/// Helper to apply a binary operation if both operands are available
+fn apply_binary_op<F>(
+    left: &str,
+    right: &str,
+    values: &HashMap<String, u16>,
+    op: F,
+) -> Option<u16>
+where
+    F: Fn(u16, u16) -> u16,
+{
+    resolve_operand(left, values)
+        .and_then(|l| resolve_operand(right, values).map(|r| op(l, r)))
+}
+
+/// Calculate wire values using an iterative approach
 fn calculate_values(instructions: Vec<Instruction>) -> HashMap<String, u16> {
     let mut values: HashMap<String, u16> = HashMap::new();
-    let mut operations = instructions
-        .iter()
-        .map(|instruction| {
-            (
-                instruction.target.to_owned(),
-                instruction.operation.to_owned(),
-            )
-        })
-        .collect::<Vec<(String, Operation)>>();
-    let mut current_operation_index = 0;
-    loop {
-        let (target, operation) = operations[current_operation_index].to_owned();
-        match operation {
-            Operation::Assignment(value) => {
-                values.insert(target, value);
-                operations.remove(current_operation_index);
-            }
-            Operation::AssignmentFromRefence(reference) => {
-                if values.contains_key(&reference) {
-                    let value = values.get(&reference).unwrap();
-                    values.insert(target, *value);
-                    operations.remove(current_operation_index);
+    let mut pending: HashMap<String, Operation> = instructions
+        .into_iter()
+        .map(|inst| (inst.target, inst.operation))
+        .collect();
+
+    // Keep processing until we can't resolve any more operations
+    while !pending.is_empty() {
+        let mut resolved = Vec::new();
+
+        for (target, operation) in pending.iter() {
+            let result = match operation {
+                Operation::Assignment(value) => Some(*value),
+                Operation::AssignmentFromRefence(reference) => values.get(reference).copied(),
+                Operation::And(left, right) => apply_binary_op(left, right, &values, |l, r| l & r),
+                Operation::Or(left, right) => apply_binary_op(left, right, &values, |l, r| l | r),
+                Operation::LShift(left, amount) => {
+                    values.get(left).map(|v| v << amount)
                 }
-            }
-            Operation::And(left, right) => {
-                let left_as_number = left.parse::<u16>();
-                let right_as_number = right.parse::<u16>();
-                match (left_as_number, right_as_number) {
-                    (Ok(left_value), Ok(right_value)) => {
-                        values.insert(target, left_value & right_value);
-                        operations.remove(current_operation_index);
-                    }
-                    (Ok(left_value), Err(_)) => {
-                        if values.contains_key(&right) {
-                            let right_value = values.get(&right).unwrap();
-                            values.insert(target, left_value & right_value);
-                            operations.remove(current_operation_index);
-                        }
-                    }
-                    (Err(_), Ok(right_value)) => {
-                        if values.contains_key(&left) {
-                            let left_value = values.get(&left).unwrap();
-                            values.insert(target, left_value & right_value);
-                            operations.remove(current_operation_index);
-                        }
-                    }
-                    _ => {
-                        if values.contains_key(&left) && values.contains_key(&right) {
-                            let left_value = values.get(&left).unwrap();
-                            let right_value = values.get(&right).unwrap();
-                            values.insert(target, left_value & right_value);
-                            operations.remove(current_operation_index);
-                        }
-                    }
+                Operation::RShift(left, amount) => {
+                    values.get(left).map(|v| v >> amount)
                 }
-            }
-            Operation::Or(left, right) => {
-                let left_as_number = left.parse::<u16>();
-                let right_as_number = right.parse::<u16>();
-                match (left_as_number, right_as_number) {
-                    (Ok(left_value), Ok(right_value)) => {
-                        values.insert(target, left_value | right_value);
-                        operations.remove(current_operation_index);
-                    }
-                    (Ok(left_value), Err(_)) => {
-                        if values.contains_key(&right) {
-                            let right_value = values.get(&right).unwrap();
-                            values.insert(target, left_value | right_value);
-                            operations.remove(current_operation_index);
-                        }
-                    }
-                    (Err(_), Ok(right_value)) => {
-                        if values.contains_key(&left) {
-                            let left_value = values.get(&left).unwrap();
-                            values.insert(target, left_value | right_value);
-                            operations.remove(current_operation_index);
-                        }
-                    }
-                    _ => {
-                        if values.contains_key(&left) && values.contains_key(&right) {
-                            let left_value = values.get(&left).unwrap();
-                            let right_value = values.get(&right).unwrap();
-                            values.insert(target, left_value | right_value);
-                            operations.remove(current_operation_index);
-                        }
-                    }
-                }
-            }
-            Operation::LShift(left, right) => {
-                if values.contains_key(&left) {
-                    let left_value = values.get(&left).unwrap();
-                    values.insert(target, left_value << right);
-                    operations.remove(current_operation_index);
-                }
-            }
-            Operation::RShift(left, right) => {
-                if values.contains_key(&left) {
-                    let left_value = values.get(&left).unwrap();
-                    values.insert(target, left_value >> right);
-                    operations.remove(current_operation_index);
-                }
-            }
-            Operation::Not(left) => {
-                if values.contains_key(&left) {
-                    let left_value = values.get(&left).unwrap();
-                    values.insert(target, !left_value);
-                    operations.remove(current_operation_index);
-                }
+                Operation::Not(left) => values.get(left).map(|v| !v),
+            };
+
+            if let Some(value) = result {
+                values.insert(target.clone(), value);
+                resolved.push(target.clone());
             }
         }
-        if values.contains_key("a") {
-            break;
+
+        // Remove resolved operations
+        for target in resolved {
+            pending.remove(&target);
         }
-        if operations.len() == 0 {
-            break;
-        }
-        current_operation_index += 1;
-        current_operation_index %= operations.len();
     }
+
     values
 }
 
 impl Solvable for SeventhDay {
-    fn solve_first(&self, is_prod: bool) -> i32 {
+    fn solve_first(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.first(self.exercise.content.to_owned())
+            self.first(&self.exercise.content)
         } else {
-            self.first(self.exercise.example.to_owned())
+            self.first(&self.exercise.example)
         }
     }
 
-    fn solve_second(&self, is_prod: bool) -> i32 {
+    fn solve_second(&self, is_prod: bool) -> i64 {
         if is_prod {
-            self.second(self.exercise.content.to_owned())
+            self.second(&self.exercise.content)
         } else {
-            self.second(self.exercise.example.to_owned())
+            self.second(&self.exercise.example)
         }
     }
 
-    fn first(&self, content: String) -> i32 {
+    fn first(&self, content: &str) -> i64 {
         let instructions = parse_instructions(content);
         let values = calculate_values(instructions);
-        *values.get("a").unwrap_or(&0) as i32
+        *values.get("a").unwrap_or(&0) as i64
     }
 
-    fn second(&self, content: String) -> i32 {
-        let mut instructions = parse_instructions(content);
-        let mut values = calculate_values(instructions.clone());
+    fn second(&self, content: &str) -> i64 {
+        let instructions = parse_instructions(content);
+        let values = calculate_values(instructions.clone());
         let a_value = *values.get("a").unwrap_or(&0);
-        values.insert("b".to_owned(), a_value);
 
-        instructions = instructions
-            .iter()
-            .map(|x| match x.target.as_str() {
-                "b" => Instruction::new(String::from("b"), Operation::Assignment(a_value as u16)),
-                _ => x.clone(),
+        // Update instructions to override wire 'b' with the value from 'a'
+        let instructions = instructions
+            .into_iter()
+            .map(|inst| {
+                if inst.target == "b" {
+                    Instruction::new(String::from("b"), Operation::Assignment(a_value))
+                } else {
+                    inst
+                }
             })
             .collect();
 
         let values = calculate_values(instructions);
-        *values.get("a").unwrap_or(&0) as i32
+        *values.get("a").unwrap_or(&0) as i64
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("7_test.txt");
-    const PROD: &str = include_str!("7_prod.txt");
+    const EXAMPLE: &str = include_str!("inputs/7_test.txt");
+    const PROD: &str = include_str!("inputs/7_prod.txt");
 
     #[test]
     fn test_parse() {
-        let instructions = parse_instructions(String::from(EXAMPLE));
+        let instructions = parse_instructions(EXAMPLE);
         assert_eq!(instructions.len(), 8);
         assert_eq!(
             instructions[0],
@@ -274,8 +217,8 @@ mod tests {
 
     #[test]
     fn first_test() {
-        let mut first_excersise = SeventhDay {
-            exercise: Excercise {
+        let first_exercise = SeventhDay {
+            exercise: Exercise {
                 content: String::from(PROD),
                 example: String::from(EXAMPLE),
             },
@@ -284,15 +227,15 @@ mod tests {
         let expected_example = 0;
         let expected_prod = 46065;
 
-        let result_example = first_excersise.solve_first(false);
-        let result_prod = first_excersise.solve_first(true);
+        let result_example = first_exercise.solve_first(false);
+        let result_prod = first_exercise.solve_first(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
 
         let expected_example = 0;
         let expected_prod = 14134;
-        let result_example = first_excersise.solve_second(false);
-        let result_prod = first_excersise.solve_second(true);
+        let result_example = first_exercise.solve_second(false);
+        let result_prod = first_exercise.solve_second(true);
         assert_eq!(expected_example, result_example);
         assert_eq!(expected_prod, result_prod);
     }
