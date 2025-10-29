@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func readCommands() ([]int, error) {
+func readCommands(filepath string) ([]int, error) {
 
-	content, err := os.ReadFile("cmd/15/input.data")
+	content, err := os.ReadFile(filepath)
 	if err != nil {
 		return []int{}, err
 	}
@@ -27,7 +27,7 @@ func readCommands() ([]int, error) {
 }
 func main() {
 
-	nums, err := readCommands()
+	nums, err := readCommands("cmd/15/input.data")
 	if err != nil {
 		println("was not able to read")
 	}
