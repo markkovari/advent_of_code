@@ -28,7 +28,14 @@ jobs:
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
           else
-            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            # Handle first push or null before hash
+            BEFORE="${{ github.event.before }}"
+            if [ "$BEFORE" == "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE" ]; then
+              # Get files changed in the last commit
+              CHANGED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null || git ls-files)
+            else
+              CHANGED_FILES=$(git diff --name-only $BEFORE ${{ github.sha }})
+            fi
           fi
 
           echo "Changed files:"
