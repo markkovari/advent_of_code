@@ -19,10 +19,29 @@ fn is_double(n: Id) -> bool {
     s[..mid] == s[mid..]
 }
 
+fn is_at_least_double(n: Id) -> bool {
+    let s = n.to_string();
+    let len = s.len();
+
+    (1..len)
+        .filter(|&divisor| len.is_multiple_of(divisor) && len / divisor >= 2)
+        .any(|divisor| {
+            let pattern = &s[..divisor];
+            s.as_bytes()
+                .chunks(divisor)
+                .all(|chunk| chunk == pattern.as_bytes())
+        })
+}
+
 impl Range {
     pub fn get_doubles(&self) -> Vec<Id> {
         (self.lower..=self.upper)
             .filter(|&e| is_double(e))
+            .collect()
+    }
+    pub fn get_repeating(&self) -> Vec<Id> {
+        (self.lower..=self.upper)
+            .filter(|&e| is_at_least_double(e))
             .collect()
     }
 }
@@ -72,11 +91,19 @@ fn solve_1(ranges: &[Range]) -> Id {
         .sum()
 }
 
+fn solve_2(ranges: &[Range]) -> Id {
+    ranges
+        .iter()
+        .map(|range| range.get_repeating().iter().sum::<Id>())
+        .sum()
+}
+
 pub fn run() {
     let input = include_str!("2_input");
 
     if let Some(ranges) = parse_ranges(input) {
         println!("Day 2 Part 1: {}", solve_1(&ranges));
+        println!("Day 2 Part 2: {}", solve_2(&ranges));
     }
 }
 
@@ -235,5 +262,141 @@ mod tests {
             .map(|n| n as u64)
             .sum();
         assert_eq!(sum, 1227775554);
+    }
+
+    // Part 2 tests - at least double (2+ repetitions)
+    #[test]
+    fn test_is_at_least_double_valid() {
+        assert!(is_at_least_double(11)); // 1 twice
+        assert!(is_at_least_double(1111)); // 1 four times
+        assert!(is_at_least_double(111)); // 1 three times
+        assert!(is_at_least_double(12341234)); // 1234 twice
+        assert!(is_at_least_double(123123123)); // 123 three times
+        assert!(is_at_least_double(1212121212)); // 12 five times
+        assert!(is_at_least_double(1111111)); // 1 seven times
+        assert!(is_at_least_double(99)); // 9 twice
+        assert!(is_at_least_double(999)); // 9 three times
+        assert!(is_at_least_double(1010)); // 10 twice
+        assert!(is_at_least_double(565656)); // 56 three times
+        assert!(is_at_least_double(824824824)); // 824 three times
+        assert!(is_at_least_double(2121212121)); // 21 five times
+    }
+
+    #[test]
+    fn test_is_at_least_double_invalid() {
+        assert!(!is_at_least_double(123)); // No repetition
+        assert!(!is_at_least_double(1234)); // No repetition
+        assert!(!is_at_least_double(101)); // Not a repetition
+    }
+
+    #[test]
+    fn test_range_11_22_part2() {
+        let range = Range {
+            lower: 11,
+            upper: 22,
+        };
+        assert_eq!(range.get_repeating(), vec![11, 22]);
+    }
+
+    #[test]
+    fn test_range_95_115_part2() {
+        let range = Range {
+            lower: 95,
+            upper: 115,
+        };
+        assert_eq!(range.get_repeating(), vec![99, 111]);
+    }
+
+    #[test]
+    fn test_range_998_1012_part2() {
+        let range = Range {
+            lower: 998,
+            upper: 1012,
+        };
+        assert_eq!(range.get_repeating(), vec![999, 1010]);
+    }
+
+    #[test]
+    fn test_range_1188511880_1188511890_part2() {
+        let range = Range {
+            lower: 1188511880,
+            upper: 1188511890,
+        };
+        assert_eq!(range.get_repeating(), vec![1188511885]);
+    }
+
+    #[test]
+    fn test_range_222220_222224_part2() {
+        let range = Range {
+            lower: 222220,
+            upper: 222224,
+        };
+        assert_eq!(range.get_repeating(), vec![222222]);
+    }
+
+    #[test]
+    fn test_range_1698522_1698528_part2() {
+        let range = Range {
+            lower: 1698522,
+            upper: 1698528,
+        };
+        assert_eq!(range.get_repeating(), Vec::<Id>::new());
+    }
+
+    #[test]
+    fn test_range_446443_446449_part2() {
+        let range = Range {
+            lower: 446443,
+            upper: 446449,
+        };
+        assert_eq!(range.get_repeating(), vec![446446]);
+    }
+
+    #[test]
+    fn test_range_38593856_38593862_part2() {
+        let range = Range {
+            lower: 38593856,
+            upper: 38593862,
+        };
+        assert_eq!(range.get_repeating(), vec![38593859]);
+    }
+
+    #[test]
+    fn test_range_565653_565659_part2() {
+        let range = Range {
+            lower: 565653,
+            upper: 565659,
+        };
+        assert_eq!(range.get_repeating(), vec![565656]);
+    }
+
+    #[test]
+    fn test_range_824824821_824824827_part2() {
+        let range = Range {
+            lower: 824824821,
+            upper: 824824827,
+        };
+        assert_eq!(range.get_repeating(), vec![824824824]);
+    }
+
+    #[test]
+    fn test_range_2121212118_2121212124_part2() {
+        let range = Range {
+            lower: 2121212118,
+            upper: 2121212124,
+        };
+        assert_eq!(range.get_repeating(), vec![2121212121]);
+    }
+
+    #[test]
+    fn test_example_sum_part2() {
+        let input = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
+        let ranges = parse_ranges(input).unwrap();
+        let sum: u64 = ranges
+            .iter()
+            .flat_map(|r| (r.lower..=r.upper).filter(|&n| is_at_least_double(n)))
+            .map(|n| n as u64)
+            .sum();
+        assert_eq!(sum, 4174379265);
     }
 }
