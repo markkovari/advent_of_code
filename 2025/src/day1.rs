@@ -70,7 +70,7 @@ impl FromStr for Rotation {
     }
 }
 
-pub fn parse_rotations(input: String) -> Option<Vec<Rotation>> {
+fn parse_rotations(input: String) -> Option<Vec<Rotation>> {
     input
         .lines()
         .map(|l| l.parse())

@@ -11,24 +11,26 @@ struct Range {
 fn is_double(n: Id) -> bool {
     let s = n.to_string();
     let len = s.len();
-    if len % 2 != 0 {
+    if !len.is_multiple_of(2) {
         return false;
     }
 
     let mid = len / 2;
-    &s[..mid] == &s[mid..]
+    s[..mid] == s[mid..]
 }
 
 impl Range {
     pub fn get_doubles(&self) -> Vec<Id> {
-        (self.lower..=self.upper).into_iter().filter(|&e|is_double(e)).collect()
+        (self.lower..=self.upper)
+            .filter(|&e| is_double(e))
+            .collect()
     }
 }
 
 #[derive(Debug)]
 enum ParseRangeError {
     CannotParseRange,
-    NotExactlyTwoNumbers
+    NotExactlyTwoNumbers,
 }
 
 impl FromStr for Range {
@@ -36,35 +38,38 @@ impl FromStr for Range {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let parts = s.split('-').collect::<Vec<&str>>();
-        if parts.len() != 2  {
+        if parts.len() != 2 {
             return Err(ParseRangeError::NotExactlyTwoNumbers);
         }
 
         if let [lower, upper] = parts.as_slice() {
-            match ( lower.parse::<Id>(), upper.parse::<Id>()) {
-                (Ok(lower_number), Ok(upper_number)) => {
-                    return Ok(Range { lower: lower_number, upper: upper_number});
-                },
-                _ => Err(ParseRangeError::CannotParseRange)
+            match (lower.parse::<Id>(), upper.parse::<Id>()) {
+                (Ok(lower_number), Ok(upper_number)) => Ok(Range {
+                    lower: lower_number,
+                    upper: upper_number,
+                }),
+                _ => Err(ParseRangeError::CannotParseRange),
             }
         } else {
-            return Err(ParseRangeError::CannotParseRange)
+            Err(ParseRangeError::CannotParseRange)
         }
     }
-
 }
 
 fn parse_ranges(input: &str) -> Option<Vec<Range>> {
     input
-    .trim()
-    .split(',')
-    .map(|line|line.parse())
-    .collect::<Result<Vec<_>, _>>()
-    .ok()
+        .trim()
+        .split(',')
+        .map(|line| line.parse())
+        .collect::<Result<Vec<_>, _>>()
+        .ok()
 }
 
-fn solve_1(ranges: &Vec<Range>) -> Id {
-    ranges.into_iter().map(|range| range.get_doubles().iter().sum::<Id>()).sum()
+fn solve_1(ranges: &[Range]) -> Id {
+    ranges
+        .iter()
+        .map(|range| range.get_doubles().iter().sum::<Id>())
+        .sum()
 }
 
 pub fn run() {
@@ -72,7 +77,7 @@ pub fn run() {
 
     if let Some(ranges) = parse_ranges(input) {
         println!("Day 2 Part 1: {}", solve_1(&ranges));
-    } 
+    }
 }
 
 #[cfg(test)]
@@ -112,67 +117,100 @@ mod tests {
 
     #[test]
     fn test_range_11_22() {
-        let range = Range { lower: 11, upper: 22 };
+        let range = Range {
+            lower: 11,
+            upper: 22,
+        };
         assert_eq!(range.get_doubles(), vec![11, 22]);
     }
 
     #[test]
     fn test_range_95_115() {
-        let range = Range { lower: 95, upper: 115 };
+        let range = Range {
+            lower: 95,
+            upper: 115,
+        };
         assert_eq!(range.get_doubles(), vec![99]);
     }
 
     #[test]
     fn test_range_998_1012() {
-        let range = Range { lower: 998, upper: 1012 };
+        let range = Range {
+            lower: 998,
+            upper: 1012,
+        };
         assert_eq!(range.get_doubles(), vec![1010]);
     }
 
     #[test]
     fn test_range_1188511880_1188511890() {
-        let range = Range { lower: 1188511880, upper: 1188511890 };
+        let range = Range {
+            lower: 1188511880,
+            upper: 1188511890,
+        };
         assert_eq!(range.get_doubles(), vec![1188511885]);
     }
 
     #[test]
     fn test_range_222220_222224() {
-        let range = Range { lower: 222220, upper: 222224 };
+        let range = Range {
+            lower: 222220,
+            upper: 222224,
+        };
         assert_eq!(range.get_doubles(), vec![222222]);
     }
 
     #[test]
     fn test_range_1698522_1698528() {
-        let range = Range { lower: 1698522, upper: 1698528 };
+        let range = Range {
+            lower: 1698522,
+            upper: 1698528,
+        };
         assert_eq!(range.get_doubles(), Vec::<Id>::new());
     }
 
     #[test]
     fn test_range_446443_446449() {
-        let range = Range { lower: 446443, upper: 446449 };
+        let range = Range {
+            lower: 446443,
+            upper: 446449,
+        };
         assert_eq!(range.get_doubles(), vec![446446]);
     }
 
     #[test]
     fn test_range_38593856_38593862() {
-        let range = Range { lower: 38593856, upper: 38593862 };
+        let range = Range {
+            lower: 38593856,
+            upper: 38593862,
+        };
         assert_eq!(range.get_doubles(), vec![38593859]);
     }
 
     #[test]
     fn test_range_565653_565659() {
-        let range = Range { lower: 565653, upper: 565659 };
+        let range = Range {
+            lower: 565653,
+            upper: 565659,
+        };
         assert_eq!(range.get_doubles(), Vec::<Id>::new());
     }
 
     #[test]
     fn test_range_824824821_824824827() {
-        let range = Range { lower: 824824821, upper: 824824827 };
+        let range = Range {
+            lower: 824824821,
+            upper: 824824827,
+        };
         assert_eq!(range.get_doubles(), Vec::<Id>::new());
     }
 
     #[test]
     fn test_range_2121212118_2121212124() {
-        let range = Range { lower: 2121212118, upper: 2121212124 };
+        let range = Range {
+            lower: 2121212118,
+            upper: 2121212124,
+        };
         assert_eq!(range.get_doubles(), Vec::<Id>::new());
     }
 
@@ -191,7 +229,8 @@ mod tests {
     fn test_example_sum() {
         let input = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
         let ranges = parse_ranges(input).unwrap();
-        let sum: u64 = ranges.iter()
+        let sum: u64 = ranges
+            .iter()
             .flat_map(|r| (r.lower..=r.upper).filter(|&n| is_double(n)))
             .map(|n| n as u64)
             .sum();
