@@ -132,6 +132,20 @@ fn get_solution(allocator: Allocator, content: []const u8) anyerror!u32 {
     return sum;
 }
 
+pub fn count_frequency(allocator: Allocator, numbers: [] const u8) anyerror!std.AutoHashMap(u32, u32) {
+    var freq = std.AutoHashMap(u32, u32).init(allocator);
+
+    for (numbers) |num| {
+        const currentValue = freq.get(num);
+        if (currentValue) |value| {
+            try freq.put(num, value + 1);
+        } else {
+            try freq.put(num, 1);
+        }
+    }
+    return freq;
+}
+
 test "test example is 11" {
     const ta = std.testing.allocator;
     const content = try read_file("./data/01/example", ta);
@@ -163,4 +177,25 @@ test "read_multiple_lines_pairs_with_get_number_pairs_of_lines" {
     var pairs = try get_number_pairs_of_lines(ta, content);
     defer pairs.deinit(ta);
     try expect(pairs.items.len == 2);
+}
+
+test "count frequency" {
+    const ta = std.testing.allocator;
+
+    const numbers = [_]u8{ 1, 2, 3, 4, 4, 5, 1 };
+    var freq = try count_frequency(ta, &numbers);
+    defer freq.deinit();
+    try expect(freq.count() == 5);
+    const ones_count = freq.get(1) orelse 0;
+    try expect(ones_count == 2);
+    const twos_count = freq.get(2) orelse 0;
+    try expect(twos_count == 1);
+    const threes_count = freq.get(3) orelse 0;
+    try expect(threes_count == 1);
+    const fours_count = freq.get(4) orelse 0;
+    try expect(fours_count == 2);
+    const fives_count = freq.get(5) orelse 0;
+    try expect(fives_count == 1);
+    const sixes_count = freq.get(6) orelse 0;
+    try expect(sixes_count == 0);
 }
