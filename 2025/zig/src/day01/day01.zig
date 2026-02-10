@@ -6,6 +6,7 @@ const Direction = enum { Left, Right };
 const RotationParseError = error{
     InvalidDirection,
     InvalidAmount,
+    InvalidLength,
 };
 
 fn Rotation(comptime T: type) type {
@@ -16,6 +17,9 @@ fn Rotation(comptime T: type) type {
 }
 
 fn parseFromString(comptime T: type, input: []const u8) RotationParseError!Rotation(T) {
+    if (input.len < 2) {
+        return RotationParseError.InvalidLength;
+    }
     const direction: Direction = switch (input[0]) {
         'L' => .Left,
         'R' => .Right,
@@ -66,7 +70,7 @@ test "parse to struct" {
 
 test "parse to struct with error" {
     const asText = "G23";
-    try std.testing.expectError(error.InvalidDirection, parseFromString(u32, asText));
+    try std.testing.expectError(RotationParseError.InvalidDirection, parseFromString(u32, asText));
 }
 
 test "parse multiple lines" {
@@ -93,5 +97,10 @@ test "parse multiple lines with error fails early" {
         \\R25
     ;
     const allocator = std.testing.allocator;
-    try std.testing.expectError(error.InvalidDirection, parseAllLines(u32, allocator, input));
+    try std.testing.expectError(RotationParseError.InvalidDirection, parseAllLines(u32, allocator, input));
+}
+
+test "parse with invalid length" {
+    const asText = "G";
+    try std.testing.expectError(RotationParseError.InvalidLength, parseFromString(u32, asText));
 }
