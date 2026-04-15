@@ -1,10 +1,8 @@
 use onig::Regex;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 
-use crate::{Exercise, Solvable};
-
-struct EightDay {
-    exercise: Exercise,
-}
+pub struct Day08;
 
 pub fn raw_and_unescaped_len(s: &str) -> (usize, usize) {
     if !s.starts_with('"') || !s.ends_with('"') {
@@ -21,13 +19,6 @@ pub fn raw_and_unescaped_len(s: &str) -> (usize, usize) {
     (raw_len, raw_len - 2 - esc_size + esc_count)
 }
 
-pub fn extra_chars_unescaped(text: &str) -> usize {
-    text.lines().fold(0, |extra_chars, line| {
-        let (raw_len, unescaped_len) = raw_and_unescaped_len(line);
-        extra_chars + (raw_len - unescaped_len)
-    })
-}
-
 pub fn raw_and_reescaped_len(s: &str) -> (usize, usize) {
     let raw_len = s.len();
     let re = Regex::new(r#"[\\"]"#).unwrap();
@@ -35,67 +26,37 @@ pub fn raw_and_reescaped_len(s: &str) -> (usize, usize) {
     (raw_len, raw_len + 2 + esc_count)
 }
 
-pub fn extra_chars_reescaped(text: &str) -> usize {
-    text.lines().fold(0, |extra_chars, line| {
-        let (raw_len, reescaped_len) = raw_and_reescaped_len(line);
-        extra_chars + (reescaped_len - raw_len)
-    })
-}
+impl Solution for Day08 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 8 }
 
-impl Solvable for EightDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        Box::new(input.lines().fold(0, |extra_chars, line| {
+            let (raw_len, unescaped_len) = raw_and_unescaped_len(line);
+            extra_chars + (raw_len - unescaped_len)
+        }) as i64)
     }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
-        extra_chars_unescaped(content) as i64
-    }
-
-    fn second(&self, content: &str) -> i64 {
-        extra_chars_reescaped(content) as i64
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        Box::new(input.lines().fold(0, |extra_chars, line| {
+            let (raw_len, reescaped_len) = raw_and_reescaped_len(line);
+            extra_chars + (reescaped_len - raw_len)
+        }) as i64)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("inputs/8_test.txt");
-    const PROD: &str = include_str!("inputs/8_prod.txt");
 
     #[test]
-    fn first_test() {
-        let mut first_exercise = EightDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
-
-        let expected_example = 12;
-        let expected_prod = 1350;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        let expected_example = 19;
-        let expected_prod = 2085;
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+    fn test_day08() {
+        let day = Day08;
+        let example = r#"""
+"abc"
+"aaa\"aaa"
+"\x27""#;
+        assert_eq!(day.part1(example).to_string(), "12");
+        assert_eq!(day.part2(example).to_string(), "19");
     }
 }

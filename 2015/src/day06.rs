@@ -1,9 +1,8 @@
-use crate::{Exercise, Solvable};
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 use rayon::prelude::*;
 
-struct SixthDay {
-    exercise: Exercise,
-}
+pub struct Day06;
 
 type Grid = [[bool; 1000]; 1000];
 type GridAmbient = [[i8; 1000]; 1000];
@@ -34,32 +33,6 @@ fn apply_on_ambient_grid(instruction: Instruction, grid: &mut GridAmbient) {
     }
 }
 
-fn apply_instructions(instructions: Vec<Instruction>, grid: &mut Grid) {
-    for instruction in instructions {
-        apply_on_grid(instruction, grid);
-    }
-}
-
-fn apply_increasing_instructions(instructions: Vec<Instruction>, grid: &mut GridAmbient) {
-    for instruction in instructions {
-        apply_on_ambient_grid(instruction, grid);
-    }
-}
-
-fn count_lit(grid: &Grid) -> i64 {
-    grid.par_iter()
-        .flat_map(|row| row.par_iter())
-        .filter(|&&cell| cell)
-        .count() as i64
-}
-
-fn count_brigthness(grid: &GridAmbient) -> i64 {
-    grid.par_iter()
-        .flat_map(|row| row.par_iter())
-        .map(|&cell| cell as i64)
-        .sum()
-}
-
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 enum Action {
     On,
@@ -72,13 +45,14 @@ impl TryFrom<&str> for Action {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         if value.starts_with("turn on") {
-            return Ok(Action::On);
+            Ok(Action::On)
         } else if value.starts_with("turn off") {
-            return Ok(Action::Off);
+            Ok(Action::Off)
         } else if value.starts_with("toggle") {
-            return Ok(Action::Toggle);
+            Ok(Action::Toggle)
+        } else {
+            Err(String::from("Invalid action"))
         }
-        Err(String::from("Invalid action"))
     }
 }
 
@@ -93,9 +67,9 @@ impl TryFrom<&str> for Instruction {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let mut split = value.split_whitespace().collect::<Vec<&str>>();
-        let end: Point = Point::try_from(split.pop().unwrap())?;
+        let end: Point = Point::try_from(split.pop().ok_or("Missing end point")?)?;
         split.pop();
-        let start: Point = Point::try_from(split.pop().unwrap())?;
+        let start: Point = Point::try_from(split.pop().ok_or("Missing start point")?)?;
         let action: Action = Action::try_from(split.join(" ").as_str())?;
         Ok(Instruction { action, start, end })
     }
@@ -115,88 +89,59 @@ impl TryFrom<&str> for Point {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let mut split = value.split(',');
-        let x = split.next().unwrap().parse::<i32>().unwrap();
-        let y = split.next().unwrap().parse::<i32>().unwrap();
+        let x = split.next().ok_or("Missing x")?.parse::<i32>().map_err(|e| e.to_string())?;
+        let y = split.next().ok_or("Missing y")?.parse::<i32>().map_err(|e| e.to_string())?;
         Ok(Point::new(x, y))
     }
 }
 
-impl Solvable for SixthDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
-    }
+impl Solution for Day06 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 6 }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
-        let instructions = content
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let instructions = input
             .lines()
             .map(|line| Instruction::try_from(line).unwrap())
             .collect::<Vec<Instruction>>();
         let mut grid: Grid = [[false; 1000]; 1000];
-        apply_instructions(instructions, &mut grid);
-        count_lit(&grid)
+        for instruction in instructions {
+            apply_on_grid(instruction, &mut grid);
+        }
+        Box::new(grid.par_iter()
+            .flat_map(|row| row.par_iter())
+            .filter(|&&cell| cell)
+            .count() as i64)
     }
 
-    fn second(&self, content: &str) -> i64 {
-        let instructions = content
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let instructions = input
             .lines()
             .map(|line| Instruction::try_from(line).unwrap())
             .collect::<Vec<Instruction>>();
         let mut grid: GridAmbient = [[0; 1000]; 1000];
-        apply_increasing_instructions(instructions, &mut grid);
-        count_brigthness(&grid)
+        for instruction in instructions {
+            apply_on_ambient_grid(instruction, &mut grid);
+        }
+        Box::new(grid.par_iter()
+            .flat_map(|row| row.par_iter())
+            .map(|&cell| cell as i64)
+            .sum::<i64>())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("inputs/6_test.txt");
-    const PROD: &str = include_str!("inputs/6_prod.txt");
 
     #[test]
-    fn instruction() {
-        let instruction = Instruction::try_from("turn on 0,0 through 999,999").unwrap();
-        assert_eq!(instruction.action, Action::On);
-        assert_eq!(instruction.start, Point::new(0, 0));
-        assert_eq!(instruction.end, Point::new(999, 999));
-    }
-    #[test]
-    fn first_test() {
-        let mut first_exercise = SixthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
+    fn test_day06() {
+        let day = Day06;
+        assert_eq!(day.part1("turn on 0,0 through 999,999").to_string(), "1000000");
+        assert_eq!(day.part1("toggle 0,0 through 999,0").to_string(), "1000");
+        assert_eq!(day.part1("turn off 499,499 through 500,500").to_string(), "0");
 
-        let expected_example = 998996;
-        let expected_prod = 569999;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        first_exercise.exercise.example =
-            String::from("turn on 0,0 through 0,0\ntoggle 0,0 through 999,999\n");
-
-        let expected_example = 2000001;
-        let expected_prod = 17836115;
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+        assert_eq!(day.part2("turn on 0,0 through 0,0").to_string(), "1");
+        assert_eq!(day.part2("toggle 0,0 through 999,999").to_string(), "2000000");
     }
 }

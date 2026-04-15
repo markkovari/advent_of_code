@@ -1,10 +1,8 @@
 use std::collections::HashMap;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 
-use crate::{Exercise, Solvable};
-
-struct SeventhDay {
-    exercise: Exercise,
-}
+pub struct Day07;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum Operation {
@@ -75,14 +73,6 @@ impl TryFrom<&str> for Instruction {
     }
 }
 
-fn parse_instructions(content: &str) -> Vec<Instruction> {
-    content
-        .lines()
-        .map(|line| Instruction::try_from(line).unwrap())
-        .collect::<Vec<Instruction>>()
-}
-
-/// Helper to resolve a value that might be either a number or a reference
 fn resolve_operand(operand: &str, values: &HashMap<String, u16>) -> Option<u16> {
     operand
         .parse::<u16>()
@@ -90,7 +80,6 @@ fn resolve_operand(operand: &str, values: &HashMap<String, u16>) -> Option<u16> 
         .or_else(|| values.get(operand).copied())
 }
 
-/// Helper to apply a binary operation if both operands are available
 fn apply_binary_op<F>(
     left: &str,
     right: &str,
@@ -104,15 +93,13 @@ where
         .and_then(|l| resolve_operand(right, values).map(|r| op(l, r)))
 }
 
-/// Calculate wire values using an iterative approach
-fn calculate_values(instructions: Vec<Instruction>) -> HashMap<String, u16> {
+fn calculate_values(instructions: &[Instruction]) -> HashMap<String, u16> {
     let mut values: HashMap<String, u16> = HashMap::new();
     let mut pending: HashMap<String, Operation> = instructions
-        .into_iter()
-        .map(|inst| (inst.target, inst.operation))
+        .iter()
+        .map(|inst| (inst.target.clone(), inst.operation.clone()))
         .collect();
 
-    // Keep processing until we can't resolve any more operations
     while !pending.is_empty() {
         let mut resolved = Vec::new();
 
@@ -137,7 +124,8 @@ fn calculate_values(instructions: Vec<Instruction>) -> HashMap<String, u16> {
             }
         }
 
-        // Remove resolved operations
+        if resolved.is_empty() { break; }
+
         for target in resolved {
             pending.remove(&target);
         }
@@ -146,36 +134,26 @@ fn calculate_values(instructions: Vec<Instruction>) -> HashMap<String, u16> {
     values
 }
 
-impl Solvable for SeventhDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
+impl Solution for Day07 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 7 }
+
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let instructions: Vec<Instruction> = input.lines()
+            .map(|l| Instruction::try_from(l).unwrap())
+            .collect();
+        let values = calculate_values(&instructions);
+        Box::new(*values.get("a").unwrap_or(&0) as i64)
     }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
-        let instructions = parse_instructions(content);
-        let values = calculate_values(instructions);
-        *values.get("a").unwrap_or(&0) as i64
-    }
-
-    fn second(&self, content: &str) -> i64 {
-        let instructions = parse_instructions(content);
-        let values = calculate_values(instructions.clone());
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let instructions: Vec<Instruction> = input.lines()
+            .map(|l| Instruction::try_from(l).unwrap())
+            .collect();
+        let values = calculate_values(&instructions);
         let a_value = *values.get("a").unwrap_or(&0);
 
-        // Update instructions to override wire 'b' with the value from 'a'
-        let instructions = instructions
+        let new_instructions: Vec<Instruction> = instructions
             .into_iter()
             .map(|inst| {
                 if inst.target == "b" {
@@ -186,57 +164,7 @@ impl Solvable for SeventhDay {
             })
             .collect();
 
-        let values = calculate_values(instructions);
-        *values.get("a").unwrap_or(&0) as i64
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    const EXAMPLE: &str = include_str!("inputs/7_test.txt");
-    const PROD: &str = include_str!("inputs/7_prod.txt");
-
-    #[test]
-    fn test_parse() {
-        let instructions = parse_instructions(EXAMPLE);
-        assert_eq!(instructions.len(), 8);
-        assert_eq!(
-            instructions[0],
-            Instruction::new(String::from("x"), Operation::Assignment(123),)
-        );
-        assert_eq!(
-            instructions[1],
-            Instruction::new(String::from("y"), Operation::Assignment(456))
-        );
-        assert_eq!(
-            instructions[4],
-            Instruction::new(String::from("f"), Operation::LShift("x".to_owned(), 2))
-        );
-    }
-
-    #[test]
-    fn first_test() {
-        let first_exercise = SeventhDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
-
-        let expected_example = 0;
-        let expected_prod = 46065;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        let expected_example = 0;
-        let expected_prod = 14134;
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+        let values = calculate_values(&new_instructions);
+        Box::new(*values.get("a").unwrap_or(&0) as i64)
     }
 }

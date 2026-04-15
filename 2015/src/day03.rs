@@ -58,7 +58,7 @@ fn get_visited_multiple_times(first: Santa, second: Santa) -> usize {
     for (key, value) in second.visited.iter() {
         visited.insert(*key, *value);
     }
-    visited.values().filter(|&x| *x >= &1).count()
+    visited.values().filter(|&x| *x >= 1).count()
 }
 
 impl Solution for Day03 {

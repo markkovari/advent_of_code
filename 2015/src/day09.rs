@@ -1,13 +1,10 @@
 use std::collections::HashMap;
-
 use iter_tools::Itertools;
 use rayon::prelude::*;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 
-use crate::{Exercise, Solvable};
-
-struct NinthDay {
-    exercise: Exercise,
-}
+pub struct Day09;
 
 struct Distance {
     from: String,
@@ -25,10 +22,10 @@ impl TryFrom<&str> for Distance {
     type Error = &'static str;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let mut split = value.split(" ");
-        let from = split.next().unwrap().to_owned();
-        let to = split.nth(1).unwrap().to_owned();
-        let distance = split.nth(1).unwrap().parse::<usize>().unwrap();
+        let mut split = value.split(' ');
+        let from = split.next().ok_or("Missing from")?.to_owned();
+        let to = split.nth(1).ok_or("Missing to")?.to_owned();
+        let distance = split.nth(1).ok_or("Missing distance")?.parse::<usize>().map_err(|_| "Invalid distance")?;
         Ok(Self::new(from, to, distance))
     }
 }
@@ -38,21 +35,8 @@ fn evaluate_paths(distances: Vec<Distance>) -> RoutesMap {
     let mut routes: RoutesMap = HashMap::new();
     for distance in distances {
         let Distance { from, to, distance } = distance;
-        if !routes.contains_key(&from) {
-            routes.insert(from.clone(), HashMap::new());
-        }
-
-        if !routes.contains_key(&to) {
-            routes.insert(to.clone(), HashMap::new());
-        }
-        routes
-            .get_mut(&from)
-            .unwrap()
-            .insert(to.to_owned(), distance);
-        routes
-            .get_mut(&to)
-            .unwrap()
-            .insert(from.to_owned(), distance);
+        routes.entry(from.clone()).or_default().insert(to.clone(), distance);
+        routes.entry(to).or_default().insert(from, distance);
     }
     routes
 }
@@ -74,81 +58,30 @@ fn lengths(routes: &RoutesMap) -> Vec<usize> {
         .collect()
 }
 
-fn read_content(content: &str) -> Vec<Distance> {
-    content
-        .lines()
-        .map(|line| Distance::try_from(line).unwrap())
-        .collect()
-}
+impl Solution for Day09 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 9 }
 
-impl Solvable for NinthDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let distances = input.lines().map(|l| Distance::try_from(l).unwrap()).collect();
+        Box::new(*lengths(&evaluate_paths(distances)).iter().min().unwrap() as i64)
     }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
-        *lengths(&evaluate_paths(read_content(content)))
-            .iter()
-            .min()
-            .unwrap() as i64
-    }
-
-    fn second(&self, content: &str) -> i64 {
-        *lengths(&evaluate_paths(read_content(content)))
-            .iter()
-            .max()
-            .unwrap() as i64
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let distances = input.lines().map(|l| Distance::try_from(l).unwrap()).collect();
+        Box::new(*lengths(&evaluate_paths(distances)).iter().max().unwrap() as i64)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("inputs/9_test.txt");
-    const PROD: &str = include_str!("inputs/9_prod.txt");
 
     #[test]
-    fn test_distance_parse() {
-        let distance = Distance::try_from("London to Dublin = 464").unwrap();
-        assert_eq!(distance.from, "London");
-        assert_eq!(distance.to, "Dublin");
-        assert_eq!(distance.distance, 464);
-    }
-
-    #[test]
-    fn first_test() {
-        let mut first_exercise = NinthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
-
-        let expected_example = 605;
-        let expected_prod = 117;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        let expected_example = 982;
-        let expected_prod = 909;
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+    fn test_day09() {
+        let day = Day09;
+        let example = "London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141";
+        assert_eq!(day.part1(example).to_string(), "605");
+        assert_eq!(day.part2(example).to_string(), "982");
     }
 }

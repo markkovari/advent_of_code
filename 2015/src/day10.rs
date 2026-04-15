@@ -1,10 +1,8 @@
-use crate::{Exercise, Solvable};
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 
-struct TenthDay {
-    exercise: Exercise,
-}
+pub struct Day10;
 
-/// Perform look-and-say transformation on the input
 fn look_and_say(current: &str) -> String {
     let mut result = String::with_capacity(current.len() * 2);
     let mut chars = current.chars();
@@ -29,69 +27,37 @@ fn look_and_say(current: &str) -> String {
     result
 }
 
-impl Solvable for TenthDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
-    }
+impl Solution for Day10 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 10 }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
-        let mut result = content.to_string();
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let mut result = input.trim().to_string();
         for _ in 0..40 {
             result = look_and_say(&result);
         }
-        result.len() as i64
+        Box::new(result.len() as i64)
     }
 
-    fn second(&self, content: &str) -> i64 {
-        let mut result = content.to_string();
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let mut result = input.trim().to_string();
         for _ in 0..50 {
             result = look_and_say(&result);
         }
-        result.len() as i64
+        Box::new(result.len() as i64)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("inputs/10_test.txt");
-    const PROD: &str = include_str!("inputs/10_prod.txt");
 
     #[test]
-    #[ignore = "takes too long"]
-    fn first_test() {
-        let first_exercise = TenthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
-
-        let expected_example = 82350;
-        let expected_prod = 360154;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        let expected_example = 1166642;
-        let expected_prod = 5103798;
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+    fn test_day10() {
+        assert_eq!(look_and_say("1"), "11");
+        assert_eq!(look_and_say("11"), "21");
+        assert_eq!(look_and_say("21"), "1211");
+        assert_eq!(look_and_say("1211"), "111221");
+        assert_eq!(look_and_say("111221"), "312211");
     }
 }
