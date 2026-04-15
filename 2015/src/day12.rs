@@ -1,13 +1,12 @@
-use crate::Exercise;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 use serde_json::Value;
 
-struct TwelvfthDay {
-    exercise: Exercise,
-}
+pub struct Day12;
 
 fn count_value(value: &Value) -> i32 {
     match value {
-        Value::Number(e) => e.as_i64().unwrap() as i32,
+        Value::Number(e) => e.as_i64().unwrap_or(0) as i32,
         Value::Array(array) => array.iter().map(count_value).sum(),
         Value::Object(object) => object.values().map(count_value).sum(),
         _ => 0,
@@ -16,10 +15,10 @@ fn count_value(value: &Value) -> i32 {
 
 fn skip_red(value: &Value) -> i32 {
     match value {
-        Value::Number(e) => e.as_i64().unwrap() as i32,
+        Value::Number(e) => e.as_i64().unwrap_or(0) as i32,
         Value::Array(array) => array.iter().map(skip_red).sum(),
         Value::Object(object) => {
-            if object.values().any(|v| v == "red") {
+            if object.values().any(|v| v.as_str() == Some("red")) {
                 0
             } else {
                 object.values().map(skip_red).sum()
@@ -29,63 +28,31 @@ fn skip_red(value: &Value) -> i32 {
     }
 }
 
-impl TwelvfthDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
+impl Solution for Day12 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 12 }
+
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let value: Value = serde_json::from_str(input).unwrap();
+        Box::new(count_value(&value) as i64)
     }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
-        let value: Value = serde_json::from_str(content).unwrap();
-        count_value(&value) as i64
-    }
-
-    fn second(&self, content: &str) -> i64 {
-        let value: Value = serde_json::from_str(content).unwrap();
-        skip_red(&value) as i64
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let value: Value = serde_json::from_str(input).unwrap();
+        Box::new(skip_red(&value) as i64)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("inputs/12_test.txt");
-    const PROD: &str = include_str!("inputs/12_prod.txt");
 
     #[test]
-    fn first_test() {
-        let mut first_exercise = TwelvfthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
-
-        let expected_example = 3;
-        let expected_prod = 156366;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        let expected_example = 3;
-        let expected_prod = 96852;
-
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+    fn test_day12() {
+        let day = Day12;
+        assert_eq!(day.part1("[1,2,3]").to_string(), "6");
+        assert_eq!(day.part1(r#"{"a":2,"b":4}"#).to_string(), "6");
+        assert_eq!(day.part2("[1,2,3]").to_string(), "6");
+        assert_eq!(day.part2(r#"[1,{"c":"red","a":2},3]"#).to_string(), "4");
     }
 }
