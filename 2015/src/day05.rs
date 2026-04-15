@@ -1,99 +1,62 @@
-use crate::{Exercise, Solvable};
-use iter_tools::Itertools;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 use rayon::prelude::*;
 
-struct FifthDay {
-    exercise: Exercise,
-    vowels: Vec<char>,
-    filters: Vec<String>,
-}
+pub struct Day05;
 
-impl Solvable for FifthDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
-    }
+impl Solution for Day05 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 5 }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
-        content
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let vowels = ['a', 'e', 'i', 'o', 'u'];
+        let filters = ["ab", "cd", "pq", "xy"];
+        
+        Box::new(input
             .par_lines()
-            .filter(|line: &&str| line.chars().filter(|c| self.vowels.contains(c)).count() >= 3)
-            .filter(|line: &&str| {
-                line.chars()
-                    .enumerate()
-                    .any(|(i, c)| i > 0 && c == line.chars().nth(i - 1).unwrap())
+            .filter(|line| line.chars().filter(|c| vowels.contains(c)).count() >= 3)
+            .filter(|line| {
+                let chars: Vec<char> = line.chars().collect();
+                chars.windows(2).any(|w| w[0] == w[1])
             })
-            .filter(|line: &&str| !self.filters.iter().any(|filter| line.contains(filter)))
-            .count() as i64
+            .filter(|line| !filters.iter().any(|&f| line.contains(f)))
+            .count() as i64)
     }
 
-    fn second(&self, content: &str) -> i64 {
-        content
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        Box::new(input
             .par_lines()
-            .filter(|line| line.len() >= 3)
-            .filter(|line: &&str| {
-                line.chars()
-                    .enumerate()
-                    .any(|(i, c)| i > 2 && c == line.chars().nth(i - 2).unwrap())
+            .filter(|line| {
+                let chars: Vec<char> = line.chars().collect();
+                chars.windows(3).any(|w| w[0] == w[2])
             })
-            .filter(|line: &&str| {
-                line.chars()
-                    .tuple_windows()
-                    .any(|(c1, c2)| line.matches(&format!("{}{}", c1, c2)).count() > 1)
+            .filter(|line| {
+                let chars: Vec<char> = line.chars().collect();
+                (0..chars.len() - 1).any(|i| {
+                    let pair = &line[i..i+2];
+                    line[i+2..].contains(pair)
+                })
             })
-            .count() as i64
+            .count() as i64)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("inputs/5_test.txt");
-    const PROD: &str = include_str!("inputs/5_prod.txt");
 
     #[test]
-    fn first_test() {
-        let mut first_exercise = FifthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-            vowels: vec!['a', 'e', 'i', 'o', 'u'],
-            filters: vec![
-                String::from("ab"),
-                String::from("cd"),
-                String::from("pq"),
-                String::from("xy"),
-            ],
-        };
+    fn test_day05() {
+        let day = Day05;
+        assert_eq!(day.part1("ugknbfddgicrmopn").to_string(), "1");
+        assert_eq!(day.part1("aaa").to_string(), "1");
+        assert_eq!(day.part1("jchzalrnumimnmhp").to_string(), "0");
+        assert_eq!(day.part1("haegwjzuvuyypxyu").to_string(), "0");
+        assert_eq!(day.part1("dvszwmarrgswjxmb").to_string(), "0");
 
-        let expected_example = 2;
-        let expected_prod = 255;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        first_exercise.exercise.example =
-            String::from("qjhvhtzxzqqjkmpb\nxxyxx\nuurcxstgmygtbstg\nieodomkazucvgmuy");
-
-        let expected_example = 2;
-        let expected_prod = 55;
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+        assert_eq!(day.part2("qjhvhtzxzqqjkmpb").to_string(), "1");
+        assert_eq!(day.part2("xxyxx").to_string(), "1");
+        assert_eq!(day.part2("uurcxstgmygtbstg").to_string(), "0");
+        assert_eq!(day.part2("ieodomkazucvgmuy").to_string(), "0");
     }
 }

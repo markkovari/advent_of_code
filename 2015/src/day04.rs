@@ -1,47 +1,36 @@
-use crate::{Exercise, Solvable};
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 use md5;
 
-struct FourthDay {
-    exercise: Exercise,
-}
+pub struct Day04;
 
-impl Solvable for FourthDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
-    }
+impl Solution for Day04 {
+    fn year(&self) -> u32 { 2015 }
+    fn day(&self) -> u32 { 4 }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-    fn first(&self, content: &str) -> i64 {
+    fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut counter = 0;
+        let content = input.trim();
         loop {
             let data = format!("{}{}", content, counter);
             let calculated_hash = md5::compute(data);
             let hash_as_string = format!("{:x}", calculated_hash);
             if hash_as_string.starts_with("00000") {
-                return counter;
+                return Box::new(counter as i64);
             }
             counter += 1;
         }
     }
 
-    fn second(&self, content: &str) -> i64 {
+    fn part2(&self, input: &str) -> Box<dyn Display> {
         let mut counter = 0;
+        let content = input.trim();
         loop {
             let data = format!("{}{}", content, counter);
             let calculated_hash = md5::compute(data);
             let hash_as_string = format!("{:x}", calculated_hash);
             if hash_as_string.starts_with("000000") {
-                return counter;
+                return Box::new(counter as i64);
             }
             counter += 1;
         }
@@ -51,32 +40,12 @@ impl Solvable for FourthDay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXAMPLE: &str = include_str!("inputs/4_test.txt");
-    const PROD: &str = include_str!("inputs/4_prod.txt");
 
     #[test]
     #[ignore = "Takes too long"]
-    fn first_test() {
-        let first_exercise = FourthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
-
-        let expected_example = 1048970;
-        let expected_prod = 346386;
-
-        let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        let expected_example = 5714438;
-        let expected_prod = 9958218;
-        let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+    fn test_day04() {
+        let day = Day04;
+        assert_eq!(day.part1("abcdef").to_string(), "609043");
+        assert_eq!(day.part1("pqrstuv").to_string(), "1048970");
     }
 }
