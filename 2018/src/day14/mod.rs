@@ -1,92 +1,50 @@
-use std::error::Error;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 
-use std::result;
+pub struct Day14;
 
-type Result<T> = result::Result<T, Box<dyn Error>>;
+impl Solution for Day14 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 14 }
 
-fn part1(recipe_count: usize) -> Result<usize> {
-    let mut recipes = Recipes::new();
-    while recipes.scores.len() < recipe_count + 10 {
-        recipes.step();
-    }
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let recipe_count: usize = input.trim().parse().unwrap();
+        let mut scores = vec![3, 7];
+        let mut elves = vec![0, 1];
 
-    Ok(recipes.scores[recipe_count..recipe_count + 10]
-        .iter()
-        .map(|s| s.to_string())
-        .collect::<Vec<String>>()
-        .concat()
-        .parse::<usize>()
-        .unwrap())
-}
-
-fn part2(digits: &[u32]) -> Result<usize> {
-    let mut recipes = Recipes::new();
-    let ends_at;
-    loop {
-        if recipes.scores.ends_with(digits) {
-            ends_at = recipes.scores.len() - digits.len();
-            break;
-        } else if recipes.scores[..recipes.scores.len() - 1].ends_with(digits) {
-            ends_at = recipes.scores.len() - digits.len() - 1;
-            break;
+        while scores.len() < recipe_count + 10 {
+            let new_recipe: u32 = elves.iter().map(|&e| scores[e]).sum();
+            for &digit in new_recipe.to_string().as_bytes() {
+                scores.push((digit - b'0') as u32);
+            }
+            for e in &mut elves {
+                *e = (*e + scores[*e] as usize + 1) % scores.len();
+            }
         }
-        recipes.step();
+        
+        let result: String = scores[recipe_count..recipe_count + 10].iter().map(|s| s.to_string()).collect();
+        Box::new(result)
     }
 
-    Ok(ends_at)
-}
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let digits: Vec<u32> = input.trim().chars().map(|c| c.to_digit(10).unwrap()).collect();
+        let mut scores = vec![3, 7];
+        let mut elves = vec![0, 1];
 
-#[derive(Clone, Debug)]
-struct Recipes {
-    elves: Vec<usize>,
-    scores: Vec<u32>,
-}
+        loop {
+            let new_recipe: u32 = elves.iter().map(|&e| scores[e]).sum();
+            for &digit in new_recipe.to_string().as_bytes() {
+                scores.push((digit - b'0') as u32);
+                if scores.len() > digits.len() {
+                    if scores[scores.len() - digits.len()..] == digits[..] {
+                        return Box::new(scores.len() - digits.len());
+                    }
+                }
+            }
 
-impl Recipes {
-    fn new() -> Recipes {
-        Recipes {
-            scores: vec![3, 7],
-            elves: vec![0, 1],
+            for e in &mut elves {
+                *e = (*e + scores[*e] as usize + 1) % scores.len();
+            }
         }
-    }
-
-    fn step(&mut self) {
-        let new_recipe: u32 = self.elves.iter().map(|&e| self.scores[e]).sum();
-        for &digit in new_recipe.to_string().as_bytes() {
-            let digit_value = digit - b'0';
-            self.scores.push(digit_value as u32);
-        }
-        for e in &mut self.elves {
-            *e = (*e + self.scores[*e] as usize + 1) % self.scores.len();
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn test_first() {
-        let amount: usize = include_str!("./example.data").parse().unwrap();
-        let result = part1(amount).unwrap();
-        assert_eq!(result, 5158916779);
-
-        let prod: usize = include_str!("./prod.data").parse().unwrap();
-        let result = part1(prod).unwrap();
-        assert_eq!(result, 1221283494);
-    }
-
-    #[test]
-    #[ignore]
-    fn test_second() {
-        // let amount: usize = include_str!("./example.data").parse().unwrap();
-        // let result = part2(&[3, 7]).unwrap();
-        // assert_eq!(result, 20291131);
-
-        let _prod: usize = include_str!("./prod.data").parse().unwrap();
-        let result = part2(&[6, 5, 2, 6, 0, 1]).unwrap();
-        assert_eq!(result, 20261485);
     }
 }
