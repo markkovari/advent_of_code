@@ -1,93 +1,67 @@
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use regex::Regex;
 use lazy_static::lazy_static;
-use regex::{Error, Regex};
 
-use std::io::BufRead;
+pub struct Day10;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-struct Node {
-    x: i32,
-    y: i32,
-    vx: i32,
-    vy: i32,
-}
+struct Node { x: i32, y: i32, vx: i32, vy: i32 }
 
 impl Node {
-    fn tick(&mut self) {
-        self.x += self.vx;
-        self.y += self.vy;
-    }
+    fn tick(&mut self) { self.x += self.vx; self.y += self.vy; }
 }
 
 impl TryFrom<&str> for Node {
     type Error = &'static str;
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         lazy_static! {
-            static ref RE: Regex = Regex::new(
-                r"position=<\s*([-]?\d+),\s*([-]?\d+)> velocity=<\s*([-]?\d+),\s*([-]?\d+)>"
-            )
-            .unwrap();
+            static ref RE: Regex = Regex::new(r"position=<\s*(-?\d+),\s*(-?\d+)> velocity=<\s*(-?\d+),\s*(-?\d+)>").unwrap();
         }
-
         let caps = RE.captures(value).unwrap();
-        let x = caps.get(1).unwrap().as_str().parse::<i32>().unwrap();
-        let y = caps.get(2).unwrap().as_str().parse::<i32>().unwrap();
-        let vx = caps.get(3).unwrap().as_str().parse::<i32>().unwrap();
-        let vy = caps.get(4).unwrap().as_str().parse::<i32>().unwrap();
-        Ok(Node { x, y, vx, vy })
+        Ok(Node {
+            x: caps[1].parse().unwrap(), y: caps[2].parse().unwrap(),
+            vx: caps[3].parse().unwrap(), vy: caps[4].parse().unwrap(),
+        })
     }
 }
 
-fn solution(nodes: &mut Vec<Node>) {
+fn find_message(nodes: &mut Vec<Node>) -> (String, i32) {
     for counter in 1.. {
         nodes.iter_mut().for_each(|node| node.tick());
-        if nodes[..nodes.len() - 1]
-            .iter()
-            .zip(nodes[1..].iter())
-            .all(|pair| (pair.0.y - pair.1.y).abs() <= 10)
-        {
-            println!("result of q02 is {}", counter);
-            break;
+        let min_y = nodes.iter().map(|n| n.y).min().unwrap();
+        let max_y = nodes.iter().map(|n| n.y).max().unwrap();
+
+        if max_y - min_y <= 10 {
+            let min_x = nodes.iter().map(|n| n.x).min().unwrap();
+            let max_x = nodes.iter().map(|n| n.x).max().unwrap();
+            
+            let mut grid = vec![vec!['.'; (max_x - min_x + 1) as usize]; (max_y - min_y + 1) as usize];
+            for node in nodes {
+                grid[(node.y - min_y) as usize][(node.x - min_x) as usize] = '#';
+            }
+            let message = grid.iter().map(|row| row.iter().collect::<String>()).collect::<Vec<_>>().join("
+");
+            return (message, counter);
         }
     }
+    ("".to_string(), 0)
 }
 
-fn visualize(nodes: &Vec<Node>) {
-    let min_x = nodes.iter().map(|n| n.x).min().unwrap();
-    let min_y = nodes.iter().map(|n| n.y).min().unwrap();
+impl Solution for Day10 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 10 }
 
-    let mut visualized: [[char; 100]; 10] = [['.'; 100]; 10];
-    nodes
-        .iter()
-        .for_each(|n| visualized[(n.y - min_y) as usize][(n.x - min_x) as usize] = '#');
-    visualized.iter().for_each(|line| {
-        line.iter().for_each(|c| print!("{}", c));
-        println!();
-    });
-}
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let mut nodes: Vec<Node> = input.lines().map(|s| s.try_into().unwrap()).collect();
+        let (message, _) = find_message(&mut nodes);
+        Box::new(format!("
+{}", message))
+    }
 
-fn part1(content: String) -> Result<(), Error> {
-    let _path = format!("./input/{}", "day10.txt");
-
-    let mut nodes: Vec<Node> = content
-        .lines()
-        .map(|s| s.try_into().unwrap())
-        .collect::<Vec<_>>();
-
-    solution(&mut nodes);
-    visualize(&nodes);
-    Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn test_first() {
-        let example = include_str!("./example.data");
-        let _ = part1(example.to_owned());
-        let prod = include_str!("./prod.data");
-        let _ = part1(prod.to_owned());
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let mut nodes: Vec<Node> = input.lines().map(|s| s.try_into().unwrap()).collect();
+        let (_, seconds) = find_message(&mut nodes);
+        Box::new(seconds)
     }
 }

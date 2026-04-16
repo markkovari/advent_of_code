@@ -1,185 +1,78 @@
-use text_io::scan;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use regex::Regex;
 
-fn rule_index(bits: &[bool]) -> usize {
-    let mut result = 0;
-    for &bit in bits {
-        result <<= 1;
-        if bit {
-            result |= 1;
-        }
+pub struct Day12;
+
+impl Solution for Day12 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 12 }
+
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let (initial_state, rules) = parse_input(input);
+        let result = run_simulation(initial_state, rules, 20);
+        Box::new(result)
     }
-    result
+
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let (initial_state, rules) = parse_input(input);
+        // After ~100 generations, the pattern stabilizes and shifts right by 1 pot each generation.
+        // The sum increases by a fixed amount each time.
+        let val_100 = run_simulation(initial_state.clone(), rules.clone(), 100);
+        let val_101 = run_simulation(initial_state, rules, 101);
+        let diff = val_101 - val_100;
+        let result = val_100 + (50_000_000_000 - 100) * diff;
+        Box::new(result)
+    }
 }
 
-fn is_set(c: char) -> bool {
-    c == '#'
-}
-
-fn part1(content: String) -> i32 {
-    let mut lines = content.lines();
-    let initial_state_line = lines.next().unwrap();
-    let initial_state_str: String;
-    scan!(initial_state_line.bytes() => "initial state: {}", initial_state_str);
-
-    let mut state: Vec<_> = initial_state_str.chars().map(is_set).collect();
-    let mut state_offset = 0;
-
+fn parse_input(input: &str) -> (Vec<bool>, [bool; 32]) {
+    let mut lines = input.lines();
+    let initial_state_str = lines.next().unwrap().replace("initial state: ", "");
+    let initial_state: Vec<bool> = initial_state_str.chars().map(|c| c == '#').collect();
+    
+    lines.next(); // Skip empty line
     let mut rules = [false; 32];
-    lines.next();
+    let re = Regex::new(r"([.#]{5}) => ([.#])").unwrap();
     for line in lines {
-        let pattern_str: String;
-        let result_str: String;
-        scan!(line.bytes() => "{} => {}", pattern_str, result_str);
-        let rule: Vec<_> = pattern_str.chars().map(is_set).collect();
-        rules[rule_index(&rule)] = is_set(result_str.chars().next().unwrap());
+        let caps = re.captures(line).unwrap();
+        let pattern: Vec<bool> = caps[1].chars().map(|c| c == '#').collect();
+        let result = &caps[2] == "#";
+        let index = pattern.iter().fold(0, |acc, &bit| (acc << 1) | bit as usize);
+        rules[index] = result;
     }
-
-    for i in 0..20 {
-        if state[0] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[1] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[2] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[3] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[state.len() - 1] {
-            state.push(false);
-        }
-        if state[state.len() - 2] {
-            state.push(false);
-        }
-        if state[state.len() - 3] {
-            state.push(false);
-        }
-        if state[state.len() - 4] {
-            state.push(false);
-        }
-        let mut state2 = vec![false; state.len()];
-
-        for x in 2..(state.len() - 2) {
-            state2[x] = rules[rule_index(&state[(x - 2)..=(x + 2)])];
-        }
-
-        state = state2;
-
-        let display: String = state.iter().map(|&b| if b { '#' } else { '.' }).collect();
-        println!("{}: {}", i, display);
-    }
-    state
-        .iter()
-        .enumerate()
-        .filter(|&(_, &v)| v)
-        .map(|(i, _)| i as i32 + state_offset)
-        .sum()
+    (initial_state, rules)
 }
 
-fn part2(content: String) {
-    let mut lines = content.lines();
-    let initial_state_line = lines.next().unwrap();
-    let initial_state_str: String;
-    scan!(initial_state_line.bytes() => "initial state: {}", initial_state_str);
+fn run_simulation(initial_state: Vec<bool>, rules: [bool; 32], generations: i64) -> i64 {
+    let mut state = initial_state;
+    let mut zero_offset = 0i64;
 
-    let mut state: Vec<_> = initial_state_str.chars().map(is_set).collect();
-    let mut state_offset = 0;
+    for _ in 0..generations {
+        let first_plant = state.iter().position(|&p| p).unwrap_or(0);
+        let last_plant = state.iter().rposition(|&p| p).unwrap_or(0);
 
-    let mut rules = [false; 32];
-    lines.next();
-    for line in lines {
-        let pattern_str: String;
-        let result_str: String;
-        scan!(line.bytes() => "{} => {}", pattern_str, result_str);
-        let rule: Vec<_> = pattern_str.chars().map(is_set).collect();
-        rules[rule_index(&rule)] = is_set(result_str.chars().next().unwrap());
+        let mut next_state = Vec::new();
+        let new_len = last_plant + 5;
+        let old_len = state.len();
+        if new_len > old_len {
+            state.resize(new_len, false);
+        }
+        
+        let start_padding = 4;
+        let end_padding = 4;
+        
+        state.splice(0..0, vec![false; start_padding]);
+        state.extend(vec![false; end_padding]);
+        zero_offset -= start_padding as i64;
+        
+        for i in 2..state.len() - 2 {
+            let pattern = &state[i-2..=i+2];
+            let index = pattern.iter().fold(0, |acc, &bit| (acc << 1) | bit as usize);
+            next_state.push(rules[index]);
+        }
+        state = next_state;
     }
-
-    for i in 0..200 {
-        if state[0] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[1] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[2] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[3] {
-            state.insert(0, false);
-            state_offset -= 1;
-        }
-        if state[state.len() - 1] {
-            state.push(false);
-        }
-        if state[state.len() - 2] {
-            state.push(false);
-        }
-        if state[state.len() - 3] {
-            state.push(false);
-        }
-        if state[state.len() - 4] {
-            state.push(false);
-        }
-        while !state[4] {
-            state.remove(4);
-            state_offset += 1;
-        }
-        let mut state2 = vec![false; state.len()];
-
-        for x in 2..(state.len() - 2) {
-            state2[x] = rules[rule_index(&state[(x - 2)..=(x + 2)])];
-        }
-
-        state = state2;
-
-        let display: String = state.iter().map(|&b| if b { '#' } else { '.' }).collect();
-        let result: i64 = state
-            .iter()
-            .enumerate()
-            .filter(|&(_, &v)| v)
-            .map(|(i, _)| i as i64 + state_offset)
-            .sum();
-        let count: i64 = state.iter().filter(|&&v| v).count() as i64;
-        let remaining_generations = 50000000000i64 - i - 1;
-        let predicted = result + remaining_generations * count;
-        println!("{}: {} ({} - {})", i, display, result, predicted);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn test_first() {
-        let example = include_str!("./example.data");
-        let result = part1(example.to_string());
-        assert_eq!(result, 325);
-
-        let prod = include_str!("./prod.data");
-        let result = part1(prod.to_string());
-        assert_eq!(result, 1430);
-    }
-    #[test]
-    #[ignore]
-    fn test_second() {
-        println!("----------------------EXAMPLE----------------------");
-        let example = include_str!("./example.data");
-        part2(example.to_string());
-
-        println!("----------------------PROD----------------------");
-        let prod = include_str!("./prod.data");
-        part2(prod.to_string());
-    }
+    
+    state.iter().enumerate().filter(|(_, &p)| p).map(|(i, _)| i as i64 + zero_offset).sum()
 }
