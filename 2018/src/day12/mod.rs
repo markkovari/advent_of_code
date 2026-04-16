@@ -27,17 +27,17 @@ impl Solution for Day12 {
 }
 
 fn parse_input(input: &str) -> (Vec<bool>, [bool; 32]) {
-    let mut lines = input.lines();
-    let initial_state_str = lines.next().unwrap().replace("initial state: ", "");
+    let initial_state_re = Regex::new(r"initial state: ([.#]+)").unwrap();
+    let initial_state_str = initial_state_re.captures(input).unwrap().get(1).unwrap().as_str();
     let initial_state: Vec<bool> = initial_state_str.chars().map(|c| c == '#').collect();
-    
-    lines.next(); // Skip empty line
+
     let mut rules = [false; 32];
-    let re = Regex::new(r"([.#]{5}) => ([.#])").unwrap();
-    for line in lines {
-        let caps = re.captures(line).unwrap();
-        let pattern: Vec<bool> = caps[1].chars().map(|c| c == '#').collect();
-        let result = &caps[2] == "#";
+    let rule_re = Regex::new(r"([.#]{5})\s*=>\s*([.#])").unwrap();
+    for cap in rule_re.captures_iter(input) {
+        let pattern_str = cap.get(1).unwrap().as_str();
+        let result_str = cap.get(2).unwrap().as_str();
+        let pattern: Vec<bool> = pattern_str.chars().map(|c| c == '#').collect();
+        let result = result_str == "#";
         let index = pattern.iter().fold(0, |acc, &bit| (acc << 1) | bit as usize);
         rules[index] = result;
     }

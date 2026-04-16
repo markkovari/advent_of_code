@@ -1,25 +1,24 @@
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 use regex::Regex;
+use std::collections::VecDeque;
 
 pub struct Day09;
 
 fn play_game(num_players: usize, last_marble: u32) -> u32 {
-    let mut circle = Vec::with_capacity(last_marble as usize);
-    circle.push(0);
+    let mut circle = VecDeque::with_capacity(last_marble as usize + 1);
+    circle.push_back(0);
     let mut scores = vec![0; num_players];
-    let mut current_pos = 0;
 
     for marble in 1..=last_marble {
         if marble % 23 == 0 {
-            let player = (marble - 1) as usize % num_players;
-            let remove_pos = (current_pos + circle.len() - 7) % circle.len();
-            scores[player] += marble + circle.remove(remove_pos);
-            current_pos = remove_pos;
+            let player_index = (marble - 1) as usize % num_players;
+            circle.rotate_right(7);
+            scores[player_index] += marble + circle.pop_back().unwrap();
+            circle.rotate_left(1);
         } else {
-            let insert_pos = (current_pos + 2) % circle.len();
-            circle.insert(insert_pos, marble);
-            current_pos = insert_pos;
+            circle.rotate_left(1);
+            circle.push_back(marble);
         }
     }
     *scores.iter().max().unwrap()

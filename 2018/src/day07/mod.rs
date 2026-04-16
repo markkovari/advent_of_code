@@ -4,7 +4,6 @@ use std::collections::{HashMap, HashSet};
 use nom::{
     bytes::complete::tag,
     character::complete::anychar,
-    sequence::{preceded, separated_pair},
     IResult,
 };
 
