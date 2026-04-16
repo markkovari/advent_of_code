@@ -1,187 +1,144 @@
+use aoc_rust_common::Solution;
+use std::fmt::Display;
 use std::collections::{HashMap, HashSet};
-
-use std::io::BufRead;
-
-use itertools::Itertools;
 use text_io::scan;
 
-use self::OpCode::*;
-
-type Reg = usize;
+pub struct Day16;
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 enum OpCode {
-    AddR,
-    AddI,
-    MulR,
-    MulI,
-    BanR,
-    BanI,
-    BorR,
-    BorI,
-    SetR,
-    SetI,
-    GtIR,
-    GtRI,
-    GtRR,
-    EqIR,
-    EqRI,
-    EqRR,
-}
-
-impl OpCode {
-    fn apply(self, registers: &mut [Reg], a: usize, b: usize, c: usize) {
-        registers[c] = match self {
-            AddR => registers[a] + registers[b],
-            AddI => registers[a] + b,
-            MulR => registers[a] * registers[b],
-            MulI => registers[a] * b,
-            BanR => registers[a] & registers[b],
-            BanI => registers[a] & b,
-            BorR => registers[a] | registers[b],
-            BorI => registers[a] | b,
-            SetR => registers[a],
-            SetI => a,
-            GtIR => (a > registers[b]).into(),
-            GtRI => (registers[a] > b).into(),
-            GtRR => (registers[a] > registers[b]).into(),
-            EqIR => (a == registers[b]).into(),
-            EqRI => (registers[a] == b).into(),
-            EqRR => (registers[a] == registers[b]).into(),
-        }
-    }
-}
-
-fn part1(content: String) -> usize {
-    let result = content
-        .lines()
-        .by_ref()
-        .scan(0, |state, line| {
-            if line.is_empty() {
-                *state += 1;
-            } else {
-                *state = 0;
-            }
-            if *state >= 2 {
-                None
-            } else {
-                Some(line)
-            }
-        })
-        .tuples()
-        .filter(|(l1, l2, l3, _)| {
-            let (r0, r1, r2, r3): (Reg, Reg, Reg, Reg);
-            let (s0, s1, s2, s3): (Reg, Reg, Reg, Reg);
-            let (op, a, b, c): (usize, usize, usize, usize);
-            scan!(l1.bytes() => "Before: [{}, {}, {}, {}]", r0, r1, r2, r3);
-            scan!(l2.bytes() => "{} {} {} {}", op, a, b, c);
-            scan!(l3.bytes() => "After:  [{}, {}, {}, {}]", s0, s1, s2, s3);
-
-            ALL_OP_CODES
-                .iter()
-                .filter(|op_code| {
-                    let mut registers = [r0, r1, r2, r3];
-                    op_code.apply(&mut registers, a, b, c);
-                    registers == [s0, s1, s2, s3]
-                })
-                .count()
-                >= 3
-        })
-        .count();
-    result
-}
-
-fn part2() -> usize {
-    let mut line_iter = include_str!("prod.data").lines();
-
-    let mut op_codes = vec![ALL_OP_CODES.iter().cloned().collect::<HashSet<OpCode>>(); 16];
-    let mut known_codes = HashMap::new();
-
-    for (l1, l2, l3, _) in line_iter
-        .by_ref()
-        .scan(0, |state, line| {
-            if line.is_empty() {
-                *state += 1;
-            } else {
-                *state = 0;
-            }
-            if *state >= 2 {
-                None
-            } else {
-                Some(line)
-            }
-        })
-        .tuples()
-    {
-        let (r0, r1, r2, r3): (Reg, Reg, Reg, Reg);
-        let (s0, s1, s2, s3): (Reg, Reg, Reg, Reg);
-        let (op, a, b, c): (usize, usize, usize, usize);
-        scan!(l1.bytes() => "Before: [{}, {}, {}, {}]", r0, r1, r2, r3);
-        scan!(l2.bytes() => "{} {} {} {}", op, a, b, c);
-        scan!(l3.bytes() => "After:  [{}, {}, {}, {}]", s0, s1, s2, s3);
-
-        let possible: HashSet<OpCode> = ALL_OP_CODES
-            .iter()
-            .cloned()
-            .filter(|op_code| {
-                let mut registers = [r0, r1, r2, r3];
-                op_code.apply(&mut registers, a, b, c);
-                registers == [s0, s1, s2, s3]
-            })
-            .collect();
-
-        op_codes[op].retain(|op_code| possible.contains(op_code));
-    }
-
-    while known_codes.len() < ALL_OP_CODES.len() {
-        for (code, ops) in op_codes.iter().enumerate() {
-            if ops.len() == 1 && !known_codes.contains_key(&code) {
-                known_codes.insert(code, ops.iter().cloned().next().unwrap());
-            }
-        }
-        for (&code, &op) in known_codes.iter() {
-            for (code2, ops) in op_codes.iter_mut().enumerate() {
-                if code2 != code {
-                    ops.remove(&op);
-                }
-            }
-        }
-    }
-    println!("{:?}", known_codes);
-
-    let mut registers = [0, 0, 0, 0];
-    for line in line_iter {
-        if line.is_empty() {
-            continue;
-        }
-        let (op, a, b, c): (usize, usize, usize, usize);
-        scan!(line.bytes() => "{} {} {} {}", op, a, b, c);
-        known_codes[&op].apply(&mut registers, a, b, c);
-    }
-    registers[0]
+    AddR, AddI, MulR, MulI, BanR, BanI, BorR, BorI,
+    SetR, SetI, GtIR, GtRI, GtRR, EqIR, EqRI, EqRR,
 }
 
 const ALL_OP_CODES: &[OpCode] = &[
-    AddR, AddI, MulR, MulI, BanR, BanI, BorR, BorI, SetR, SetI, GtIR, GtRI, GtRR, EqIR, EqRI, EqRR,
+    OpCode::AddR, OpCode::AddI, OpCode::MulR, OpCode::MulI,
+    OpCode::BanR, OpCode::BanI, OpCode::BorR, OpCode::BorI,
+    OpCode::SetR, OpCode::SetI, OpCode::GtIR, OpCode::GtRI, OpCode::GtRR,
+    OpCode::EqIR, OpCode::EqRI, OpCode::EqRR,
 ];
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn test_part1() {
-        let text = include_str!("./example.data").to_owned();
-        assert_eq!(part1(text), 0);
-        let text = include_str!("./prod.data").to_owned();
-        assert_eq!(part1(text), 646);
+impl OpCode {
+    fn apply(self, registers: &mut [usize], a: usize, b: usize, c: usize) {
+        registers[c] = match self {
+            OpCode::AddR => registers[a] + registers[b],
+            OpCode::AddI => registers[a] + b,
+            OpCode::MulR => registers[a] * registers[b],
+            OpCode::MulI => registers[a] * b,
+            OpCode::BanR => registers[a] & registers[b],
+            OpCode::BanI => registers[a] & b,
+            OpCode::BorR => registers[a] | registers[b],
+            OpCode::BorI => registers[a] | b,
+            OpCode::SetR => registers[a],
+            OpCode::SetI => a,
+            OpCode::GtIR => (a > registers[b]).into(),
+            OpCode::GtRI => (registers[a] > b).into(),
+            OpCode::GtRR => (registers[a] > registers[b]).into(),
+            OpCode::EqIR => (a == registers[b]).into(),
+            OpCode::EqRI => (registers[a] == b).into(),
+            OpCode::EqRR => (registers[a] == registers[b]).into(),
+        };
     }
-    #[test]
-    #[ignore]
-    fn test_part2() {
-        // let text = include_str!("./prod.data").to_owned();
-        let result = part2();
-        assert_eq!(result, 681);
+}
+
+struct Sample {
+    before: [usize; 4],
+    instruction: [usize; 4],
+    after: [usize; 4],
+}
+
+fn parse_input(input: &str) -> (Vec<Sample>, Vec<[usize; 4]>) {
+    let mut samples = Vec::new();
+    let mut program = Vec::new();
+    let mut lines = input.lines();
+    
+    loop {
+        let l1 = match lines.next() {
+            Some(l) if !l.is_empty() => l,
+            _ => break,
+        };
+        let l2 = lines.next().unwrap();
+        let l3 = lines.next().unwrap();
+        lines.next(); // Consume empty line
+
+        let (r0, r1, r2, r3): (usize, usize, usize, usize);
+        scan!(l1.bytes() => "Before: [{}, {}, {}, {}]", r0, r1, r2, r3);
+        let before = [r0, r1, r2, r3];
+
+        let (op, a, b, c): (usize, usize, usize, usize);
+        scan!(l2.bytes() => "{} {} {} {}", op, a, b, c);
+        let instruction = [op, a, b, c];
+
+        let (s0, s1, s2, s3): (usize, usize, usize, usize);
+        scan!(l3.bytes() => "After:  [{}, {}, {}, {}]", s0, s1, s2, s3);
+        let after = [s0, s1, s2, s3];
+        
+        samples.push(Sample { before, instruction, after });
+    }
+
+    // After the samples, there are two blank lines, then the test program
+    lines.next();
+    for line in lines {
+        let (op, a, b, c): (usize, usize, usize, usize);
+        scan!(line.bytes() => "{} {} {} {}", op, a, b, c);
+        program.push([op, a, b, c]);
+    }
+
+    (samples, program)
+}
+
+
+impl Solution for Day16 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 16 }
+
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let (samples, _) = parse_input(input);
+        let result = samples.iter().filter(|sample| {
+            let [_, a, b, c] = sample.instruction;
+            ALL_OP_CODES.iter().filter(|opcode| {
+                let mut registers = sample.before;
+                opcode.apply(&mut registers, a, b, c);
+                registers == sample.after
+            }).count() >= 3
+        }).count();
+        Box::new(result)
+    }
+
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let (samples, program) = parse_input(input);
+        let mut op_map: HashMap<usize, OpCode> = HashMap::new();
+        let mut possible_ops: HashMap<usize, HashSet<OpCode>> = (0..16).map(|i| (i, ALL_OP_CODES.iter().cloned().collect())).collect();
+
+        for sample in &samples {
+            let [op_num, a, b, c] = sample.instruction;
+            let possibilities = possible_ops.get_mut(&op_num).unwrap();
+            possibilities.retain(|opcode| {
+                let mut registers = sample.before;
+                opcode.apply(&mut registers, a, b, c);
+                registers == sample.after
+            });
+        }
+        
+        while op_map.len() < 16 {
+            for (op_num, possibilities) in &possible_ops {
+                if possibilities.len() == 1 {
+                    let opcode = possibilities.iter().next().unwrap().clone();
+                    op_map.insert(*op_num, opcode);
+                }
+            }
+            for opcode in op_map.values() {
+                for possibilities in possible_ops.values_mut() {
+                    possibilities.remove(opcode);
+                }
+            }
+        }
+        
+        let mut registers = [0, 0, 0, 0];
+        for instruction in &program {
+            let [op_num, a, b, c] = *instruction;
+            op_map[&op_num].apply(&mut registers, a, b, c);
+        }
+        Box::new(registers[0])
     }
 }

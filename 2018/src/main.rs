@@ -13,6 +13,7 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
 use aoc_rust_common::run_solution;
 use day01::Day01;
 use day02::Day02;
@@ -29,6 +30,7 @@ use day12::Day12;
 use day13::Day13;
 use day14::Day14;
 use day15::Day15;
+use day16::Day16;
 
 fn main() {
     run_solution(Day01);
@@ -46,4 +48,5 @@ fn main() {
     run_solution(Day13);
     run_solution(Day14);
     run_solution(Day15);
+    run_solution(Day16);
 }
