@@ -1,10 +1,7 @@
-mod day1;
-mod day2;
+mod day01;
+use aoc_rust_common::run_solution;
+use day01::Day01;
 
 fn main() {
-    println!("Advent of Code 2025");
-    println!("===================\n");
-
-    day1::run();
-    day2::run();
+    run_solution(Day01);
 }
