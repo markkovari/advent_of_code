@@ -13,6 +13,17 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
+mod day17;
+mod day18;
+mod day19;
+mod day20;
+mod day21;
+mod day22;
+mod day23;
+mod day24;
+mod day25;
+mod day26;
 
 use aoc_rust_common::run_solution;
 use day01::Day01;
@@ -30,6 +41,17 @@ use day12::Day12;
 use day13::Day13;
 use day14::Day14;
 use day15::Day15;
+use day16::Day16;
+use day17::Day17;
+use day18::Day18;
+use day19::Day19;
+use day20::Day20;
+use day21::Day21;
+use day22::Day22;
+use day23::Day23;
+use day24::Day24;
+use day25::Day25;
+use day26::Day26;
 
 fn main() {
     run_solution(Day01);
@@ -47,4 +69,15 @@ fn main() {
     run_solution(Day13);
     run_solution(Day14);
     run_solution(Day15);
+    run_solution(Day16);
+    run_solution(Day17);
+    run_solution(Day18);
+    run_solution(Day19);
+    run_solution(Day20);
+    run_solution(Day21);
+    run_solution(Day22);
+    run_solution(Day23);
+    run_solution(Day24);
+    run_solution(Day25);
+    run_solution(Day26);
 }

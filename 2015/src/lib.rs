@@ -24,22 +24,3 @@ pub mod day23;
 pub mod day24;
 pub mod day25;
 pub mod day26;
-
-/// Holds input data for an Advent of Code exercise
-pub struct Exercise {
-    pub content: String,
-    pub example: String,
-}
-
-/// Trait for solving Advent of Code problems
-pub trait Solvable {
-    /// Solve part 1 of the problem
-    fn first(&self, content: &str) -> i64;
-    /// Solve part 2 of the problem
-    fn second(&self, content: &str) -> i64;
-
-    /// Helper to solve part 1 with example or production data
-    fn solve_first(&self, is_prod: bool) -> i64;
-    /// Helper to solve part 2 with example or production data
-    fn solve_second(&self, is_prod: bool) -> i64;
-}
