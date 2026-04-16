@@ -1,338 +1,114 @@
-use core::fmt;
-use std::error::Error;
-
-use std::{
-    cmp,
-    collections::{HashMap, HashSet},
-    ops::RangeInclusive,
-    result,
-    str::FromStr,
-};
-
-use itertools::Itertools;
-use lazy_static::lazy_static;
-
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use std::collections::HashSet;
 use regex::Regex;
+use std::cmp::{min, max};
 
-macro_rules! err {
-    ($($tt:tt)*) => { Err(Box::<dyn Error>::from(format!($($tt)*))) }
+pub struct Day17;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+struct Point { x: i32, y: i32 }
+
+fn parse(input: &str) -> (HashSet<Point>, i32, i32) {
+    let mut clay = HashSet::new();
+    let re = Regex::new(r"(x|y)=(\d+), (x|y)=(\d+)..(\d+)").unwrap();
+    let mut min_y = i32::MAX;
+    let mut max_y = i32::MIN;
+
+    for line in input.lines() {
+        let caps = re.captures(line).unwrap();
+        let a = caps[2].parse().unwrap();
+        let b1: i32 = caps[4].parse().unwrap();
+        let b2: i32 = caps[5].parse().unwrap();
+
+        if &caps[1] == "x" {
+            min_y = min(min_y, b1);
+            max_y = max(max_y, b2);
+            for y in b1..=b2 { clay.insert(Point { x: a, y }); }
+        } else {
+            min_y = min(min_y, a);
+            max_y = max(max_y, a);
+            for x in b1..=b2 { clay.insert(Point { x, y: a }); }
+        }
+    }
+    (clay, min_y, max_y)
 }
 
-type Result<T> = result::Result<T, Box<dyn std::error::Error>>;
+fn solve(input: &str) -> (usize, usize) {
+    let (clay, min_y, max_y) = parse(input);
+    let mut flowing_water = HashSet::new();
+    let mut still_water = HashSet::new();
+    let mut stack = vec![Point { x: 500, y: 0 }];
 
-#[derive(Clone, Debug)]
-struct Ground {
-    spring: Coordinate,
-    clay: HashSet<Coordinate>,
-    water: HashMap<Coordinate, Water>,
-    settled: HashSet<Coordinate>,
-    min: Coordinate,
-    max: Coordinate,
-}
+    while let Some(point) = stack.pop() {
+        if point.y > max_y { continue; }
 
-impl Ground {
-    fn new() -> Ground {
-        Ground {
-            spring: Coordinate { x: 500, y: 0 },
-            clay: HashSet::new(),
-            water: HashMap::new(),
-            settled: HashSet::new(),
-            min: Coordinate { x: 0, y: 0 },
-            max: Coordinate { x: 0, y: 0 },
-        }
-    }
-
-    fn water_in_bounds(&self) -> usize {
-        self.water
-            .keys()
-            .filter(|&&c| self.min.y <= c.y && c.y <= self.max.y)
-            .count()
-    }
-
-    fn water_at_rest(&self) -> usize {
-        self.water.values().filter(|&&w| w == Water::Rest).count()
-    }
-
-    fn add_water(&mut self) -> bool {
-        let mut rested = false;
-        let mut stack = vec![self.spring];
-        let mut seen = HashSet::new();
-        while let Some(c) = stack.pop() {
-            if seen.contains(&c) {
-                continue;
-            }
-            seen.insert(c);
-
-            if let Some(down) = self.down(c) {
-                if down.y <= self.max.y {
-                    stack.push(down);
-                    self.water.insert(down, Water::Flow);
-                }
-                continue;
-            }
-
-            let mut blocked = true;
-            let mut c2 = c;
-            while let Some(left) = self.left(c2) {
-                c2 = left;
-                self.water.insert(c2, Water::Flow);
-                if self.down(c2).is_some() {
-                    stack.push(c2);
-                    blocked = false;
-                    break;
-                }
-            }
-            c2 = c;
-            while let Some(right) = self.right(c2) {
-                c2 = right;
-                self.water.insert(c2, Water::Flow);
-                if self.down(c2).is_some() {
-                    stack.push(c2);
-                    blocked = false;
-                    break;
-                }
-            }
-            if blocked {
-                self.water.insert(c, Water::Rest);
-                rested = true;
-            }
-        }
-        rested
-    }
-
-    fn down(&mut self, c: Coordinate) -> Option<Coordinate> {
-        let down = Coordinate { x: c.x, y: c.y + 1 };
-        if self.is_clay(down) {
-            return None;
-        }
-        if !self.is_settled(down) {
-            return Some(down);
+        let mut current = point;
+        while current.y <= max_y && !clay.contains(&current) {
+            flowing_water.insert(current);
+            current.y += 1;
         }
 
-        let mut left = Coordinate {
-            x: down.x - 1,
-            y: down.y,
-        };
-        if !self.settled.contains(&left) {
-            let start = left;
-            while !self.is_clay(left) {
-                if !self.is_settled(left) {
-                    return Some(left);
-                }
+        if current.y > max_y { continue; }
+
+        current.y -= 1; // Step back up to solid ground
+
+        loop {
+            let mut left = current;
+            let mut right = current;
+            let mut wall_left = false;
+            let mut wall_right = false;
+
+            while !clay.contains(&Point { x: left.x - 1, y: left.y }) {
                 left.x -= 1;
-            }
-            self.settled.insert(start);
-        }
-
-        let mut right = Coordinate {
-            x: down.x + 1,
-            y: down.y,
-        };
-        if !self.settled.contains(&right) {
-            let start = right;
-            while !self.is_clay(right) {
-                if !self.is_settled(right) {
-                    return Some(right);
+                let down = Point { x: left.x, y: left.y + 1 };
+                if !clay.contains(&down) && !still_water.contains(&down) {
+                    stack.push(left);
+                    break;
                 }
+            }
+            if clay.contains(&Point { x: left.x - 1, y: left.y }) { wall_left = true; }
+
+            while !clay.contains(&Point { x: right.x + 1, y: right.y }) {
                 right.x += 1;
-            }
-            self.settled.insert(start);
-        }
-
-        None
-    }
-
-    fn left(&self, c: Coordinate) -> Option<Coordinate> {
-        let left = Coordinate { x: c.x - 1, y: c.y };
-        if self.is_clay(left) || self.is_settled(left) {
-            None
-        } else {
-            Some(left)
-        }
-    }
-
-    fn right(&self, c: Coordinate) -> Option<Coordinate> {
-        let right = Coordinate { x: c.x + 1, y: c.y };
-        if self.is_clay(right) || self.is_settled(right) {
-            None
-        } else {
-            Some(right)
-        }
-    }
-
-    fn is_clay(&self, c: Coordinate) -> bool {
-        self.clay.contains(&c)
-    }
-
-    fn is_settled(&self, c: Coordinate) -> bool {
-        self.water.get(&c).map_or(false, |&w| w == Water::Rest)
-    }
-
-    fn add_clay_scans(&mut self, scans: &[ClayScan]) {
-        if scans.is_empty() {
-            return;
-        }
-        self.min = Coordinate {
-            x: *scans[0].x.start(),
-            y: *scans[0].y.start(),
-        };
-        self.max = self.min;
-        for scan in scans {
-            for x in scan.x.clone() {
-                for y in scan.y.clone() {
-                    let c = Coordinate { x, y };
-                    self.clay.insert(c);
-                    self.min.x = cmp::min(self.min.x, c.x);
-                    self.min.y = cmp::min(self.min.y, c.y);
-                    self.max.x = cmp::max(self.max.x, c.x);
-                    self.max.y = cmp::max(self.max.y, c.y);
+                let down = Point { x: right.x, y: right.y + 1 };
+                if !clay.contains(&down) && !still_water.contains(&down) {
+                    stack.push(right);
+                    break;
                 }
             }
-        }
-    }
-}
+            if clay.contains(&Point { x: right.x + 1, y: right.y }) { wall_right = true; }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum Water {
-    Flow,
-    Rest,
-}
-
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-struct Coordinate {
-    x: i64,
-    y: i64,
-}
-
-#[derive(Clone, Debug)]
-struct ClayScan {
-    x: RangeInclusive<i64>,
-    y: RangeInclusive<i64>,
-}
-
-impl FromStr for ClayScan {
-    type Err = Box<dyn Error>;
-
-    fn from_str(s: &str) -> Result<ClayScan> {
-        lazy_static! {
-            static ref RE1: Regex = Regex::new(
-                r"(?x)
-                x=(?P<x>[0-9]+),\sy=(?P<y1>[0-9]+)\.\.(?P<y2>[0-9]+)
-            "
-            )
-            .unwrap();
-            static ref RE2: Regex = Regex::new(
-                r"(?x)
-                y=(?P<y>[0-9]+),\sx=(?P<x1>[0-9]+)\.\.(?P<x2>[0-9]+)
-            "
-            )
-            .unwrap();
-        }
-
-        if let Some(caps) = RE1.captures(s) {
-            let x = caps["x"].parse()?;
-            let (y1, y2) = (caps["y1"].parse()?, caps["y2"].parse()?);
-            return Ok(ClayScan {
-                x: x..=x,
-                y: y1..=y2,
-            });
-        }
-        if let Some(caps) = RE2.captures(s) {
-            let (x1, x2) = (caps["x1"].parse()?, caps["x2"].parse()?);
-            let y = caps["y"].parse()?;
-            return Ok(ClayScan {
-                x: x1..=x2,
-                y: y..=y,
-            });
-        }
-        err!("unrecognized clay scan: {:?}", s)
-    }
-}
-
-impl fmt::Display for Ground {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for y in self.spring.y..=self.max.y {
-            for x in (self.min.x - 1)..=(self.max.x + 1) {
-                let c = Coordinate { x, y };
-                if c == self.spring {
-                    write!(f, "+")?;
-                } else if self.clay.contains(&c) {
-                    write!(f, "#")?;
-                } else if let Some(&w) = self.water.get(&c) {
-                    write!(f, "{}", w)?;
+            for x in left.x..=right.x {
+                if wall_left && wall_right {
+                    still_water.insert(Point { x, y: current.y });
                 } else {
-                    write!(f, ".")?;
+                    flowing_water.insert(Point { x, y: current.y });
                 }
             }
-            writeln!(f)?;
-        }
-        Ok(())
-    }
-}
 
-impl fmt::Display for Water {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Water::Flow => write!(f, "|"),
-            Water::Rest => write!(f, "~"),
+            if !(wall_left && wall_right) { break; }
+            current.y -= 1;
         }
     }
+    
+    let total_water = flowing_water.union(&still_water).filter(|p| p.y >= min_y && p.y <= max_y).count();
+    let still_water_count = still_water.len();
+    (total_water, still_water_count)
 }
 
-fn part1(content: String) -> usize {
-    let mut scans: Vec<ClayScan> = vec![];
 
-    for line in content.lines() {
-        let scan = line
-            .parse()
-            .or_else(|err| err!("failed to parse '{:?}': {}", line, err))
-            .unwrap();
-        scans.push(scan);
+impl Solution for Day17 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 17 }
+
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let (total_water, _) = solve(input);
+        Box::new(total_water)
     }
 
-    let mut ground = Ground::new();
-    ground.add_clay_scans(&scans);
-    while ground.add_water() {}
-
-    ground.water_in_bounds()
-}
-
-fn part2(content: String) -> usize {
-    let mut scans: Vec<ClayScan> = vec![];
-
-    for line in content.lines() {
-        let scan = line
-            .parse()
-            .or_else(|err| err!("failed to parse '{:?}': {}", line, err))
-            .unwrap();
-        scans.push(scan);
-    }
-
-    let mut ground = Ground::new();
-    ground.add_clay_scans(&scans);
-    while ground.add_water() {}
-
-    ground.water_at_rest()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[ignore]
-    fn test_part1() {
-        let text = include_str!("./example.data").to_owned();
-        assert_eq!(part1(text), 57);
-        let text = include_str!("./prod.data").to_owned();
-        assert_eq!(part1(text), 29741);
-    }
-    #[test]
-    #[ignore]
-    fn test_part2() {
-        let text = include_str!("./example.data").to_owned();
-        assert_eq!(part2(text), 29);
-        let text = include_str!("./prod.data").to_owned();
-        assert_eq!(part2(text), 24198);
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let (_, still_water) = solve(input);
+        Box::new(still_water)
     }
 }
