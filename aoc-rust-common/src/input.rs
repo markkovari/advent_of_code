@@ -14,7 +14,7 @@ pub fn get_input(year: u32, day: u32) -> String {
 
     for path in &paths {
         if let Ok(content) = fs::read_to_string(path) {
-            return content;
+            return content.trim_end().to_string();
         }
     }
 
