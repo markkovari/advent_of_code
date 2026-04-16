@@ -1,439 +1,165 @@
-#![allow(dead_code)]
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use std::collections::{BTreeMap, VecDeque, HashSet};
 
-use std::cmp;
-use std::collections::{BTreeMap, BTreeSet, VecDeque};
-use std::error::Error;
-use std::fmt;
-use std::io::{self, Write};
-use std::result;
-use std::str::FromStr;
+pub struct Day15;
 
-macro_rules! err {
-    ($($tt:tt)*) => { Err(Box::<dyn Error>::from(format!($($tt)*))) }
-}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Cell { Wall, Open }
 
-type Result<T> = result::Result<T, Box<dyn Error>>;
-
-fn part1() -> Result<()> {
-    let content = include_str!("./prod.data");
-    let caves: Caves = content.parse()?;
-
-    writeln!(
-        io::stdout(),
-        "part 1, outcome: {}",
-        caves.clone().outcome()?
-    )?;
-
-    for power in 4..100 {
-        let mut caves = caves.clone();
-        caves.set_elf_attack_power(power);
-
-        let initial_elves = caves.remaining_elves();
-        let outcome = caves.outcome()?;
-        if initial_elves == caves.remaining_elves() {
-            writeln!(
-                io::stdout(),
-                "part 2, elves at power {}, outcome: {}",
-                power,
-                outcome,
-            )?;
-            break;
-        }
-    }
-    Ok(())
-}
-
-#[derive(Clone, Debug, Default)]
-struct Caves {
-    grid: BTreeMap<Coordinate, Cell>,
-    units: BTreeMap<Coordinate, Unit>,
-    max: Coordinate,
-}
-
-#[derive(Clone, Debug)]
-enum Cell {
-    Wall,
-    Open,
-}
-
-impl Caves {
-    fn outcome(&mut self) -> Result<usize> {
-        const LIMIT: usize = 500;
-
-        for i in 0..LIMIT {
-            let moved = self.step();
-            if !moved {
-                let hp = self.hp();
-                return Ok(i * hp);
-            }
-        }
-        err!("no outcome after {} iterations", LIMIT)
-    }
-
-    fn remaining_elves(&self) -> usize {
-        self.units.values().filter(|u| u.is_elf()).count()
-    }
-
-    fn set_elf_attack_power(&mut self, power: usize) {
-        for unit in self.units.values_mut() {
-            if unit.is_elf() {
-                unit.attack = power;
-            }
-        }
-    }
-
-    fn hp(&self) -> usize {
-        self.units.values().map(|u| u.hp).sum()
-    }
-
-    fn step(&mut self) -> bool {
-        let mut any_move = false;
-        let unit_coordinates: Vec<_> = self.units.keys().cloned().collect();
-        for c in unit_coordinates.into_iter() {
-            if !self.units.contains_key(&c) {
-                continue;
-            }
-            if !self.any_enemies(c) {
-                return false;
-            }
-            if let Some(attack) = self.best_attack_unit(c) {
-                self.attack(c, attack);
-                any_move = true;
-                continue;
-            }
-
-            let nextc = match self.next_step(c) {
-                None => continue,
-                Some(nextc) => nextc,
-            };
-            any_move = true;
-
-            let unit = self.units.remove(&c).unwrap();
-            self.units.insert(nextc, unit);
-            if let Some(attack) = self.best_attack_unit(nextc) {
-                self.attack(nextc, attack);
-            }
-        }
-        any_move
-    }
-
-    fn next_step(&self, unit: Coordinate) -> Option<Coordinate> {
-        self.nearest_target(unit)
-            .and_then(|t| self.nearest_step(unit, t))
-    }
-
-    fn nearest_step(&self, unit: Coordinate, target: Coordinate) -> Option<Coordinate> {
-        let dists = self.distances(target);
-        self.neighbors(unit)
-            .filter_map(|c| dists.get(&c).map(|dist| (c, dist)))
-            .min_by_key(|&(_, dist)| dist)
-            .map(|(c, _)| c)
-    }
-
-    fn nearest_target(&self, unit: Coordinate) -> Option<Coordinate> {
-        let dists = self.distances(unit);
-        self.targets(unit)
-            .into_iter()
-            .filter_map(|c| dists.get(&c).map(|dist| (c, dist)))
-            .min_by_key(|&(_, dist)| dist)
-            .map(|(c, _)| c)
-    }
-
-    fn distances(&self, origin: Coordinate) -> BTreeMap<Coordinate, usize> {
-        let mut d = BTreeMap::new();
-        d.insert(origin, 0);
-
-        // let mut todo = vec![origin];
-        let mut todo = VecDeque::new();
-        todo.push_front(origin);
-        let mut todo_set = BTreeSet::new();
-        let mut visited = BTreeSet::new();
-        while let Some(c) = todo.pop_front() {
-            visited.insert(c);
-            todo_set.remove(&c);
-            for neighbor in self.neighbors(c) {
-                if visited.contains(&neighbor) {
-                    continue;
-                }
-                if !todo_set.contains(&neighbor) {
-                    todo.push_back(neighbor);
-                    todo_set.insert(neighbor);
-                }
-
-                let candidate_dist = 1 + *d.get(&c).unwrap_or(&0);
-                if !d.contains_key(&neighbor) || candidate_dist < d[&neighbor] {
-                    d.insert(neighbor, candidate_dist);
-                }
-            }
-        }
-        d
-    }
-
-    fn targets(&self, origin: Coordinate) -> BTreeSet<Coordinate> {
-        let unit = &self.units[&origin];
-        let mut targets = BTreeSet::new();
-        for (&c, candidate) in &self.units {
-            if unit.is_enemy(candidate) {
-                targets.extend(self.neighbors(c));
-            }
-        }
-        targets
-    }
-
-    fn any_enemies(&self, unit: Coordinate) -> bool {
-        for candidate in self.units.values() {
-            if self.units[&unit].is_enemy(candidate) {
-                return true;
-            }
-        }
-        false
-    }
-
-    fn attack(&mut self, attacker: Coordinate, victim: Coordinate) {
-        let power = self.units[&attacker].attack;
-        if self.units.get_mut(&victim).unwrap().absorb(power) {
-            self.units.remove(&victim);
-        }
-    }
-
-    fn best_attack_unit(&self, c: Coordinate) -> Option<Coordinate> {
-        let unit = &self.units[&c];
-        c.neighbors(self.max)
-            .into_iter()
-            .filter(|c| self.units.contains_key(c))
-            .filter(|c| unit.is_enemy(&self.units[c]))
-            .min_by_key(|c| (self.units[c].hp, *c))
-    }
-
-    fn neighbors(&self, origin: Coordinate) -> impl Iterator<Item = Coordinate> + '_ {
-        origin
-            .neighbors(self.max)
-            .into_iter()
-            .filter(move |&c| self.is_open(c))
-    }
-
-    fn is_open(&self, c: Coordinate) -> bool {
-        !self.units.contains_key(&c) && self.grid[&c].is_open()
-    }
-}
-
-impl Cell {
-    fn is_open(&self) -> bool {
-        match *self {
-            Cell::Open => true,
-            Cell::Wall => false,
-        }
-    }
-}
-
-impl FromStr for Caves {
-    type Err = Box<dyn Error>;
-
-    fn from_str(s: &str) -> Result<Caves> {
-        if !s.is_ascii() {
-            return err!("only ASCII caves are supported");
-        }
-
-        let mut caves = Caves::default();
-        caves.max.x = s.lines().next().unwrap_or("").len() - 1;
-        caves.max.y = s.lines().count() - 1;
-        if !s.lines().all(|line| line.len() == caves.max.x + 1) {
-            return err!("all lines in input must have the same length");
-        }
-
-        for (y, line) in s.lines().enumerate() {
-            for x in line.char_indices().map(|(x, _)| x) {
-                let c = Coordinate { x, y };
-                let cell = &line[x..x + 1];
-                if ["E", "G"].contains(&cell) {
-                    let unit = cell.parse()?;
-                    caves.grid.insert(c, Cell::Open);
-                    caves.units.insert(c, unit);
-                } else {
-                    caves.grid.insert(c, cell.parse()?);
-                }
-            }
-        }
-        Ok(caves)
-    }
-}
-
-impl FromStr for Cell {
-    type Err = Box<dyn Error>;
-
-    fn from_str(s: &str) -> Result<Cell> {
-        match s.as_bytes().first() {
-            None => err!("cannot deserialize empty string into cell"),
-            Some(&b'#') => Ok(Cell::Wall),
-            Some(&b'.') => Ok(Cell::Open),
-            Some(&b) => err!("unrecognized cell: 0x{:X}", b),
-        }
-    }
-}
-
-impl fmt::Display for Caves {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for (c, cell) in &self.grid {
-            if let Some(ref unit) = self.units.get(c) {
-                write!(f, "{}", unit)?;
-            } else {
-                write!(f, "{}", cell)?;
-            }
-            if c.x == self.max.x {
-                writeln!(f)?;
-            }
-        }
-        Ok(())
-    }
-}
-
-impl fmt::Display for Cell {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Cell::Wall => write!(f, "#"),
-            Cell::Open => write!(f, "."),
-        }
-    }
-}
-
-#[derive(Clone, Copy, Default, Eq, Hash, PartialEq)]
-struct Coordinate {
-    x: usize,
-    y: usize,
-}
-
-impl Coordinate {
-    fn with_x(self, x: usize) -> Coordinate {
-        Coordinate { x, ..self }
-    }
-
-    fn with_y(self, y: usize) -> Coordinate {
-        Coordinate { y, ..self }
-    }
-
-    fn distance(&self, other: Coordinate) -> usize {
-        let x = (self.x as isize - other.x as isize).abs();
-        let y = (self.y as isize - other.y as isize).abs();
-        (x + y) as usize
-    }
-
-    fn neighbors(self, max: Coordinate) -> Vec<Coordinate> {
-        assert!(
-            self <= max,
-            "{:?} should be <= than the max {:?}",
-            self,
-            max
-        );
-
-        let mut coords = vec![];
-        if self.y >= 1 {
-            coords.push(self.with_y(self.y - 1));
-        }
-        if self.x >= 1 {
-            coords.push(self.with_x(self.x - 1));
-        }
-        if self.x < max.x {
-            coords.push(self.with_x(self.x + 1));
-        }
-        if self.y < max.y {
-            coords.push(self.with_y(self.y + 1));
-        }
-        coords
-    }
-}
-
-impl fmt::Debug for Coordinate {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {})", self.x, self.y)
-    }
-}
-
-impl Ord for Coordinate {
-    fn cmp(&self, other: &Coordinate) -> cmp::Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
-impl PartialOrd for Coordinate {
-    fn partial_cmp(&self, other: &Coordinate) -> Option<cmp::Ordering> {
-        Some((self.y, self.x).cmp(&(other.y, other.x)))
-    }
-}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum UnitKind { Elf, Goblin }
 
 #[derive(Clone, Debug)]
 struct Unit {
-    attack: usize,
-    hp: usize,
     kind: UnitKind,
+    hp: usize,
+    attack: usize,
+    pos: Coordinate,
 }
 
-#[derive(Clone, Copy, Debug)]
-enum UnitKind {
-    Elf,
-    Goblin,
-}
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord)]
+struct Coordinate { y: usize, x: usize }
 
-impl Unit {
-    fn is_enemy(&self, candidate: &Unit) -> bool {
-        match (self.kind, candidate.kind) {
-            (UnitKind::Elf, UnitKind::Goblin) => true,
-            (UnitKind::Goblin, UnitKind::Elf) => true,
-            _ => false,
+fn parse_input(input: &str, elf_attack: usize) -> (BTreeMap<Coordinate, Cell>, Vec<Unit>) {
+    let mut grid = BTreeMap::new();
+    let mut units = Vec::new();
+    for (y, line) in input.lines().enumerate() {
+        for (x, char) in line.chars().enumerate() {
+            let pos = Coordinate { y, x };
+            match char {
+                '#' => { grid.insert(pos, Cell::Wall); }
+                '.' => { grid.insert(pos, Cell::Open); }
+                'G' => {
+                    grid.insert(pos, Cell::Open);
+                    units.push(Unit { kind: UnitKind::Goblin, hp: 200, attack: 3, pos });
+                }
+                'E' => {
+                    grid.insert(pos, Cell::Open);
+                    units.push(Unit { kind: UnitKind::Elf, hp: 200, attack: elf_attack, pos });
+                }
+                _ => {}
+            }
         }
     }
+    (grid, units)
+}
 
-    fn is_elf(&self) -> bool {
-        match self.kind {
-            UnitKind::Elf => true,
-            UnitKind::Goblin => false,
+fn simulate(grid: &BTreeMap<Coordinate, Cell>, units: &mut Vec<Unit>) -> Option<usize> {
+    let mut rounds = 0;
+    loop {
+        units.sort_by_key(|u| u.pos);
+
+        for i in 0..units.len() {
+            if units[i].hp == 0 { continue; }
+
+            let enemies_present = units.iter().any(|u| u.kind != units[i].kind && u.hp > 0);
+            if !enemies_present {
+                return Some(rounds * units.iter().filter(|u| u.hp > 0).map(|u| u.hp).sum::<usize>());
+            }
+            
+            let current_pos = units[i].pos;
+            let current_kind = units[i].kind;
+
+            let targets: Vec<_> = units.iter().filter(|u| u.kind != current_kind && u.hp > 0).cloned().collect();
+            let in_range: Vec<_> = targets.iter().flat_map(|t| neighbors(t.pos, grid)).collect();
+            
+            let adjacent_to_enemy = neighbors(current_pos, grid).iter().any(|n| targets.iter().any(|t| t.pos == *n));
+
+            if !adjacent_to_enemy {
+                if let Some(next_pos) = find_next_step(current_pos, &in_range, grid, units) {
+                    units[i].pos = next_pos;
+                }
+            }
+            
+            let updated_pos = units[i].pos;
+            let attack_power = units[i].attack;
+            
+            let attackable_targets: Vec<_> = neighbors(updated_pos, grid);
+            let best_target = units.iter_mut().filter(|u| u.hp > 0 && u.kind != current_kind && attackable_targets.contains(&u.pos)).min_by_key(|t| (t.hp, t.pos));
+
+            if let Some(target) = best_target {
+                if target.hp <= attack_power {
+                    target.hp = 0;
+                } else {
+                    target.hp -= attack_power;
+                }
+            }
+        }
+        units.retain(|u| u.hp > 0);
+        rounds += 1;
+    }
+}
+
+fn find_next_step(start: Coordinate, targets: &[Coordinate], grid: &BTreeMap<Coordinate, Cell>, units: &[Unit]) -> Option<Coordinate> {
+    let mut queue = VecDeque::new();
+    queue.push_back((start, Vec::new()));
+    let mut visited = HashSet::new();
+    visited.insert(start);
+
+    let unit_positions: HashSet<_> = units.iter().filter(|u| u.hp > 0).map(|u| u.pos).collect();
+    
+    let mut found_paths = Vec::new();
+
+    while let Some((pos, path)) = queue.pop_front() {
+        if targets.contains(&pos) {
+             found_paths.push(path);
+             continue;
+        }
+
+        for &neighbor in &neighbors(pos, grid) {
+            if !visited.contains(&neighbor) && !unit_positions.contains(&neighbor) {
+                let mut new_path = path.clone();
+                new_path.push(neighbor);
+                visited.insert(neighbor);
+                queue.push_back((neighbor, new_path));
+            }
         }
     }
-
-    fn absorb(&mut self, power: usize) -> bool {
-        self.hp = self.hp.saturating_sub(power);
-        self.is_dead()
-    }
-
-    fn is_dead(&self) -> bool {
-        self.hp == 0
-    }
+    
+    if found_paths.is_empty() { return None; }
+    
+    found_paths.sort_by(|a,b| {
+        if a.len() != b.len() { a.len().cmp(&b.len()) }
+        else { a.last().unwrap().cmp(b.last().unwrap()) }
+    });
+    
+    found_paths.first().and_then(|p| p.first()).copied()
 }
 
-impl FromStr for Unit {
-    type Err = Box<dyn Error>;
 
-    fn from_str(s: &str) -> Result<Unit> {
-        let kind = match s.as_bytes().first() {
-            None => return err!("cannot deserialize empty string into unit"),
-            Some(&b'E') => UnitKind::Elf,
-            Some(&b'G') => UnitKind::Goblin,
-            Some(&b) => return err!("unrecognized unit kind: 0x{:X}", b),
-        };
-        Ok(Unit {
-            attack: 3,
-            hp: 200,
-            kind,
-        })
-    }
-}
-
-impl fmt::Display for Unit {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.kind {
-            UnitKind::Elf => write!(f, "E"),
-            UnitKind::Goblin => write!(f, "G"),
+fn neighbors(pos: Coordinate, grid: &BTreeMap<Coordinate, Cell>) -> Vec<Coordinate> {
+    let mut result = Vec::new();
+    let moves = [(-1, 0), (0, -1), (0, 1), (1, 0)]; // Reading order: up, left, right, down
+    for (dy, dx) in moves.iter() {
+        let new_pos = Coordinate { y: (pos.y as isize + dy) as usize, x: (pos.x as isize + dx) as usize };
+        if grid.get(&new_pos) == Some(&Cell::Open) {
+            result.push(new_pos);
         }
     }
+    result
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Solution for Day15 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 15 }
 
-    #[test]
-    #[ignore = "Life is too short to wait for this test to run, the only thing matters is that it compiles, no more joy or happiness in life"]
-    fn test_part1() -> Result<()> {
-        part1()?;
-        Ok(())
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let (grid, mut units) = parse_input(input, 3);
+        Box::new(simulate(&grid, &mut units).unwrap_or(0))
+    }
+
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        for elf_attack in 4.. {
+            let (grid, mut units) = parse_input(input, elf_attack);
+            let initial_elves = units.iter().filter(|u| u.kind == UnitKind::Elf).count();
+            if let Some(outcome) = simulate(&grid, &mut units) {
+                let final_elves = units.iter().filter(|u| u.kind == UnitKind::Elf).count();
+                if initial_elves == final_elves {
+                    return Box::new(outcome);
+                }
+            }
+        }
+        Box::new("No solution found")
     }
 }
