@@ -1,55 +1,19 @@
-use std::{
-    collections::{HashMap, HashSet},
-    vec,
-};
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use std::collections::HashMap;
 
-fn read_freqs(is_prod: bool) -> Vec<HashMap<char, usize>> {
-    let mut content = include_str!("./example.data");
-    if is_prod {
-        content = include_str!("./prod.data");
-    }
-    content = content.trim();
+pub struct Day02;
 
-    let mut freqs = vec![];
-    for line in content.lines() {
-        let mut freq = HashMap::new();
-        for c in line.chars() {
-            let counter = freq.entry(c).or_insert(0);
-            *counter += 1;
-        }
-        freqs.push(freq);
-    }
-    freqs
-}
-
-fn get_with_occ(occ: &HashMap<char, usize>, n: usize) -> HashSet<char> {
-    let mut set: HashSet<char> = HashSet::new();
-    for (c, count) in occ.iter() {
-        if *count == n {
-            set.insert(*c);
-        }
-    }
-    set
-}
-
-fn get_two_closest(of_ids: Vec<String>) -> [String; 2] {
-    let mut closest = ["".to_string(), "".to_string()];
+fn get_two_closest(of_ids: &[String]) -> (String, String) {
+    let mut closest = (String::new(), String::new());
     let mut min = usize::max_value();
     for (i, id) in of_ids.iter().enumerate() {
         for (j, other) in of_ids.iter().enumerate() {
-            if i == j {
-                continue;
-            }
-            let mut diff = 0;
-            for (c, o) in id.chars().zip(other.chars()) {
-                if c != o {
-                    diff += 1;
-                }
-            }
+            if i == j { continue; }
+            let diff = id.chars().zip(other.chars()).filter(|(c1, c2)| c1 != c2).count();
             if diff < min {
                 min = diff;
-                closest[0] = id.to_string();
-                closest[1] = other.to_string();
+                closest = (id.clone(), other.clone());
             }
         }
     }
@@ -57,58 +21,29 @@ fn get_two_closest(of_ids: Vec<String>) -> [String; 2] {
 }
 
 fn get_common_chars(a: &str, b: &str) -> String {
-    let mut common = String::new();
-    for (c, o) in a.chars().zip(b.chars()) {
-        if c == o {
-            common.push(c);
-        }
-    }
-    common
+    a.chars().zip(b.chars()).filter(|(c1, c2)| c1 == c2).map(|(c, _)| c).collect()
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Solution for Day02 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 2 }
 
-    #[test]
-    #[ignore]
-    fn test_first() {
-        let nums = read_freqs(false);
-        let with_2 = nums.iter().filter(|e| e.values().any(|&v| v == 2)).count();
-        let with_3 = nums.iter().filter(|e| e.values().any(|&v| v == 3)).count();
-
-        assert_eq!(with_2 * with_3, 12);
-        let nums = read_freqs(true);
-        let with_2 = nums.iter().filter(|e| e.values().any(|&v| v == 2)).count();
-        let with_3 = nums.iter().filter(|e| e.values().any(|&v| v == 3)).count();
-
-        assert_eq!(with_2 * with_3, 5000);
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let (twos, threes) = input.lines().fold((0, 0), |(mut twos, mut threes), line| {
+            let mut counts = HashMap::new();
+            for c in line.chars() {
+                *counts.entry(c).or_insert(0) += 1;
+            }
+            if counts.values().any(|&v| v == 2) { twos += 1; }
+            if counts.values().any(|&v| v == 3) { threes += 1; }
+            (twos, threes)
+        });
+        Box::new(twos * threes)
     }
 
-    #[test]
-    #[ignore]
-    fn test_second() {
-        let [first, second] = get_two_closest(vec![
-            "abcde".to_string(),
-            "fghij".to_string(),
-            "klmno".to_string(),
-            "pqrst".to_string(),
-            "fguij".to_string(),
-            "axcye".to_string(),
-            "wvxyz".to_string(),
-        ]);
-        let common = get_common_chars(&first, &second);
-
-        assert_eq!(common, "fgij".to_owned());
-        let ids = include_str!("prod.data")
-            .trim()
-            .lines()
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>();
-
-        let [first, second] = get_two_closest(ids);
-        let common = get_common_chars(&first, &second);
-
-        assert_eq!(common, "ymdrchgpvwfloluktajxijsqb".to_owned());
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let ids: Vec<String> = input.lines().map(|s| s.to_string()).collect();
+        let (a, b) = get_two_closest(&ids);
+        Box::new(get_common_chars(&a, &b))
     }
 }
