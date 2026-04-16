@@ -1,4 +1,4 @@
-use std::sync::mpsc::{Receiver, Sender};
+use std::sync::mpsc::{channel, Sender, Receiver};
 
 pub struct Computer {
     pub p: Vec<isize>,
@@ -6,101 +6,110 @@ pub struct Computer {
     pub rb: isize,
     pub i: Sender<isize>,
     pub o: Receiver<isize>,
-    pub _i: Receiver<isize>,
-    pub _o: Sender<isize>,
+    _i: Receiver<isize>,
+    _o: Sender<isize>,
 }
 
-pub mod parsers {
-    #[allow(dead_code)]
-    #[allow(unused_imports)]
-    pub use nom::{
-        branch::alt,
-        bytes::complete::tag,
-        character::complete::{alpha1, alphanumeric1, anychar, char, digit1, line_ending, one_of},
-        combinator::{map, map_res, opt, verify},
-        error::ErrorKind,
-        multi::{fold_many1, many0, many1, separated_list0, separated_list1},
-        sequence::{delimited, pair, preceded, terminated, tuple},
-        Err, IResult,
-    };
-
-    macro_rules! unsigned_nr_str_parser {
-        ($fn_name: ident, $t:ident) => {
-            pub fn $fn_name(s: &str) -> IResult<&str, $t> {
-                map_res(digit1, |s: &str| {
-                    s.parse::<$t>()
-                        .map_err(|_err| Err::Error((s, ErrorKind::Digit)))
-                })(s)
-            }
-        };
+impl Clone for Computer {
+    fn clone(&self) -> Self {
+        let ((i, _i), (_o, o)) = (channel(), channel());
+        Self {
+            p: self.p.clone(),
+            n: self.n,
+            rb: self.rb,
+            i, o, _i, _o
+        }
     }
+}
 
-    macro_rules! signed_nr_str_parser {
-        ($fn_name: ident, $t:ident) => {
-            pub fn $fn_name(s: &str) -> IResult<&str, $t> {
-                map_res(
-                    pair(opt(one_of("+-")), digit1),
-                    |(sign, s): (Option<char>, &str)| {
-                        s.parse::<$t>()
-                            .map_err(|_err| Err::Error((s, ErrorKind::Digit)))
-                            .map(|v| if let Some('-') = sign { -v } else { v })
-                    },
-                )(s)
-            }
-        };
-    }
-
-    unsigned_nr_str_parser!(usize_str, usize);
-    unsigned_nr_str_parser!(u8_str, u8);
-    unsigned_nr_str_parser!(u16_str, u16);
-    unsigned_nr_str_parser!(u32_str, u32);
-    unsigned_nr_str_parser!(u64_str, u64);
-
-    signed_nr_str_parser!(isize_str, isize);
-    signed_nr_str_parser!(i8_str, i8);
-    signed_nr_str_parser!(i16_str, i16);
-    signed_nr_str_parser!(i32_str, i32);
-    signed_nr_str_parser!(i64_str, i64);
-
-    use nom::{
-        error::{make_error, ParseError},
-        Compare, InputIter, InputLength, Slice,
-    };
-    use std::ops::{Range, RangeFrom, RangeTo};
-    pub fn line_ending_or_eof<T, E: ParseError<T>>(input: T) -> IResult<T, (), E>
-    where
-        T: Clone,
-        T: Slice<Range<usize>> + Slice<RangeFrom<usize>> + Slice<RangeTo<usize>>,
-        T: InputIter + InputLength,
-        T: Compare<&'static str>,
-    {
-        alt((map(line_ending, |_| ()), eof))(input)
-    }
-
-    /// Matches the end of the file
-    pub fn eof<T: nom::InputLength, E: ParseError<T>>(input: T) -> IResult<T, (), E> {
-        if input.input_len() == 0 {
-            Ok((input, ()))
-        } else {
-            Err(nom::Err::Error(make_error(input, ErrorKind::Eof)))
+impl Computer {
+    pub fn from_string(s: &str) -> Self {
+        let ((i, _i), (_o, o)) = (channel(), channel());
+        Self {
+            p: s.split(',').filter_map(|l| l.trim().parse().ok()).collect(),
+            n: 0,
+            rb: 0,
+            i,
+            o,
+            _i,
+            _o,
         }
     }
 
-    pub fn is_ascii_printable(c: char) -> bool {
-        let value = c as u64;
-        value >= 32 && value < 127
+    #[must_use]
+    #[inline(always)]
+    fn acc(&mut self, i: isize, m: Option<isize>) -> &mut isize {
+        let i = match m {
+            Some(0) | None => self.p[i as usize] as usize,
+            Some(1) => i as usize,
+            Some(2) => (self.rb + self.p[i as usize]) as usize,
+            _ => unreachable!(),
+        };
+        if i >= self.p.len() {
+            self.p.resize(i + 1, 0);
+        }
+        &mut self.p[i]
     }
 
-    pub fn printable0<T, E: ParseError<T>>(input: T) -> IResult<T, T, E>
-    where
-        T: nom::InputTakeAtPosition<Item = char>,
-    {
-        input.split_at_position_complete(|item| !is_ascii_printable(item))
-    }
-    pub fn printable1<T, E: ParseError<T>>(input: T) -> IResult<T, T, E>
-    where
-        T: nom::InputTakeAtPosition<Item = char>,
-    {
-        input.split_at_position1_complete(|item| !is_ascii_printable(item), ErrorKind::AlphaNumeric)
+    pub fn run(&mut self) -> bool {
+        loop {
+            let mut inst_val = self.p[self.n as usize];
+            let opcode = inst_val % 100;
+            inst_val /= 100;
+            let mut modes = Vec::new();
+            while inst_val > 0 {
+                modes.push(inst_val % 10);
+                inst_val /= 10;
+            }
+
+            self.n = match opcode {
+                1 => {
+                    let v = *self.acc(self.n + 1, modes.get(0).copied()) + *self.acc(self.n + 2, modes.get(1).copied());
+                    *self.acc(self.n + 3, modes.get(2).copied()) = v;
+                    self.n + 4
+                }
+                2 => {
+                    let v = *self.acc(self.n + 1, modes.get(0).copied()) * *self.acc(self.n + 2, modes.get(1).copied());
+                    *self.acc(self.n + 3, modes.get(2).copied()) = v;
+                    self.n + 4
+                }
+                3 => {
+                    match self._i.try_recv() {
+                        Ok(i) => *self.acc(self.n + 1, modes.get(0).copied()) = i,
+                        Err(_) => return false,
+                    }
+                    self.n + 2
+                }
+                4 => {
+                    let v = *self.acc(self.n + 1, modes.get(0).copied());
+                    self._o.send(v).unwrap();
+                    self.n + 2
+                }
+                5 if *self.acc(self.n + 1, modes.get(0).copied()) != 0 => {
+                    *self.acc(self.n + 2, modes.get(1).copied()) as isize
+                }
+                5 => self.n + 3,
+                6 if *self.acc(self.n + 1, modes.get(0).copied()) == 0 => {
+                    *self.acc(self.n + 2, modes.get(1).copied()) as isize
+                }
+                6 => self.n + 3,
+                7 => {
+                    let v = if *self.acc(self.n + 1, modes.get(0).copied()) < *self.acc(self.n + 2, modes.get(1).copied()) { 1 } else { 0 };
+                    *self.acc(self.n + 3, modes.get(2).copied()) = v;
+                    self.n + 4
+                }
+                8 => {
+                    let v = if *self.acc(self.n + 1, modes.get(0).copied()) == *self.acc(self.n + 2, modes.get(1).copied()) { 1 } else { 0 };
+                    *self.acc(self.n + 3, modes.get(2).copied()) = v;
+                    self.n + 4
+                }
+                9 => {
+                    self.rb += *self.acc(self.n + 1, modes.get(0).copied());
+                    self.n + 2
+                },
+                99 => return true,
+                _ => panic!("Unknown OPCODE: {} at {}", self.p[self.n as usize], self.n),
+            };
+        }
     }
 }

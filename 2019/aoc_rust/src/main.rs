@@ -1,8 +1,9 @@
-#![allow(dead_code)]
 mod days;
 mod utils;
 
+use aoc_rust_common::run_solution;
+use days::day13::Day13;
+
 fn main() {
-    // println!("{}", days::day13::part_1());
-    // println!("{}", days::day13::part_2());
+    run_solution(Day13);
 }
