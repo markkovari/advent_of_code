@@ -1,244 +1,101 @@
-use itertools::Itertools;
-use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use std::collections::{HashMap, BinaryHeap};
+use std::cmp::Reverse;
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
-enum Type {
-    Rocky,
-    Narrow,
-    Wet,
-}
+pub struct Day22;
 
-fn get_risk(region_type: &Type) -> usize {
-    match region_type {
-        Type::Rocky => 0,
-        Type::Wet => 1,
-        Type::Narrow => 2,
-    }
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Region { Rocky, Wet, Narrow }
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+enum Tool { Torch, ClimbingGear, Neither }
 
-fn get_index(
-    pos: (usize, usize),
-    depth: usize,
-    target: (usize, usize),
-    memo: &mut HashMap<(usize, usize), usize>,
-) -> usize {
-    if let Some(level) = memo.get(&pos) {
-        return *level;
-    }
-    let level = if pos == (0, 0) {
-        0
-    } else if pos == target {
-        return 0;
-    } else if pos.0 == 0 {
-        pos.1 * 16807
-    } else if pos.1 == 0 {
-        pos.0 * 48271
-    } else {
-        get_erosion((pos.0 - 1, pos.1), depth, target, memo)
-            * get_erosion((pos.0, pos.1 - 1), depth, target, memo)
-    };
+impl Solution for Day22 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 22 }
 
-    memo.insert(pos, level);
-    level
-}
-
-fn get_erosion(
-    pos: (usize, usize),
-    depth: usize,
-    target: (usize, usize),
-    memo: &mut HashMap<(usize, usize), usize>,
-) -> usize {
-    let index = get_index(pos, depth, target, memo);
-    (depth + index) % 20183
-}
-
-fn get_type(
-    pos: (usize, usize),
-    depth: usize,
-    target: (usize, usize),
-    memo: &mut HashMap<(usize, usize), usize>,
-) -> Type {
-    let erosion = get_erosion(pos, depth, target, memo);
-    match erosion % 3 {
-        0 => Type::Rocky,
-        1 => Type::Wet,
-        2 => Type::Narrow,
-        _ => unreachable!(),
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Copy, Hash)]
-enum Equipment {
-    Neither,
-    Torch,
-    Climbing,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug, Hash)]
-struct State {
-    time: usize,
-    min_dist: usize,
-    pos: (i32, i32),
-    equipped: Equipment,
-}
-
-impl Ord for State {
-    fn cmp(&self, other: &Self) -> Ordering {
-        (self.time + self.min_dist)
-            .cmp(&(other.time + other.min_dist))
-            .reverse()
-    }
-}
-
-impl PartialOrd for State {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-fn min_dist(pos: (i32, i32), target: (usize, usize)) -> usize {
-    ((pos.0 - (target.0 as i32)).abs() + (pos.1 - (target.1 as i32)).abs()) as usize
-}
-
-fn navigate(
-    target: (usize, usize),
-    depth: usize,
-    type_memo: &mut HashMap<(usize, usize), usize>,
-) -> usize {
-    let mut queue: BinaryHeap<State> = BinaryHeap::new();
-    let mut seen = HashSet::new();
-    queue.push(State {
-        pos: (0, 0),
-        min_dist: min_dist((0, 0), target),
-        time: 0,
-        equipped: Equipment::Torch,
-    });
-
-    while !queue.is_empty() {
-        let state = queue.pop().unwrap();
-
-        if state.pos.0 < 0 || state.pos.1 < 0 {
-            continue;
-        }
-        let pos = state.pos;
-        let region = get_type((pos.0 as usize, pos.1 as usize), depth, target, type_memo);
-
-        if region == Type::Rocky && state.equipped == Equipment::Neither {
-            continue;
-        } else if region == Type::Wet && state.equipped == Equipment::Torch {
-            continue;
-        } else if region == Type::Narrow && state.equipped == Equipment::Climbing {
-            continue;
-        }
-
-        if !seen.insert(state.clone()) {
-            continue;
-        }
-
-        if state.pos.0 as usize == target.0 && state.pos.1 as usize == target.1 {
-            if state.equipped == Equipment::Climbing {
-                return state.time + 7;
-            } else {
-                return state.time;
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let (depth, target) = parse(input);
+        let mut erosion_levels = HashMap::new();
+        let mut total_risk = 0;
+        for y in 0..=target.1 {
+            for x in 0..=target.0 {
+                total_risk += get_erosion((x, y), depth, target, &mut erosion_levels) % 3;
             }
         }
-
-        queue.push(State {
-            pos: (pos.0 - 1, pos.1),
-            min_dist: min_dist((pos.0 - 1, pos.1), target),
-            time: state.time + 1,
-            equipped: state.equipped,
-        });
-        queue.push(State {
-            pos: (pos.0 + 1, pos.1),
-            min_dist: min_dist((pos.0 + 1, pos.1), target),
-            time: state.time + 1,
-            equipped: state.equipped.clone(),
-        });
-        queue.push(State {
-            pos: (pos.0, pos.1 - 1),
-            min_dist: min_dist((pos.0, pos.1 - 1), target),
-            time: state.time + 1,
-            equipped: state.equipped.clone(),
-        });
-        queue.push(State {
-            pos: (pos.0, pos.1 + 1),
-            min_dist: min_dist((pos.0, pos.1 + 1), target),
-            time: state.time + 1,
-            equipped: state.equipped.clone(),
-        });
-
-        if state.equipped != Equipment::Neither {
-            queue.push(State {
-                pos,
-                min_dist: state.min_dist,
-                time: state.time + 7,
-                equipped: Equipment::Neither,
-            });
-        }
-        if state.equipped != Equipment::Torch {
-            queue.push(State {
-                pos,
-                min_dist: state.min_dist,
-                time: state.time + 7,
-                equipped: Equipment::Torch,
-            });
-        }
-        if state.equipped != Equipment::Climbing {
-            queue.push(State {
-                pos,
-                min_dist: state.min_dist,
-                time: state.time + 7,
-                equipped: Equipment::Climbing,
-            });
-        }
+        Box::new(total_risk)
     }
+    
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let (depth, target) = parse(input);
+        let mut erosion_levels = HashMap::new();
+        let mut dists = HashMap::new();
+        let mut pq = BinaryHeap::new();
 
-    unreachable!();
+        dists.insert(((0, 0), Tool::Torch), 0);
+        pq.push(Reverse((0, (0, 0), Tool::Torch)));
+
+        while let Some(Reverse((time, pos, tool))) = pq.pop() {
+            if dists.get(&(pos, tool)).map_or(false, |&t| t < time) { continue; }
+            if pos == target && tool == Tool::Torch { return Box::new(time); }
+
+            for &next_tool in &[Tool::Torch, Tool::ClimbingGear, Tool::Neither] {
+                if is_valid_tool(next_tool, get_type(pos, depth, target, &mut erosion_levels)) {
+                    let next_time = time + if tool == next_tool { 0 } else { 7 };
+                    if dists.get(&(pos, next_tool)).map_or(true, |&t| t > next_time) {
+                        dists.insert((pos, next_tool), next_time);
+                    }
+                }
+            }
+            
+            for (dx, dy) in &[(0, 1), (0, -1), (1, 0), (-1, 0)] {
+                let next_pos = (pos.0 + dx, pos.1 + dy);
+                if next_pos.0 >= 0 && next_pos.1 >= 0 {
+                    if is_valid_tool(tool, get_type(next_pos, depth, target, &mut erosion_levels)) {
+                        let next_time = time + 1;
+                        if dists.get(&(next_pos, tool)).map_or(true, |&t| t > next_time) {
+                             dists.insert((next_pos, tool), next_time);
+                             pq.push(Reverse((next_time, next_pos, tool)));
+                        }
+                    }
+                }
+            }
+        }
+        Box::new("No path found")
+    }
 }
 
-pub fn solve(inputs: Vec<String>) -> (usize, usize) {
-    let depth = inputs[0]
-        .split(": ")
-        .skip(1)
-        .next()
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
-    let target_vec = inputs[1]
-        .split(": ")
-        .skip(1)
-        .next()
-        .unwrap()
-        .split(",")
-        .map(|w| w.parse::<usize>().unwrap())
-        .collect_vec();
-    let target = (target_vec[1], target_vec[0]);
-
-    let mut memo = HashMap::new();
-    let mut total_risk = 0;
-    for y in 0..=target.0 {
-        for x in 0..=target.1 {
-            total_risk += get_risk(&get_type((y, x), depth, target, &mut memo));
-        }
-    }
-
-    let part2 = navigate(target, depth, &mut memo);
-    (total_risk, part2)
+fn parse(input: &str) -> (i32, (i32, i32)) {
+    let mut lines = input.lines();
+    let depth: i32 = lines.next().unwrap().split_whitespace().nth(1).unwrap().parse().unwrap();
+    let target_coords: Vec<i32> = lines.next().unwrap().split_whitespace().nth(1).unwrap().split(',').map(|s| s.parse().unwrap()).collect();
+    (depth, (target_coords[0], target_coords[1]))
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+fn get_erosion(pos: (i32, i32), depth: i32, target: (i32, i32), memo: &mut HashMap<(i32, i32), i32>) -> i32 {
+    if let Some(&erosion) = memo.get(&pos) { return erosion; }
+    let geo_index = match pos {
+        (0, 0) => 0,
+        p if p == target => 0,
+        (x, 0) => x * 16807,
+        (0, y) => y * 48271,
+        (x, y) => get_erosion((x - 1, y), depth, target, memo) * get_erosion((x, y - 1), depth, target, memo),
+    };
+    let erosion = (geo_index + depth) % 20183;
+    memo.insert(pos, erosion);
+    erosion
+}
 
-    #[test]
-    #[ignore]
-    fn test_part1() {
-        let text = include_str!("./prod.data")
-            .lines()
-            .map(|l| l.to_owned())
-            .collect_vec();
-        assert_eq!(solve(text), (6208, 1039));
+fn get_type(pos: (i32, i32), depth: i32, target: (i32, i32), memo: &mut HashMap<(i32, i32), i32>) -> Region {
+    match get_erosion(pos, depth, target, memo) % 3 {
+        0 => Region::Rocky, 1 => Region::Wet, 2 => Region::Narrow, _ => unreachable!()
+    }
+}
+
+fn is_valid_tool(tool: Tool, region: Region) -> bool {
+    match region {
+        Region::Rocky => tool == Tool::ClimbingGear || tool == Tool::Torch,
+        Region::Wet => tool == Tool::ClimbingGear || tool == Tool::Neither,
+        Region::Narrow => tool == Tool::Torch || tool == Tool::Neither,
     }
 }

@@ -1,244 +1,150 @@
-use std::cmp::Reverse;
-use std::error::Error;
-use std::str::FromStr;
-
-use lazy_static::*;
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use std::collections::{HashMap, HashSet};
 use regex::Regex;
 
-type Result<T> = std::result::Result<T, Box<dyn Error>>;
+pub struct Day24;
 
-#[derive(Clone, Eq, Debug, PartialEq, Copy)]
-enum Team {
-    Immune,
-    Infect,
-}
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Team { ImmuneSystem, Infection }
 
-#[derive(Clone, Eq, Debug, PartialEq, Copy)]
-struct Unit {
-    team: Team,
-    group: Group,
-}
-
-#[derive(Clone, Eq, Debug, PartialEq, Copy)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct Group {
-    units: usize,
-    hp: usize,
-    dmg: usize,
-    mults: [u8; 5],
-    dmg_typ: DamageType,
-    init: usize,
+    id: usize,
+    team: Team,
+    units: i32,
+    hp: i32,
+    attack: i32,
+    attack_type: String,
+    initiative: i32,
+    weaknesses: HashSet<String>,
+    immunities: HashSet<String>,
 }
 
 impl Group {
-    /// damage self deals to other
-    fn damage_to(&self, other: &Group) -> usize {
-        self.units * self.dmg * other.mults[self.dmg_typ as usize] as usize
-    }
-}
-#[derive(Clone, Copy, Eq, Debug, PartialEq, Hash)]
-#[repr(u8)]
-enum DamageType {
-    Slashing = 0,
-    Cold = 1,
-    Bludgeoning = 2,
-    Radiation = 3,
-    Fire = 4,
-}
+    fn effective_power(&self) -> i32 { self.units * self.attack }
 
-impl FromStr for DamageType {
-    type Err = Box<dyn Error>;
-    fn from_str(s: &str) -> Result<DamageType> {
-        Ok(match s {
-            "slashing" => DamageType::Slashing,
-            "cold" => DamageType::Cold,
-            "bludgeoning" => DamageType::Bludgeoning,
-            "radiation" => DamageType::Radiation,
-            "fire" => DamageType::Fire,
-            _ => return Err(format!("invalid type: {:?}", s).into()),
-        })
+    fn damage_to(&self, other: &Group) -> i32 {
+        if other.immunities.contains(&self.attack_type) { return 0; }
+        let power = self.effective_power();
+        if other.weaknesses.contains(&self.attack_type) { power * 2 } else { power }
     }
 }
 
-fn battle(mut units: Vec<Unit>) -> (Option<Team>, usize) {
+fn parse(input: &str) -> Vec<Group> {
+    let mut groups = Vec::new();
+    let mut current_team = Team::ImmuneSystem;
+    let mut id_counter = 1;
+    let re = Regex::new(r"(\d+) units each with (\d+) hit points (\([^)]*\) )?with an attack that does (\d+) (\w+) damage at initiative (\d+)").unwrap();
+    
+    for line in input.lines() {
+        if line.contains("Immune System") { current_team = Team::ImmuneSystem; id_counter = 1; }
+        else if line.contains("Infection") { current_team = Team::Infection; id_counter = 1; }
+        else if let Some(caps) = re.captures(line) {
+            let mut weaknesses = HashSet::new();
+            let mut immunities = HashSet::new();
+            if let Some(m) = caps.get(3) {
+                let mods = m.as_str().trim().trim_matches(|p| p == '(' || p == ')');
+                for part in mods.split(';') {
+                    let part = part.trim();
+                    if let Some(w) = part.strip_prefix("weak to ") {
+                        w.split(", ").for_each(|s| { weaknesses.insert(s.to_string()); });
+                    }
+                    if let Some(i) = part.strip_prefix("immune to ") {
+                        i.split(", ").for_each(|s| { immunities.insert(s.to_string()); });
+                    }
+                }
+            }
+            groups.push(Group {
+                id: id_counter,
+                team: current_team.clone(),
+                units: caps[1].parse().unwrap(),
+                hp: caps[2].parse().unwrap(),
+                attack: caps[4].parse().unwrap(),
+                attack_type: caps[5].to_string(),
+                initiative: caps[6].parse().unwrap(),
+                weaknesses, immunities,
+            });
+            id_counter += 1;
+        }
+    }
+    groups
+}
+
+fn fight(groups: &mut Vec<Group>) -> (Option<Team>, i32) {
     loop {
-        units.sort_by_key(|v| Reverse((v.units * v.dmg, v.init)));
-        let mut targets: Vec<Option<usize>> = vec![None; units.len()];
-        for (j, u) in units.iter().enumerate() {
-            let mut best = 0;
-            for (i, v) in units.iter().enumerate() {
-                if u.team == v.team || targets.contains(&Some(i)) || v.units == 0 {
-                    continue;
-                }
-                if u.damage_to(&v) > best {
-                    best = u.damage_to(&v);
-                    targets[j] = Some(i);
-                };
-            }
-        }
-        let mut attackers = (0..units.len()).collect::<Vec<_>>();
-        attackers.sort_by_key(|&idx| Reverse(units[idx].init));
-        let mut any_die = false;
-        for atk_idx in attackers {
-            if units[atk_idx].units == 0 {
-                continue;
-            }
-            if let Some(j) = targets[atk_idx] {
-                let atk = units[atk_idx];
-                let mut def = units[j];
-                let dmg = atk.damage_to(&def);
-                def.units = def.units.saturating_sub(dmg / def.hp);
-                any_die = any_die || dmg > def.hp;
-                units[j] = def;
-            }
-        }
+        groups.sort_by(|a, b| (b.effective_power(), b.initiative).cmp(&(a.effective_power(), a.initiative)));
+        let mut targets = HashMap::new();
+        let mut targeted = HashSet::new();
 
-        if !any_die {
-            return (None, 0);
-        }
-
-        let alive = units.iter().fold((0, 0), |mut teams, group| {
-            if group.team == Team::Immune {
-                teams.0 += group.units;
-            } else {
-                teams.1 += group.units;
-            }
-            teams
-        });
-        if alive == (0, 0) {
-            return (None, 0);
-        } else if alive.0 == 0 {
-            return (Some(Team::Infect), alive.1);
-        } else if alive.1 == 0 {
-            return (Some(Team::Immune), alive.0);
-        }
-    }
-}
-
-static INPUT: &str = "data/day24";
-
-fn solve(content: String) -> Result<(usize, usize)> {
-    let mut team = Team::Immune;
-    let mut units = Vec::new();
-    for line in content.lines() {
-        if line.starts_with("Immune System:") {
-            team = Team::Immune;
-        } else if line.starts_with("Infection:") {
-            team = Team::Infect;
-        } else if !line.trim().is_empty() {
-            let group = line.parse()?;
-            units.push(Unit { team, group });
-        }
-    }
-    let (_, p1) = battle(units.clone());
-    let p2 = (1..)
-        .filter_map(|b| {
-            let mut units = units.clone();
-            units
-                .iter_mut()
-                .filter(|u| u.team == Team::Immune)
-                .for_each(|u| u.dmg += b);
-            match battle(units) {
-                (Some(Team::Immune), rem) => Some(rem),
-                _ => None,
-            }
-        })
-        .next()
-        .unwrap();
-    Ok((p1, p2))
-}
-
-impl std::ops::Deref for Unit {
-    type Target = Group;
-    fn deref(&self) -> &Group {
-        &self.group
-    }
-}
-
-impl std::ops::DerefMut for Unit {
-    fn deref_mut(&mut self) -> &mut Group {
-        &mut self.group
-    }
-}
-
-impl FromStr for Group {
-    type Err = Box<dyn Error>;
-    fn from_str(s: &str) -> Result<Self> {
-        lazy_static! {
-            static ref UNHP: Regex =
-                Regex::new(r"^(\d+) units each with (\d+) hit points").unwrap();
-            static ref DMIN: Regex =
-                Regex::new(r"with an attack that does (\d+) (\w+) damage at initiative (\d+)$")
-                    .unwrap();
-        }
-        let wk = s
-            .trim_matches(|c| !(c == ')' || c == '('))
-            .trim_matches(|c| c == ')' || c == '(');
-        let caps = UNHP
-            .captures(s)
-            .ok_or(format!("no UNHP match for input: {:?}", s))?;
-        let units = caps
-            .get(1)
-            .ok_or(format!("no units in input: {:?}", s))?
-            .as_str()
-            .parse()?;
-        let hp = caps
-            .get(2)
-            .ok_or(format!("no hp in input: {:?}", s))?
-            .as_str()
-            .parse()?;
-        let caps = DMIN
-            .captures(s)
-            .ok_or(format!("no DMIN match for input: {:?}", s))?;
-        let dmg = caps
-            .get(1)
-            .ok_or(format!("no dmg in input: {:?}", s))?
-            .as_str()
-            .parse()?;
-        let dmg_typ = caps
-            .get(2)
-            .ok_or(format!("no dmg type in input: {:?}", s))?
-            .as_str()
-            .parse()?;
-        let init = caps
-            .get(3)
-            .ok_or(format!("no initative in input: {:?}", s))?
-            .as_str()
-            .parse()?;
-        let mut mults = [1; 5];
-
-        for w in wk.split(';') {
-            let w = w.trim();
-            if w.starts_with("weak to ") {
-                let w = w.trim_start_matches("weak to ");
-                for d in w.split(", ") {
-                    mults[d.parse::<DamageType>()? as usize] = 2;
-                }
-            } else if w.starts_with("immune to ") {
-                let w = w.trim_start_matches("immune to ");
-                for d in w.split(", ") {
-                    mults[d.parse::<DamageType>()? as usize] = 0;
+        for i in 0..groups.len() {
+            let attacker = &groups[i];
+            let best_target = (0..groups.len())
+                .filter(|&j| groups[j].team != attacker.team && !targeted.contains(&j))
+                .max_by(|&j1, &j2| {
+                    let d1 = attacker.damage_to(&groups[j1]);
+                    let d2 = attacker.damage_to(&groups[j2]);
+                    (d1, groups[j1].effective_power(), groups[j1].initiative)
+                        .cmp(&(d2, groups[j2].effective_power(), groups[j2].initiative))
+                });
+            
+            if let Some(j) = best_target {
+                 if attacker.damage_to(&groups[j]) > 0 {
+                    targets.insert(i, j);
+                    targeted.insert(j);
                 }
             }
         }
-        Ok(Self {
-            units,
-            hp,
-            dmg,
-            dmg_typ,
-            mults,
-            init,
-        })
+        
+        let mut attackers: Vec<usize> = (0..groups.len()).collect();
+        attackers.sort_by_key(|&i| std::cmp::Reverse(groups[i].initiative));
+        
+        let mut units_killed = 0;
+        for i in attackers {
+            if groups[i].units <= 0 { continue; }
+            if let Some(j) = targets.get(&i) {
+                let damage = groups[i].damage_to(&groups[*j]);
+                let killed = (damage / groups[*j].hp).min(groups[*j].units);
+                units_killed += killed;
+                groups[*j].units -= killed;
+            }
+        }
+
+        if units_killed == 0 { return (None, 0); }
+
+        groups.retain(|g| g.units > 0);
+        let immune_left = groups.iter().any(|g| g.team == Team::ImmuneSystem);
+        let infection_left = groups.iter().any(|g| g.team == Team::Infection);
+
+        if !immune_left || !infection_left {
+            let winner = if immune_left { Some(Team::ImmuneSystem) } else { Some(Team::Infection) };
+            return (winner, groups.iter().map(|g| g.units).sum());
+        }
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Solution for Day24 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 24 }
 
-    #[test]
-    #[ignore]
-    fn test_part1() {
-        let text = include_str!("./prod.data").to_owned();
-        assert_eq!(solve(text).unwrap(), (18532, 6523));
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let mut groups = parse(input);
+        let (_, score) = fight(&mut groups);
+        Box::new(score)
+    }
+
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let initial_groups = parse(input);
+        for boost in 1.. {
+            let mut groups = initial_groups.clone();
+            for g in &mut groups {
+                if g.team == Team::ImmuneSystem { g.attack += boost; }
+            }
+            let (winner, score) = fight(&mut groups);
+            if winner == Some(Team::ImmuneSystem) {
+                return Box::new(score);
+            }
+        }
+        Box::new("No solution found")
     }
 }

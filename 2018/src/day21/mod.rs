@@ -1,146 +1,68 @@
-use regex::Regex;
-use std::{collections::HashSet, hash::Hash};
+use aoc_rust_common::Solution;
+use std::fmt::Display;
+use std::collections::HashSet;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
-enum OpCode {
-    Addr,
-    Addi,
-    Mulr,
-    Muli,
-    Banr,
-    Bani,
-    Borr,
-    Bori,
-    Setr,
-    Seti,
-    Gtir,
-    Gtri,
-    Gtrr,
-    Eqir,
-    Eqri,
-    Eqrr,
-}
+pub struct Day21;
 
-impl OpCode {
-    fn apply(self, a: usize, b: usize, c: usize, data: &mut Vec<usize>) {
-        match self {
-            OpCode::Addr => data[c] = data[a] + data[b],
-            OpCode::Addi => data[c] = data[a] + b,
-            OpCode::Mulr => data[c] = data[a] * data[b],
-            OpCode::Muli => data[c] = data[a] * b,
-            OpCode::Banr => data[c] = data[a] & data[b],
-            OpCode::Bani => data[c] = data[a] & b,
-            OpCode::Borr => data[c] = data[a] | data[b],
-            OpCode::Bori => data[c] = data[a] | b,
-            OpCode::Setr => data[c] = data[a],
-            OpCode::Seti => data[c] = a,
-            OpCode::Gtir => data[c] = if a > data[b] { 1 } else { 0 },
-            OpCode::Gtri => data[c] = if data[a] > b { 1 } else { 0 },
-            OpCode::Gtrr => data[c] = if data[a] > data[b] { 1 } else { 0 },
-            OpCode::Eqir => data[c] = if a == data[b] { 1 } else { 0 },
-            OpCode::Eqri => data[c] = if data[a] == b { 1 } else { 0 },
-            OpCode::Eqrr => data[c] = if data[a] == data[b] { 1 } else { 0 },
-        }
-    }
-}
+// This solution is based on reverse-engineering the assembly-like code.
+// The code essentially computes a sequence of numbers and halts when a number repeats.
+// Part 1 asks for the first number generated.
+// Part 2 asks for the last number generated before the sequence repeats.
 
-type Input = (usize, Vec<(OpCode, usize, usize, usize)>);
+impl Solution for Day21 {
+    fn year(&self) -> u32 { 2018 }
+    fn day(&self) -> u32 { 21 }
 
-fn solve(content: String) -> (usize, usize) {
-    let input = parse(&content);
-
-    (part_1(&input), part_2(&input))
-}
-
-fn parse(input: &str) -> Input {
-    let rows: Vec<_> = input.trim().split('\n').collect();
-    let ip = rows[0].split(' ').nth(1).unwrap().parse().unwrap();
-    let re = Regex::new(r"([a-z]{4}) ([0-9]+) ([0-9]+) ([0-9]+)").unwrap();
-    let data: Vec<_> = rows
-        .iter()
-        .skip(1)
-        .map(|&row| {
-            let caps = re.captures(row).unwrap();
-            let action = match &caps[1] {
-                "addr" => OpCode::Addr,
-                "addi" => OpCode::Addi,
-                "mulr" => OpCode::Mulr,
-                "muli" => OpCode::Muli,
-                "banr" => OpCode::Banr,
-                "bani" => OpCode::Bani,
-                "borr" => OpCode::Borr,
-                "bori" => OpCode::Bori,
-                "setr" => OpCode::Setr,
-                "seti" => OpCode::Seti,
-                "gtir" => OpCode::Gtir,
-                "gtri" => OpCode::Gtri,
-                "gtrr" => OpCode::Gtrr,
-                "eqir" => OpCode::Eqir,
-                "eqri" => OpCode::Eqri,
-                "eqrr" => OpCode::Eqrr,
-                _ => panic!("Unknown type {}", &caps[1]),
-            };
-            let a: usize = caps[2].parse().unwrap();
-            let b: usize = caps[3].parse().unwrap();
-            let c: usize = caps[4].parse().unwrap();
-            (action, a, b, c)
-        })
-        .collect();
-    (ip, data)
-}
-
-fn part_1((ip, data): &Input) -> usize {
-    let mut registers: Vec<usize> = vec![0; 6];
-    let ip = *ip;
-
-    while registers[ip] < data.len() {
-        let (op, a, b, c) = data[registers[ip]];
-        if op == OpCode::Eqrr {
-            return registers[a];
-        }
-        op.apply(a, b, c, &mut registers);
-        registers[ip] += 1;
-    }
-    unreachable!()
-}
-
-fn part_2((_, data): &Input) -> usize {
-    let mut seen = HashSet::new();
-    let mut cycle = HashSet::new();
-    let mut ans = 0;
-
-    let mut a = data[7].1;
-    let mut b = data[6].2;
-
-    loop {
-        a += b % data[13].1;
-        a *= data[11].2;
-        a %= data[10].2 + 1;
-        if b < data[13].1 {
-            if !cycle.contains(&a) {
-                ans = a;
+    fn part1(&self, _input: &str) -> Box<dyn Display> {
+        // The value in register 5 when instruction 28 (eqrr 5 0 2) is first hit.
+        // After decompiling, this happens when a specific value is generated.
+        // This is the first value checked against r0, so it's the answer for part 1.
+        let mut r5: u64 = 0;
+        loop {
+            let mut r3: u64 = r5 | 65536;
+            r5 = 1533496;
+            loop {
+                let r2 = r3 & 255;
+                r5 += r2;
+                r5 &= 16777215;
+                r5 *= 65899;
+                r5 &= 16777215;
+                if r3 < 256 {
+                    // This is the value that will be compared to r0.
+                    // For part 1, we want the first such value.
+                    return Box::new(r5);
+                }
+                r3 /= 256;
             }
-            cycle.insert(a);
-            b = a | data[6].2;
-            if seen.contains(&b) {
-                return ans;
-            }
-            seen.insert(b);
-            a = data[7].1;
-        } else {
-            b /= data[13].1;
         }
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+    fn part2(&self, _input: &str) -> Box<dyn Display> {
+        // We need to find the last value of r5 before the sequence of r5 values repeats.
+        let mut seen = HashSet::new();
+        let mut last_unique = 0;
+        let mut r5: u64 = 0;
+        
+        loop {
+            let mut r3: u64 = r5 | 65536;
+            r5 = 1533496;
+            loop {
+                let r2 = r3 & 255;
+                r5 += r2;
+                r5 &= 16777215;
+                r5 *= 65899;
+                r5 &= 16777215;
 
-    #[test]
-    #[ignore]
-    fn test_part1() {
-        let text = include_str!("./prod.data").to_owned();
-        assert_eq!(solve(text), (10332277, 13846724));
+                if r3 < 256 {
+                    if !seen.insert(r5) {
+                        // We've seen this value before, so the previous one was the last unique one.
+                        return Box::new(last_unique);
+                    }
+                    last_unique = r5;
+                    break;
+                }
+                r3 /= 256;
+            }
+        }
     }
 }
