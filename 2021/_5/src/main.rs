@@ -1,18 +1,7 @@
-struct Point {
-    horizontal: u8,
-    vertical: u8,
-}
-
-struct Line {
-    start: Point,
-    end: Point,
-}
-
-struct Table {
-    points: Vec<Vec<Point>>,
-}
+mod day05;
+use aoc_rust_common::run_solution;
+use day05::Day05;
 
 fn main() {
-    let content = include_str!("../input.test").lines().collect::<Vec<&str>>();
-    println!("Content: {:?}", content);
+    run_solution(Day05);
 }
