@@ -49,7 +49,6 @@ fn run_simulation(initial_state: Vec<bool>, rules: [bool; 32], generations: i64)
     let mut zero_offset = 0i64;
 
     for _ in 0..generations {
-        let first_plant = state.iter().position(|&p| p).unwrap_or(0);
         let last_plant = state.iter().rposition(|&p| p).unwrap_or(0);
 
         let mut next_state = Vec::new();
