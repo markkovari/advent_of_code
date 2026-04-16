@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"strings"
 	"github.com/markkovari/advent_of_code/aoc-go-common"
 )
@@ -10,7 +9,7 @@ import (
 type Day11 struct{}
 
 func (d Day11) Part1(input string) string {
-	d1, d2 := solve(input)
+	d1, _ := solve(input)
 	return fmt.Sprintf("%d", d1)
 }
 

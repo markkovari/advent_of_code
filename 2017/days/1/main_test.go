@@ -1,4 +1,4 @@
-package days
+package old
 
 import "testing"
 
@@ -7,7 +7,7 @@ func TestFirst(t *testing.T) {
 
 		result, err := Day1First(false)
 		if err != nil {
-			t.Error("Should not fail")
+			t.Errorf("Should not fail, error: %v", err)
 		}
 		want := 9
 		if result != want {

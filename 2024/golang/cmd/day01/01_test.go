@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func Test01Example(t *testing.T) {
-	left, right, err := read01File("../data/01/example")
+	left, right, err := read01File("../../../inputs/1/test.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}
@@ -16,7 +16,7 @@ func Test01Example(t *testing.T) {
 }
 
 func Test01ExampleSecond(t *testing.T) {
-	left, right, err := read01File("../data/01/example")
+	left, right, err := read01File("../../../inputs/1/test.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}
@@ -28,7 +28,7 @@ func Test01ExampleSecond(t *testing.T) {
 }
 
 func Test01Input(t *testing.T) {
-	left, right, err := read01File("../data/01/input")
+	left, right, err := read01File("../../../inputs/1/prod.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}
@@ -41,7 +41,7 @@ func Test01Input(t *testing.T) {
 }
 
 func Test01InputSecond(t *testing.T) {
-	left, right, err := read01File("../data/01/input")
+	left, right, err := read01File("../../../inputs/1/prod.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}

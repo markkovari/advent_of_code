@@ -36,14 +36,14 @@ func read02File(path string) ([][]int, error) {
 func countSafeLevels(levels [][]int) int {
 	count := 0
 	for _, row := range levels {
-		if isLevelSafe(row) {
+		if isLevelSafeOld(row) {
 			count++
 		}
 	}
 	return count
 }
 
-func isLevelSafe(row []int) bool {
+func isLevelSafeOld(row []int) bool {
 	if len(row) < 2 {
 		return false
 	}
@@ -63,9 +63,9 @@ func isLevelSafe(row []int) bool {
 	return true
 }
 
-func isLevelSafeTolerate(row []int) bool {
+func isLevelSafeOldTolerate(row []int) bool {
 	for i := 0; i < len(row); i++ {
-		if isLevelSafe(skipAtFrom(i, row)) {
+		if isLevelSafeOld(skipAtFromOld(i, row)) {
 			return true
 		}
 	}
@@ -75,14 +75,14 @@ func isLevelSafeTolerate(row []int) bool {
 func countSafeLevelsTolerate(levels [][]int) int {
 	count := 0
 	for _, row := range levels {
-		if isLevelSafeTolerate(row) {
+		if isLevelSafeOldTolerate(row) {
 			count++
 		}
 	}
 	return count
 }
 
-func skipAtFrom(index int, elements []int) []int {
+func skipAtFromOld(index int, elements []int) []int {
 	newElements := make([]int, 0)
 	for i := range len(elements) {
 		if i == index {

@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func Test02Example(t *testing.T) {
-	levels, err := read02File("../data/02/example")
+	levels, err := read02File("../../../inputs/2/test.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}
@@ -14,7 +14,7 @@ func Test02Example(t *testing.T) {
 }
 
 func Test02Input(t *testing.T) {
-	levels, err := read02File("../data/02/input")
+	levels, err := read02File("../../../inputs/2/prod.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}
@@ -25,7 +25,7 @@ func Test02Input(t *testing.T) {
 }
 
 func Test02Part2Example(t *testing.T) {
-	levels, err := read02File("../data/02/example")
+	levels, err := read02File("../../../inputs/2/test.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}
@@ -36,7 +36,7 @@ func Test02Part2Example(t *testing.T) {
 }
 
 func Test02Part2Input(t *testing.T) {
-	levels, err := read02File("../data/02/input")
+	levels, err := read02File("../../../inputs/2/prod.txt")
 	if err != nil {
 		t.Fatalf("Error reading file: %v", err)
 	}

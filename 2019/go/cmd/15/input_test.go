@@ -5,7 +5,7 @@ import (
 )
 
 func TestReadCommands(t *testing.T) {
-	vals, err := readCommands("input.data")
+	vals, err := readCommands("../../../inputs/15/prod.txt")
 	if err != nil {
 		t.Fatalf("cannot read inputs, %v+", err)
 	}
@@ -15,7 +15,7 @@ func TestReadCommands(t *testing.T) {
 	}
 
 	expectedExampleLen := 7
-	example, err := readCommands("./input.example")
+	example, err := readCommands("../../../inputs/15/test.txt")
 	if err != nil {
 		t.Fatalf("cannot read inputs, %v+", err)
 	}

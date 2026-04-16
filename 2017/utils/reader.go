@@ -13,8 +13,8 @@ func ReadTextsOfDay(ofDay string) (string, string, error) {
 	}
 
 	// TODO: This is a bit hacky, but it works for now. -> Probably remains like this for eternity.
-	examplePath := path.Join(currentDir, "..", "..", "inputs", ofDay, "example.data")
-	prodPath := path.Join(currentDir, "..", "..", "inputs", ofDay, "prod.data")
+	examplePath := path.Join(currentDir, "..", "..", "inputs", ofDay, "test.txt")
+	prodPath := path.Join(currentDir, "..", "..", "inputs", ofDay, "prod.txt")
 	example, err := ioutil.ReadFile(examplePath)
 	if err != nil {
 		return "", "", err

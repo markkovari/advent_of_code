@@ -27,7 +27,7 @@ func readCommands(filepath string) ([]int, error) {
 }
 func main() {
 
-	nums, err := readCommands("cmd/15/input.data")
+	nums, err := readCommands("../../../inputs/15/prod.txt")
 	if err != nil {
 		println("was not able to read")
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
 	"github.com/markkovari/advent_of_code/aoc-go-common"
 )
 
@@ -11,7 +12,9 @@ type Day10 struct{}
 
 func (d Day10) Part1(input string) string {
 	list := make([]int, 256)
-	for i := range list { list[i] = i }
+	for i := range list {
+		list[i] = i
+	}
 	lengths := parse(input)
 	pos, skip := 0, 0
 	for _, l := range lengths {
@@ -24,8 +27,13 @@ func (d Day10) Part1(input string) string {
 
 func (d Day10) Part2(input string) string {
 	list := make([]int, 256)
-	for i := range list { list[i] = i }
-	lengths := append([]int(nil), input...)
+	for i := range list {
+		list[i] = i
+	}
+	var lengths []int
+	for _, b := range []byte(strings.TrimSpace(input)) {
+		lengths = append(lengths, int(b))
+	}
 	lengths = append(lengths, []int{17, 31, 73, 47, 23}...)
 	pos, skip := 0, 0
 	for round := 0; round < 64; round++ {
@@ -38,7 +46,9 @@ func (d Day10) Part2(input string) string {
 	var hash string
 	for i := 0; i < 16; i++ {
 		block := 0
-		for j := 0; j < 16; j++ { block ^= list[i*16+j] }
+		for j := 0; j < 16; j++ {
+			block ^= list[i*16+j]
+		}
 		hash += fmt.Sprintf("%02x", block)
 	}
 	return hash
