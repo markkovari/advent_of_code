@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use iter_tools::Itertools;
-use std::fmt::Display;
 
 pub struct Day24;
 
@@ -33,13 +33,13 @@ impl Solution for Day24 {
         24
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let packages: Vec<u64> = input.lines().map(|l| l.parse().unwrap()).collect();
-        Box::new(find_qe(&packages, 3))
+        Ok((find_qe(&packages, 3)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let packages: Vec<u64> = input.lines().map(|l| l.parse().unwrap()).collect();
-        Box::new(find_qe(&packages, 4))
+        Ok((find_qe(&packages, 4)).to_string())
     }
 }

@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day11;
 
@@ -86,13 +86,13 @@ impl Solution for Day11 {
         11
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
-        Box::new(create_new_password(input.trim().to_owned()))
+    fn part1(&self, input: &str) -> Result<String> {
+        Ok((create_new_password(input.trim().to_owned())).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let p1 = create_new_password(input.trim().to_owned());
-        Box::new(create_new_password(p1))
+        Ok((create_new_password(p1)).to_string())
     }
 }
 

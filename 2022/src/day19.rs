@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 use std::collections::VecDeque;
@@ -79,13 +80,13 @@ impl Solution for Day19 {
     fn year(&self) -> u32 { 2022 }
     fn day(&self) -> u32 { 19 }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let blueprints = parse(input);
-        Box::new(blueprints.iter().enumerate().map(|(idx, blueprint)| (idx + 1) as u16 * max_geodes(blueprint, 24)).sum::<u16>() as i64)
+        Ok((blueprints.iter().enumerate().map(|(idx, blueprint)| (idx + 1) as u16 * max_geodes(blueprint, 24)).sum::<u16>() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let blueprints = parse(input);
-        Box::new(blueprints.iter().take(3).map(|blueprint| max_geodes(blueprint, 32) as u64).product::<u64>() as i64)
+        Ok((blueprints.iter().take(3).map(|blueprint| max_geodes(blueprint, 32) as u64).product::<u64>() as i64).to_string())
     }
 }

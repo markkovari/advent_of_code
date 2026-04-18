@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::str::FromStr;
 
 pub struct Day04;
@@ -29,7 +29,7 @@ impl Solution for Day04 {
         4
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let count = input
             .lines()
             .filter(|line| {
@@ -38,10 +38,10 @@ impl Solution for Day04 {
                     || (r2.from <= r1.from && r2.until >= r1.until)
             })
             .count();
-        Box::new(count)
+        Ok((count).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let count = input
             .lines()
             .filter(|line| {
@@ -49,7 +49,7 @@ impl Solution for Day04 {
                 r1.from <= r2.until && r1.until >= r2.from
             })
             .count();
-        Box::new(count)
+        Ok((count).to_string())
     }
 }
 

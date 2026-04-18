@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day08;
 
@@ -71,7 +71,7 @@ impl Solution for Day08 {
         8
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let grid = parse(input);
         let rows = grid.len();
         let cols = grid[0].len();
@@ -79,10 +79,10 @@ impl Solution for Day08 {
             .flat_map(|r| (0..cols).map(move |c| (r, c)))
             .filter(|&(r, c)| visible(&grid, r, c))
             .count();
-        Box::new(count)
+        Ok((count).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let grid = parse(input);
         let rows = grid.len();
         let cols = grid[0].len();
@@ -91,6 +91,6 @@ impl Solution for Day08 {
             .map(|(r, c)| score(&grid, r, c))
             .max()
             .unwrap_or(0);
-        Box::new(max_score)
+        Ok((max_score).to_string())
     }
 }

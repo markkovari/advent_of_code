@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use regex::Regex;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day14;
 
@@ -62,16 +62,16 @@ impl Solution for Day14 {
         14
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let duration = 2503;
         let raindeer: Vec<Raindeer> = input
             .lines()
             .map(|line| Raindeer::try_from(line).unwrap())
             .collect();
-        Box::new(raindeer.iter().map(|r| r.distance(duration)).max().unwrap() as i64)
+        Ok((raindeer.iter().map(|r| r.distance(duration)).max().unwrap() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let duration = 2503;
         let raindeer: Vec<Raindeer> = input
             .lines()
@@ -92,6 +92,6 @@ impl Solution for Day14 {
                 }
             }
         }
-        Box::new(*scores.values().max().unwrap() as i64)
+        Ok((*scores.values().max().unwrap() as i64).to_string())
     }
 }

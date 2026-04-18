@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use serde_json::Value;
-use std::fmt::Display;
 
 pub struct Day12;
 
@@ -36,14 +36,14 @@ impl Solution for Day12 {
         12
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let value: Value = serde_json::from_str(input).unwrap();
-        Box::new(count_value(&value) as i64)
+        Ok((count_value(&value) as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let value: Value = serde_json::from_str(input).unwrap();
-        Box::new(skip_red(&value) as i64)
+        Ok((skip_red(&value) as i64).to_string())
     }
 }
 
@@ -54,9 +54,9 @@ mod tests {
     #[test]
     fn test_day12() {
         let day = Day12;
-        assert_eq!(day.part1("[1,2,3]").to_string(), "6");
-        assert_eq!(day.part1(r#"{"a":2,"b":4}"#).to_string(), "6");
-        assert_eq!(day.part2("[1,2,3]").to_string(), "6");
-        assert_eq!(day.part2(r#"[1,{"c":"red","a":2},3]"#).to_string(), "4");
+        assert_eq!(day.part1("[1,2,3]").unwrap(), "6");
+        assert_eq!(day.part1(r#"{"a":2,"b":4}"#).unwrap(), "6");
+        assert_eq!(day.part2("[1,2,3]").unwrap(), "6");
+        assert_eq!(day.part2(r#"[1,{"c":"red","a":2},3]"#).unwrap(), "4");
     }
 }

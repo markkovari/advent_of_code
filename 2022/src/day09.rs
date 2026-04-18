@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashSet;
-use std::fmt::Display;
 
 pub struct Day09;
 
@@ -60,11 +60,11 @@ impl Solution for Day09 {
         9
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
-        Box::new(simulate(input, 2))
+    fn part1(&self, input: &str) -> Result<String> {
+        Ok((simulate(input, 2)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
-        Box::new(simulate(input, 10))
+    fn part2(&self, input: &str) -> Result<String> {
+        Ok((simulate(input, 10)).to_string())
     }
 }

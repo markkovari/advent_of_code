@@ -1,8 +1,8 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::cmp;
-use std::fmt::Display;
 
 pub struct Day22;
 
@@ -160,7 +160,7 @@ impl Solution for Day22 {
         22
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"Hit Points: (\d+)").unwrap();
         }
@@ -177,10 +177,10 @@ impl Solution for Day22 {
             recharge_timer: 0,
             hard_mode: false,
         };
-        Box::new(find_min_mana(start_state))
+        Ok((find_min_mana(start_state)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"Hit Points: (\d+)").unwrap();
         }
@@ -197,6 +197,6 @@ impl Solution for Day22 {
             recharge_timer: 0,
             hard_mode: true,
         };
-        Box::new(find_min_mana(start_state))
+        Ok((find_min_mana(start_state)).to_string())
     }
 }

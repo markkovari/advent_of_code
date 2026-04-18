@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use rayon::prelude::*;
 use regex::Regex;
-use std::fmt::Display;
 
 pub struct Day15;
 
@@ -101,85 +101,81 @@ impl Solution for Day15 {
         15
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let ingredients: Vec<Ingredient> = input
             .lines()
             .map(|line| Ingredient::try_from(line).unwrap())
             .collect();
         if ingredients.len() == 2 {
-            Box::new(
-                (0..=100)
-                    .map(|a| {
-                        let b = 100 - a;
-                        cookie_score(&ingredients, &[a, b])
-                    })
-                    .max()
-                    .unwrap_or(0) as i64,
-            )
+            Ok(((0..=100)
+                .map(|a| {
+                    let b = 100 - a;
+                    cookie_score(&ingredients, &[a, b])
+                })
+                .max()
+                .unwrap_or(0) as i64)
+                .to_string())
         } else {
             let ings = ingredients.clone();
-            Box::new(
-                (0..=100)
-                    .into_par_iter()
-                    .flat_map(move |a| {
+            Ok(((0..=100)
+                .into_par_iter()
+                .flat_map(move |a| {
+                    let ings = ings.clone();
+                    (0..=100 - a).into_par_iter().flat_map(move |b| {
                         let ings = ings.clone();
-                        (0..=100 - a).into_par_iter().flat_map(move |b| {
-                            let ings = ings.clone();
-                            (0..=100 - a - b).into_par_iter().map(move |c| {
-                                let d = 100 - a - b - c;
-                                cookie_score(&ings, &[a, b, c, d])
-                            })
+                        (0..=100 - a - b).into_par_iter().map(move |c| {
+                            let d = 100 - a - b - c;
+                            cookie_score(&ings, &[a, b, c, d])
                         })
                     })
-                    .max()
-                    .unwrap_or(0) as i64,
-            )
+                })
+                .max()
+                .unwrap_or(0) as i64)
+                .to_string())
         }
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let ingredients: Vec<Ingredient> = input
             .lines()
             .map(|line| Ingredient::try_from(line).unwrap())
             .collect();
         if ingredients.len() == 2 {
-            Box::new(
-                (0..=100)
-                    .filter_map(|a| {
-                        let b = 100 - a;
-                        let ratios = [a, b];
-                        if cookie_calories(&ingredients, &ratios) == 500 {
-                            Some(cookie_score(&ingredients, &ratios))
-                        } else {
-                            None
-                        }
-                    })
-                    .max()
-                    .unwrap_or(0) as i64,
-            )
+            Ok(((0..=100)
+                .filter_map(|a| {
+                    let b = 100 - a;
+                    let ratios = [a, b];
+                    if cookie_calories(&ingredients, &ratios) == 500 {
+                        Some(cookie_score(&ingredients, &ratios))
+                    } else {
+                        None
+                    }
+                })
+                .max()
+                .unwrap_or(0) as i64)
+                .to_string())
         } else {
             let ings = ingredients.clone();
-            Box::new(
-                (0..=100)
-                    .into_par_iter()
-                    .flat_map(move |a| {
+            Ok(((0..=100)
+                .into_par_iter()
+                .flat_map(move |a| {
+                    let ings = ings.clone();
+                    (0..=100 - a).into_par_iter().flat_map(move |b| {
                         let ings = ings.clone();
-                        (0..=100 - a).into_par_iter().flat_map(move |b| {
-                            let ings = ings.clone();
-                            (0..=100 - a - b).into_par_iter().filter_map(move |c| {
-                                let d = 100 - a - b - c;
-                                let ratios = [a, b, c, d];
-                                if cookie_calories(&ings, &ratios) == 500 {
-                                    Some(cookie_score(&ings, &ratios))
-                                } else {
-                                    None
-                                }
-                            })
+                        (0..=100 - a - b).into_par_iter().filter_map(move |c| {
+                            let d = 100 - a - b - c;
+                            let ratios = [a, b, c, d];
+                            if cookie_calories(&ings, &ratios) == 500 {
+                                Some(cookie_score(&ings, &ratios))
+                            } else {
+                                None
+                            }
                         })
                     })
-                    .max()
-                    .unwrap_or(0) as i64,
-            )
+                })
+                .max()
+                .unwrap_or(0) as i64)
+                .to_string())
         }
     }
 }

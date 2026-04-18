@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use serde_scan::scan;
 use std::collections::{HashMap, HashSet};
-use std::fmt::Display;
 
 pub struct Day06;
 
@@ -13,7 +13,7 @@ impl Solution for Day06 {
         6
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let coords: Vec<(i32, i32)> = input
             .lines()
             .map(|l| scan!("{}, {}" <- l).unwrap())
@@ -53,10 +53,10 @@ impl Solution for Day06 {
             .max()
             .unwrap_or(&0);
 
-        Box::new(*max_area)
+        Ok((*max_area).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let coords: Vec<(i32, i32)> = input
             .lines()
             .map(|l| scan!("{}, {}" <- l).unwrap())
@@ -81,6 +81,6 @@ impl Solution for Day06 {
             })
             .count();
 
-        Box::new(safe_region_size)
+        Ok((safe_region_size).to_string())
     }
 }

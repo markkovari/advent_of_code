@@ -1,9 +1,9 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use iter_tools::Itertools;
 use rayon::prelude::*;
 use regex::Regex;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day13;
 
@@ -76,7 +76,7 @@ impl Solution for Day13 {
         13
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let relations_vec: Vec<Relation> = input
             .lines()
             .map(|l| Relation::try_from(l).unwrap())
@@ -84,18 +84,17 @@ impl Solution for Day13 {
         let relations = evaluate_sitting(relations_vec);
         let people: Vec<String> = relations.keys().map(|k| k.to_owned()).collect();
         let amount = people.len();
-        Box::new(
-            people
-                .iter()
-                .permutations(amount)
-                .par_bridge()
-                .map(|permutation| calc_happiness(&relations, &permutation) as i64)
-                .max()
-                .unwrap_or(0),
-        )
+        Ok(people
+            .iter()
+            .permutations(amount)
+            .par_bridge()
+            .map(|permutation| calc_happiness(&relations, &permutation) as i64)
+            .max()
+            .unwrap_or(0)
+            .to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let relations_vec: Vec<Relation> = input
             .lines()
             .map(|l| Relation::try_from(l).unwrap())
@@ -111,14 +110,13 @@ impl Solution for Day13 {
 
         let people: Vec<String> = relations.keys().map(|k| k.to_owned()).collect();
         let amount = people.len();
-        Box::new(
-            people
-                .iter()
-                .permutations(amount)
-                .par_bridge()
-                .map(|permutation| calc_happiness(&relations, &permutation) as i64)
-                .max()
-                .unwrap_or(0),
-        )
+        Ok(people
+            .iter()
+            .permutations(amount)
+            .par_bridge()
+            .map(|permutation| calc_happiness(&relations, &permutation) as i64)
+            .max()
+            .unwrap_or(0)
+            .to_string())
     }
 }

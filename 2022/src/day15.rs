@@ -1,7 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use itertools::Itertools;
-use std::collections::{HashMap, HashSet};
-use std::fmt::Display;
+use std::collections::HashSet;
 
 pub struct Day15;
 
@@ -86,7 +85,7 @@ impl Solution for Day15 {
         15
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let pairs = parse(input);
         let row = 2_000_000;
         let ranges = get_row_ranges(row, &pairs);
@@ -96,19 +95,19 @@ impl Solution for Day15 {
             .filter(|p| p[1].row == row)
             .map(|p| p[1].col)
             .collect();
-        Box::new(count as usize - beacons.len())
+        Ok((count as usize - beacons.len()).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let pairs = parse(input);
         let max_coord = 4_000_000;
         for row in 0..=max_coord {
             let ranges = get_row_ranges(row, &pairs);
             if ranges.len() > 1 {
                 let col = ranges[0].end() + 1;
-                return Box::new(col as i64 * 4_000_000 + row as i64);
+                return Ok((col as i64 * 4_000_000 + row as i64).to_string());
             }
         }
-        Box::new(0)
+        Ok((0).to_string())
     }
 }

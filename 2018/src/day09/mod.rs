@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use regex::Regex;
 use std::collections::VecDeque;
-use std::fmt::Display;
 
 pub struct Day09;
 
@@ -32,21 +32,21 @@ impl Solution for Day09 {
         9
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let re =
             Regex::new(r"(\d+)\s*players;\s*last\s*marble\s*is\s*worth\s*(\d+)\s*points?").unwrap();
         let caps = re.captures(input).unwrap();
         let players: usize = caps[1].parse().unwrap();
         let marbles: u32 = caps[2].parse().unwrap();
-        Box::new(play_game(players, marbles))
+        Ok((play_game(players, marbles)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let re =
             Regex::new(r"(\d+)\s*players;\s*last\s*marble\s*is\s*worth\s*(\d+)\s*points?").unwrap();
         let caps = re.captures(input).unwrap();
         let players: usize = caps[1].parse().unwrap();
         let marbles: u32 = caps[2].parse().unwrap();
-        Box::new(play_game(players, marbles * 100))
+        Ok((play_game(players, marbles * 100)).to_string())
     }
 }

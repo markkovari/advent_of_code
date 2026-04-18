@@ -1,9 +1,9 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use iter_tools::Itertools;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::cmp;
-use std::fmt::Display;
 
 pub struct Day21;
 
@@ -100,29 +100,27 @@ impl Solution for Day21 {
         21
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let player = Fighter::new(100, 0, 0);
         let boss = Fighter::parse(input);
         let items = all_items();
-        Box::new(
-            all_valid_item_combinations(&items)
-                .filter(|i| player.fight(&boss, i))
-                .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
-                .min()
-                .unwrap_or(0),
-        )
+        Ok(all_valid_item_combinations(&items)
+            .filter(|i| player.fight(&boss, i))
+            .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
+            .min()
+            .unwrap_or(0)
+            .to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let player = Fighter::new(100, 0, 0);
         let boss = Fighter::parse(input);
         let items = all_items();
-        Box::new(
-            all_valid_item_combinations(&items)
-                .filter(|i| !player.fight(&boss, i))
-                .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
-                .max()
-                .unwrap_or(0),
-        )
+        Ok(all_valid_item_combinations(&items)
+            .filter(|i| !player.fight(&boss, i))
+            .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
+            .max()
+            .unwrap_or(0)
+            .to_string())
     }
 }

@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::{HashMap, HashSet};
-use std::fmt::Display;
 use text_io::scan;
 
 pub struct Day16;
@@ -125,7 +125,7 @@ impl Solution for Day16 {
         16
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (samples, _) = parse_input(input);
         let result = samples
             .iter()
@@ -142,10 +142,10 @@ impl Solution for Day16 {
                     >= 3
             })
             .count();
-        Box::new(result)
+        Ok((result).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (samples, program) = parse_input(input);
         let mut op_map: HashMap<usize, OpCode> = HashMap::new();
         let mut possible_ops: HashMap<usize, HashSet<OpCode>> = (0..16)
@@ -181,6 +181,6 @@ impl Solution for Day16 {
             let [op_num, a, b, c] = *instruction;
             op_map[&op_num].apply(&mut registers, a, b, c);
         }
-        Box::new(registers[0])
+        Ok((registers[0]).to_string())
     }
 }

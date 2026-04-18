@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day07;
 
@@ -134,16 +134,16 @@ impl Solution for Day07 {
         7
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let instructions: Vec<Instruction> = input
             .lines()
             .map(|l| Instruction::try_from(l).unwrap())
             .collect();
         let values = calculate_values(&instructions);
-        Box::new(*values.get("a").unwrap_or(&0) as i64)
+        Ok((*values.get("a").unwrap_or(&0) as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let instructions: Vec<Instruction> = input
             .lines()
             .map(|l| Instruction::try_from(l).unwrap())
@@ -163,6 +163,6 @@ impl Solution for Day07 {
             .collect();
 
         let values = calculate_values(&new_instructions);
-        Box::new(*values.get("a").unwrap_or(&0) as i64)
+        Ok((*values.get("a").unwrap_or(&0) as i64).to_string())
     }
 }

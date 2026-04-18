@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::str::FromStr;
 
 pub struct Day04;
@@ -60,7 +60,7 @@ impl Solution for Day04 {
         4
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut sections = input.split("\n\n");
         let numbers: Vec<u8> = sections
             .next()
@@ -74,14 +74,14 @@ impl Solution for Day04 {
             for table in &mut tables {
                 table.mark(num);
                 if table.check_win() {
-                    return Box::new(table.score(num));
+                    return Ok((table.score(num)).to_string());
                 }
             }
         }
-        Box::new(0)
+        Ok((0).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut sections = input.split("\n\n");
         let numbers: Vec<u8> = sections
             .next()
@@ -101,11 +101,11 @@ impl Solution for Day04 {
                 if table.check_win() {
                     won[i] = true;
                     if won.iter().all(|&w| w) {
-                        return Box::new(table.score(num));
+                        return Ok((table.score(num)).to_string());
                     }
                 }
             }
         }
-        Box::new(0)
+        Ok((0).to_string())
     }
 }

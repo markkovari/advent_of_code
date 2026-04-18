@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day01;
 
@@ -11,15 +11,18 @@ impl Solution for Day01 {
         1
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
-        Box::new(input.chars().fold(0, |acc, c| match c {
-            '(' => acc + 1,
-            ')' => acc - 1,
-            _ => acc,
-        }))
+    fn part1(&self, input: &str) -> Result<String> {
+        Ok(input
+            .chars()
+            .fold(0, |acc, c| match c {
+                '(' => acc + 1,
+                ')' => acc - 1,
+                _ => acc,
+            })
+            .to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut floor = 0;
         for (pos, c) in input.chars().enumerate() {
             floor += match c {
@@ -28,10 +31,10 @@ impl Solution for Day01 {
                 _ => 0,
             };
             if floor == -1 {
-                return Box::new((pos + 1) as i64);
+                return Ok(((pos + 1) as i64).to_string());
             }
         }
-        Box::new((input.len() + 1) as i64)
+        Ok(((input.len() + 1) as i64).to_string())
     }
 }
 
@@ -42,17 +45,17 @@ mod tests {
     #[test]
     fn test_day01() {
         let day = Day01;
-        assert_eq!(day.part1("(())").to_string(), "0");
-        assert_eq!(day.part1("()()").to_string(), "0");
-        assert_eq!(day.part1("(((").to_string(), "3");
-        assert_eq!(day.part1("(()(()(").to_string(), "3");
-        assert_eq!(day.part1("))(((((").to_string(), "3");
-        assert_eq!(day.part1("())").to_string(), "-1");
-        assert_eq!(day.part1("))(").to_string(), "-1");
-        assert_eq!(day.part1(")))").to_string(), "-3");
-        assert_eq!(day.part1(")())())").to_string(), "-3");
+        assert_eq!(day.part1("(())").unwrap(), "0");
+        assert_eq!(day.part1("()()").unwrap(), "0");
+        assert_eq!(day.part1("(((").unwrap(), "3");
+        assert_eq!(day.part1("(()(()(").unwrap(), "3");
+        assert_eq!(day.part1("))(((((").unwrap(), "3");
+        assert_eq!(day.part1("())").unwrap(), "-1");
+        assert_eq!(day.part1("))(").unwrap(), "-1");
+        assert_eq!(day.part1(")))").unwrap(), "-3");
+        assert_eq!(day.part1(")())())").unwrap(), "-3");
 
-        assert_eq!(day.part2(")").to_string(), "1");
-        assert_eq!(day.part2("()())").to_string(), "5");
+        assert_eq!(day.part2(")").unwrap(), "1");
+        assert_eq!(day.part2("()())").unwrap(), "5");
     }
 }

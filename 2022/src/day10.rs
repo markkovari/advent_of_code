@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::str::FromStr;
 
 pub struct Day10;
@@ -30,7 +30,7 @@ impl Solution for Day10 {
         10
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let instructions: Vec<Instruction> = input.lines().map(|l| l.parse().unwrap()).collect();
         let mut x = 1;
         let mut cycle = 0;
@@ -57,10 +57,10 @@ impl Solution for Day10 {
                 }
             }
         }
-        Box::new(signal_strength)
+        Ok((signal_strength).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let instructions: Vec<Instruction> = input.lines().map(|l| l.parse().unwrap()).collect();
         let mut x = 1;
         let mut cycle = 0;
@@ -93,6 +93,6 @@ impl Solution for Day10 {
                 }
             }
         }
-        Box::new(format!("\n{}", crt))
+        Ok((format!("\n{}", crt)).to_string())
     }
 }

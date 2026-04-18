@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 use std::collections::HashSet;
@@ -42,13 +43,13 @@ impl Solution for Day18 {
     fn year(&self) -> u32 { 2022 }
     fn day(&self) -> u32 { 18 }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let cubes = parse(input);
         let count = cubes.iter().flat_map(|c| c.neighbours()).filter(|n| !cubes.contains(n)).count();
-        Box::new(count)
+        Ok((count).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let cubes = parse(input);
         let bounds = bounds(&cubes);
         let mut exposed = HashSet::new();
@@ -64,6 +65,6 @@ impl Solution for Day18 {
         }
         
         let count = cubes.iter().flat_map(|c| c.neighbours()).filter(|n| exposed.contains(n)).count();
-        Box::new(count)
+        Ok((count).to_string())
     }
 }

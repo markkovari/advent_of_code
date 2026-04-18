@@ -1,9 +1,9 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::i64 as nom_i64, multi::separated_list0,
     sequence::delimited, IResult, Parser,
 };
-use std::fmt::Display;
 
 pub struct Day13;
 
@@ -28,7 +28,7 @@ impl Solution for Day13 {
         13
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut count = 0;
         for (i, pair) in input.split("\n\n").enumerate() {
             let mut lines = pair.lines();
@@ -38,10 +38,10 @@ impl Solution for Day13 {
                 count += i + 1;
             }
         }
-        Box::new(count)
+        Ok((count).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut packets: Vec<Packet> = input
             .lines()
             .filter(|l| !l.is_empty())
@@ -56,6 +56,6 @@ impl Solution for Day13 {
 
         let pos1 = packets.iter().position(|e| e == &div1).unwrap() + 1;
         let pos2 = packets.iter().position(|e| e == &div2).unwrap() + 1;
-        Box::new(pos1 * pos2)
+        Ok((pos1 * pos2).to_string())
     }
 }

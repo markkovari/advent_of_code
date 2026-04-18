@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use nom::{bytes::complete::tag, character::complete::anychar, IResult};
 use std::collections::{HashMap, HashSet};
-use std::fmt::Display;
 
 pub struct Day07;
 
@@ -37,7 +37,7 @@ impl Solution for Day07 {
         7
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (all_steps, requirements) = get_deps(input);
         let mut done: HashSet<Step> = HashSet::new();
         let mut ordered = String::new();
@@ -62,10 +62,10 @@ impl Solution for Day07 {
                 break; // No available steps
             }
         }
-        Box::new(ordered)
+        Ok((ordered).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (all_steps, requirements) = get_deps(input);
         let mut done: HashSet<Step> = HashSet::new();
         let mut workers = vec![(0, '.'); 5]; // (time_free, step)
@@ -113,6 +113,6 @@ impl Solution for Day07 {
         }
 
         let final_time = workers.iter().map(|(tf, _)| *tf).max().unwrap_or(time);
-        Box::new(final_time)
+        Ok((final_time).to_string())
     }
 }

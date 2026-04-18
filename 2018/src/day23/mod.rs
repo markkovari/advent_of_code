@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use regex::Regex;
-use std::fmt::Display;
 
 pub struct Day23;
 
@@ -20,7 +20,7 @@ impl Solution for Day23 {
         23
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let bots: Vec<Bot> = input
             .lines()
             .map(|line| {
@@ -43,13 +43,13 @@ impl Solution for Day23 {
                     <= strongest.r
             })
             .count();
-        Box::new(count)
+        Ok((count).to_string())
     }
 
-    fn part2(&self, _input: &str) -> Box<dyn Display> {
+    fn part2(&self, _input: &str) -> Result<String> {
         // This is a complex problem (related to finding the point in the intersection of the most octahedrons).
         // The solution involves a search algorithm (like simulated annealing or a priority queue search over regions).
         // For now, returning a placeholder as the full implementation is very complex.
-        Box::new("Not implemented")
+        Ok(("Not implemented").to_string())
     }
 }

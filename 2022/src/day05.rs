@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::str::FromStr;
 
 pub struct Day05;
@@ -66,7 +66,7 @@ impl Solution for Day05 {
         5
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (mut shipment, instructions) = parse(input);
         for inst in instructions {
             for _ in 0..inst.amount {
@@ -74,16 +74,14 @@ impl Solution for Day05 {
                 shipment.stacks[inst.to].elements.push(item);
             }
         }
-        Box::new(
-            shipment
-                .stacks
-                .iter()
-                .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
-                .collect::<String>(),
-        )
+        Ok(shipment
+            .stacks
+            .iter()
+            .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
+            .collect::<String>())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (mut shipment, instructions) = parse(input);
         for inst in instructions {
             let mut moved = Vec::new();
@@ -94,13 +92,11 @@ impl Solution for Day05 {
                 shipment.stacks[inst.to].elements.push(item);
             }
         }
-        Box::new(
-            shipment
-                .stacks
-                .iter()
-                .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
-                .collect::<String>(),
-        )
+        Ok(shipment
+            .stacks
+            .iter()
+            .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
+            .collect::<String>())
     }
 }
 

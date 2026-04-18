@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day02;
 
@@ -42,7 +42,7 @@ impl Solution for Day02 {
         2
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (twos, threes) = input.lines().fold((0, 0), |(mut twos, mut threes), line| {
             let mut counts = HashMap::new();
             for c in line.chars() {
@@ -56,12 +56,12 @@ impl Solution for Day02 {
             }
             (twos, threes)
         });
-        Box::new(twos * threes)
+        Ok((twos * threes).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let ids: Vec<String> = input.lines().map(|s| s.to_string()).collect();
         let (a, b) = get_two_closest(&ids);
-        Box::new(get_common_chars(&a, &b))
+        Ok((get_common_chars(&a, &b)).to_string())
     }
 }

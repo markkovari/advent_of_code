@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use regex::Regex;
-use std::fmt::Display;
 
 pub struct Day12;
 
@@ -12,13 +12,13 @@ impl Solution for Day12 {
         12
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (initial_state, rules) = parse_input(input);
         let result = run_simulation(initial_state, rules, 20);
-        Box::new(result)
+        Ok((result).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (initial_state, rules) = parse_input(input);
         // After ~100 generations, the pattern stabilizes and shifts right by 1 pot each generation.
         // The sum increases by a fixed amount each time.
@@ -26,7 +26,7 @@ impl Solution for Day12 {
         let val_101 = run_simulation(initial_state, rules, 101);
         let diff = val_101 - val_100;
         let result = val_100 + (50_000_000_000 - 100) * diff;
-        Box::new(result)
+        Ok((result).to_string())
     }
 }
 

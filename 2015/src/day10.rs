@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day10;
 
@@ -35,20 +35,20 @@ impl Solution for Day10 {
         10
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut result = input.trim().to_string();
         for _ in 0..40 {
             result = look_and_say(&result);
         }
-        Box::new(result.len() as i64)
+        Ok((result.len() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut result = input.trim().to_string();
         for _ in 0..50 {
             result = look_and_say(&result);
         }
-        Box::new(result.len() as i64)
+        Ok((result.len() as i64).to_string())
     }
 }
 

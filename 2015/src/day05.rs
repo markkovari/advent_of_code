@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use rayon::prelude::*;
-use std::fmt::Display;
 
 pub struct Day05;
 
@@ -12,40 +12,38 @@ impl Solution for Day05 {
         5
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let vowels = ['a', 'e', 'i', 'o', 'u'];
         let filters = ["ab", "cd", "pq", "xy"];
 
-        Box::new(
-            input
-                .par_lines()
-                .filter(|line| line.chars().filter(|c| vowels.contains(c)).count() >= 3)
-                .filter(|line| {
-                    let chars: Vec<char> = line.chars().collect();
-                    chars.windows(2).any(|w| w[0] == w[1])
-                })
-                .filter(|line| !filters.iter().any(|&f| line.contains(f)))
-                .count() as i64,
-        )
+        Ok((input
+            .par_lines()
+            .filter(|line| line.chars().filter(|c| vowels.contains(c)).count() >= 3)
+            .filter(|line| {
+                let chars: Vec<char> = line.chars().collect();
+                chars.windows(2).any(|w| w[0] == w[1])
+            })
+            .filter(|line| !filters.iter().any(|&f| line.contains(f)))
+            .count() as i64)
+            .to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
-        Box::new(
-            input
-                .par_lines()
-                .filter(|line| {
-                    let chars: Vec<char> = line.chars().collect();
-                    chars.windows(3).any(|w| w[0] == w[2])
+    fn part2(&self, input: &str) -> Result<String> {
+        Ok((input
+            .par_lines()
+            .filter(|line| {
+                let chars: Vec<char> = line.chars().collect();
+                chars.windows(3).any(|w| w[0] == w[2])
+            })
+            .filter(|line| {
+                let chars: Vec<char> = line.chars().collect();
+                (0..chars.len() - 1).any(|i| {
+                    let pair = &line[i..i + 2];
+                    line[i + 2..].contains(pair)
                 })
-                .filter(|line| {
-                    let chars: Vec<char> = line.chars().collect();
-                    (0..chars.len() - 1).any(|i| {
-                        let pair = &line[i..i + 2];
-                        line[i + 2..].contains(pair)
-                    })
-                })
-                .count() as i64,
-        )
+            })
+            .count() as i64)
+            .to_string())
     }
 }
 
@@ -56,15 +54,15 @@ mod tests {
     #[test]
     fn test_day05() {
         let day = Day05;
-        assert_eq!(day.part1("ugknbfddgicrmopn").to_string(), "1");
-        assert_eq!(day.part1("aaa").to_string(), "1");
-        assert_eq!(day.part1("jchzalrnumimnmhp").to_string(), "0");
-        assert_eq!(day.part1("haegwjzuvuyypxyu").to_string(), "0");
-        assert_eq!(day.part1("dvszwmarrgswjxmb").to_string(), "0");
+        assert_eq!(day.part1("ugknbfddgicrmopn").unwrap(), "1");
+        assert_eq!(day.part1("aaa").unwrap(), "1");
+        assert_eq!(day.part1("jchzalrnumimnmhp").unwrap(), "0");
+        assert_eq!(day.part1("haegwjzuvuyypxyu").unwrap(), "0");
+        assert_eq!(day.part1("dvszwmarrgswjxmb").unwrap(), "0");
 
-        assert_eq!(day.part2("qjhvhtzxzqqjkmpb").to_string(), "1");
-        assert_eq!(day.part2("xxyxx").to_string(), "1");
-        assert_eq!(day.part2("uurcxstgmygtbstg").to_string(), "0");
-        assert_eq!(day.part2("ieodomkazucvgmuy").to_string(), "0");
+        assert_eq!(day.part2("qjhvhtzxzqqjkmpb").unwrap(), "1");
+        assert_eq!(day.part2("xxyxx").unwrap(), "1");
+        assert_eq!(day.part2("uurcxstgmygtbstg").unwrap(), "0");
+        assert_eq!(day.part2("ieodomkazucvgmuy").unwrap(), "0");
     }
 }

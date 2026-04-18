@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 
@@ -7,7 +8,7 @@ impl Solution for Day02 {
     fn year(&self) -> u32 { 2022 }
     fn day(&self) -> u32 { 2 }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let score = input.lines().map(|line| {
             let mut parts = line.split_whitespace();
             let opp = parts.next().unwrap();
@@ -22,10 +23,10 @@ impl Solution for Day02 {
             };
             score + outcome
         }).sum::<i32>();
-        Box::new(score)
+        Ok((score).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let score = input.lines().map(|line| {
             let mut parts = line.split_whitespace();
             let opp = parts.next().unwrap();
@@ -40,6 +41,6 @@ impl Solution for Day02 {
             let choice_score = match me { "X" => 1, "Y" => 2, "Z" => 3, _ => 0 };
             choice_score + outcome_score
         }).sum::<i32>();
-        Box::new(score)
+        Ok((score).to_string())
     }
 }

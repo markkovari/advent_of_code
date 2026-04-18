@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day18;
 
@@ -79,15 +79,15 @@ impl Solution for Day18 {
         18
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut area = parse(input);
         for _ in 0..10 {
             area = step(&area);
         }
-        Box::new(resource_value(&area))
+        Ok((resource_value(&area)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut area = parse(input);
         let mut history = HashMap::new();
         let target_min = 1_000_000_000;
@@ -98,10 +98,10 @@ impl Solution for Day18 {
                 let cycle_len = min - prev_min;
                 let remaining_mins = target_min - min;
                 if remaining_mins % cycle_len == 0 {
-                    return Box::new(resource_value(&area));
+                    return Ok((resource_value(&area)).to_string());
                 }
             }
         }
-        Box::new(resource_value(&area))
+        Ok((resource_value(&area)).to_string())
     }
 }

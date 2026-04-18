@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use onig::Regex;
-use std::fmt::Display;
 
 pub struct Day08;
 
@@ -34,18 +34,24 @@ impl Solution for Day08 {
         8
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
-        Box::new(input.lines().fold(0, |extra_chars, line| {
-            let (raw_len, unescaped_len) = raw_and_unescaped_len(line);
-            extra_chars + (raw_len - unescaped_len)
-        }) as i64)
+    fn part1(&self, input: &str) -> Result<String> {
+        Ok(input
+            .lines()
+            .fold(0, |extra_chars, line| {
+                let (raw_len, unescaped_len) = raw_and_unescaped_len(line);
+                extra_chars + (raw_len - unescaped_len)
+            })
+            .to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
-        Box::new(input.lines().fold(0, |extra_chars, line| {
-            let (raw_len, reescaped_len) = raw_and_reescaped_len(line);
-            extra_chars + (reescaped_len - raw_len)
-        }) as i64)
+    fn part2(&self, input: &str) -> Result<String> {
+        Ok(input
+            .lines()
+            .fold(0, |extra_chars, line| {
+                let (raw_len, reescaped_len) = raw_and_reescaped_len(line);
+                extra_chars + (reescaped_len - raw_len)
+            })
+            .to_string())
     }
 }
 
@@ -60,7 +66,7 @@ mod tests {
 "abc"
 "aaa\"aaa"
 "\x27""#;
-        assert_eq!(day.part1(example).to_string(), "12");
-        assert_eq!(day.part2(example).to_string(), "19");
+        assert_eq!(day.part1(example).unwrap(), "12");
+        assert_eq!(day.part2(example).unwrap(), "19");
     }
 }

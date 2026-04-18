@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day11;
 
@@ -40,7 +40,7 @@ impl Solution for Day11 {
         11
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let serial_number: i32 = input.trim().parse().unwrap();
         let sat = build_summed_area_table(serial_number);
         let mut max_power = i32::MIN;
@@ -54,10 +54,10 @@ impl Solution for Day11 {
                 }
             }
         }
-        Box::new(format!("{},{}", max_coord.0, max_coord.1))
+        Ok((format!("{},{}", max_coord.0, max_coord.1)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let serial_number: i32 = input.trim().parse().unwrap();
         let sat = build_summed_area_table(serial_number);
         let mut max_power = i32::MIN;
@@ -73,7 +73,7 @@ impl Solution for Day11 {
                 }
             }
         }
-        Box::new(format!(
+        Ok(format!(
             "{},{},{}",
             max_details.0, max_details.1, max_details.2
         ))

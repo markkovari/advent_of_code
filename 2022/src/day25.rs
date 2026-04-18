@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 
@@ -30,12 +31,12 @@ impl Solution for Day25 {
     fn year(&self) -> u32 { 2022 }
     fn day(&self) -> u32 { 25 }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let total = input.lines().map(snafu_to_decimal).sum();
-        Box::new(decimal_to_snafu(total))
+        Ok((decimal_to_snafu(total)).to_string())
     }
 
-    fn part2(&self, _input: &str) -> Box<dyn Display> {
-        Box::new("There is no part 2 for Day 25!")
+    fn part2(&self, _input: &str) -> Result<String> {
+        Ok(("There is no part 2 for Day 25!").to_string())
     }
 }

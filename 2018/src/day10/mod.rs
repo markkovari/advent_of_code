@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::fmt::Display;
 
 pub struct Day10;
 
@@ -75,19 +75,19 @@ impl Solution for Day10 {
         10
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut nodes: Vec<Node> = input.lines().map(|s| s.try_into().unwrap()).collect();
         let (message, _) = find_message(&mut nodes);
-        Box::new(format!(
+        Ok(format!(
             "
 {}",
             message
         ))
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut nodes: Vec<Node> = input.lines().map(|s| s.try_into().unwrap()).collect();
         let (_, seconds) = find_message(&mut nodes);
-        Box::new(seconds)
+        Ok((seconds).to_string())
     }
 }

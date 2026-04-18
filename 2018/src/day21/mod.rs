@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashSet;
-use std::fmt::Display;
 
 pub struct Day21;
 
@@ -17,7 +17,7 @@ impl Solution for Day21 {
         21
     }
 
-    fn part1(&self, _input: &str) -> Box<dyn Display> {
+    fn part1(&self, _input: &str) -> Result<String> {
         // The value in register 5 when instruction 28 (eqrr 5 0 2) is first hit.
         // After decompiling, this happens when a specific value is generated.
         // This is the first value checked against r0, so it's the answer for part 1.
@@ -34,14 +34,14 @@ impl Solution for Day21 {
                 if r3 < 256 {
                     // This is the value that will be compared to r0.
                     // For part 1, we want the first such value.
-                    return Box::new(r5);
+                    return Ok((r5).to_string());
                 }
                 r3 /= 256;
             }
         }
     }
 
-    fn part2(&self, _input: &str) -> Box<dyn Display> {
+    fn part2(&self, _input: &str) -> Result<String> {
         // We need to find the last value of r5 before the sequence of r5 values repeats.
         let mut seen = HashSet::new();
         let mut last_unique = 0;
@@ -60,7 +60,7 @@ impl Solution for Day21 {
                 if r3 < 256 {
                     if !seen.insert(r5) {
                         // We've seen this value before, so the previous one was the last unique one.
-                        return Box::new(last_unique);
+                        return Ok((last_unique).to_string());
                     }
                     last_unique = r5;
                     break;

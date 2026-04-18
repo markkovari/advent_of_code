@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 use std::collections::HashMap;
@@ -37,12 +38,12 @@ impl Solution for Day17 {
     fn year(&self) -> u32 { 2022 }
     fn day(&self) -> u32 { 17 }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
-        Box::new(solve(input, 2022))
+    fn part1(&self, input: &str) -> Result<String> {
+        Ok((solve(input, 2022)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
-        Box::new(solve(input, 1_000_000_000_000))
+    fn part2(&self, input: &str) -> Result<String> {
+        Ok((solve(input, 1_000_000_000_000)).to_string())
     }
 }
 

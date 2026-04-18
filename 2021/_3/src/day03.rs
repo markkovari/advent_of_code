@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day03;
 
@@ -11,7 +11,7 @@ impl Solution for Day03 {
         3
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let lines: Vec<&str> = input.lines().collect();
         let element_count = lines[0].len();
         let line_count = lines.len();
@@ -38,10 +38,10 @@ impl Solution for Day03 {
                 acc
             }
         });
-        Box::new(gamma * epsilon)
+        Ok((gamma * epsilon).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let lines: Vec<&str> = input.lines().collect();
         let oxygen = filter_lines(lines.clone(), |c, pos, lines| {
             let ones = lines
@@ -59,7 +59,7 @@ impl Solution for Day03 {
             let target = if ones * 2 >= lines.len() { '0' } else { '1' };
             c == target
         });
-        Box::new(oxygen * co2)
+        Ok((oxygen * co2).to_string())
     }
 }
 

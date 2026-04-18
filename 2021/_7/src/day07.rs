@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day07;
 
@@ -15,7 +15,7 @@ impl Solution for Day07 {
         7
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let numbers: Vec<i64> = input
             .trim()
             .split(',')
@@ -29,10 +29,10 @@ impl Solution for Day07 {
             .min()
             .unwrap();
 
-        Box::new(min_fuel)
+        Ok((min_fuel).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let numbers: Vec<i64> = input
             .trim()
             .split(',')
@@ -51,6 +51,6 @@ impl Solution for Day07 {
             .min()
             .unwrap();
 
-        Box::new(min_fuel)
+        Ok((min_fuel).to_string())
     }
 }

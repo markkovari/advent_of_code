@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::{HashSet, VecDeque};
-use std::fmt::Display;
 
 pub struct Day12;
 
@@ -81,13 +81,13 @@ impl Solution for Day12 {
         12
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (grid, start, end) = parse(input);
-        Box::new(bfs(&grid, start, Some(end), true))
+        Ok((bfs(&grid, start, Some(end), true)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (grid, _, end) = parse(input);
-        Box::new(bfs(&grid, end, None, false))
+        Ok((bfs(&grid, end, None, false)).to_string())
     }
 }

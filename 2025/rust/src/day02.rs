@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::str::FromStr;
 
 pub struct Day02;
@@ -46,7 +46,7 @@ impl Solution for Day02 {
         2
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let ranges: Vec<Range> = input
             .trim()
             .split(',')
@@ -56,10 +56,10 @@ impl Solution for Day02 {
             .iter()
             .flat_map(|r| (r.lower..=r.upper).filter(|&n| is_double(n)))
             .sum();
-        Box::new(sum)
+        Ok((sum).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let ranges: Vec<Range> = input
             .trim()
             .split(',')
@@ -69,6 +69,6 @@ impl Solution for Day02 {
             .iter()
             .flat_map(|r| (r.lower..=r.upper).filter(|&n| is_at_least_double(n)))
             .sum();
-        Box::new(sum)
+        Ok((sum).to_string())
     }
 }

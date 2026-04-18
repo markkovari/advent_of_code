@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day20;
 
@@ -41,24 +41,24 @@ impl Solution for Day20 {
         20
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let target: usize = input.trim().parse().unwrap();
         let target_presents = target / 10;
         for i in 1.. {
             if divisors_sum(i) >= target_presents {
-                return Box::new(i as i64);
+                return Ok((i as i64).to_string());
             }
         }
-        Box::new(0)
+        Ok((0).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let target: usize = input.trim().parse().unwrap();
         for i in 1.. {
             if divisors_sum_part2(i) * 11 >= target {
-                return Box::new(i as i64);
+                return Ok((i as i64).to_string());
             }
         }
-        Box::new(0)
+        Ok((0).to_string())
     }
 }

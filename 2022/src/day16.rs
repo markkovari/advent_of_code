@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 use std::collections::HashMap;
@@ -16,24 +17,24 @@ impl Solution for Day16 {
     fn year(&self) -> u32 { 2022 }
     fn day(&self) -> u32 { 16 }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let valves = parse(input);
         let dists = compute_dists(&valves);
         let non_zero = valves.iter().filter(|v| v.flow > 0).map(|v| v.name).collect::<Vec<_>>();
         let start = "AA";
         
         let mut memo = HashMap::new();
-        Box::new(max_pressure(start, 30, 0, &non_zero, &dists, &valves, &mut memo))
+        Ok((max_pressure(start, 30, 0, &non_zero, &dists, &valves, &mut memo)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let valves = parse(input);
         let dists = compute_dists(&valves);
         let non_zero = valves.iter().filter(|v| v.flow > 0).map(|v| v.name).collect::<Vec<_>>();
         let start = "AA";
         
         let mut memo = HashMap::new();
-        Box::new(max_pressure_two(start, start, 26, 26, 0, &non_zero, &dists, &valves, &mut memo))
+        Ok((max_pressure_two(start, start, 26, 26, 0, &non_zero, &dists, &valves, &mut memo)).to_string())
     }
 }
 

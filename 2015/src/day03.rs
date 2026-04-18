@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 type Position = (i32, i32);
 
@@ -69,15 +69,15 @@ impl Solution for Day03 {
         3
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut santa = Santa::new();
         for direction in input.chars() {
             santa.move_to(direction);
         }
-        Box::new(santa.get_visited_multiple() as i64)
+        Ok((santa.get_visited_multiple() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut santa = Santa::new();
         let mut robo_santa = Santa::new();
         for direction in input.chars().enumerate() {
@@ -87,7 +87,7 @@ impl Solution for Day03 {
                 robo_santa.move_to(direction.1);
             }
         }
-        Box::new(get_visited_multiple_times(santa, robo_santa) as i64)
+        Ok((get_visited_multiple_times(santa, robo_santa) as i64).to_string())
     }
 }
 
@@ -100,14 +100,14 @@ mod tests {
         let day = Day03;
         const PROD: &str = include_str!("inputs/3_prod.txt");
 
-        assert_eq!(day.part1(">").to_string(), "2");
-        assert_eq!(day.part1("^>v<").to_string(), "4");
-        assert_eq!(day.part1("^v^v^v^v^v").to_string(), "2");
-        assert_eq!(day.part1(PROD).to_string(), "2572");
+        assert_eq!(day.part1(">").unwrap(), "2");
+        assert_eq!(day.part1("^>v<").unwrap(), "4");
+        assert_eq!(day.part1("^v^v^v^v^v").unwrap(), "2");
+        assert_eq!(day.part1(PROD).unwrap(), "2572");
 
-        assert_eq!(day.part2("^v").to_string(), "3");
-        assert_eq!(day.part2("^>v<").to_string(), "3");
-        assert_eq!(day.part2("^v^v^v^v^v").to_string(), "11");
-        assert_eq!(day.part2(PROD).to_string(), "2631");
+        assert_eq!(day.part2("^v").unwrap(), "3");
+        assert_eq!(day.part2("^>v<").unwrap(), "3");
+        assert_eq!(day.part2("^v^v^v^v^v").unwrap(), "11");
+        assert_eq!(day.part2(PROD).unwrap(), "2631");
     }
 }

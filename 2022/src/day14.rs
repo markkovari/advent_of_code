@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day14;
 
@@ -18,7 +18,7 @@ impl Solution for Day14 {
         14
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut grid = parse(input);
         let max_y = *grid.keys().map(|p| &p.1).max().unwrap();
         let mut sand_count = 0;
@@ -43,10 +43,10 @@ impl Solution for Day14 {
                 }
             }
         }
-        Box::new(sand_count)
+        Ok((sand_count).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut grid = parse(input);
         let max_y = *grid.keys().map(|p| &p.1).max().unwrap();
         let mut sand_count = 0;
@@ -70,7 +70,7 @@ impl Solution for Day14 {
                     grid.insert(sand, Tile::Sand);
                     sand_count += 1;
                     if sand == (500, 0) {
-                        return Box::new(sand_count);
+                        return Ok((sand_count).to_string());
                     }
                     break;
                 }

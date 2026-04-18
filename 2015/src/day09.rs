@@ -1,8 +1,8 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use iter_tools::Itertools;
 use rayon::prelude::*;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day09;
 
@@ -73,20 +73,20 @@ impl Solution for Day09 {
         9
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let distances = input
             .lines()
             .map(|l| Distance::try_from(l).unwrap())
             .collect();
-        Box::new(*lengths(&evaluate_paths(distances)).iter().min().unwrap() as i64)
+        Ok((*lengths(&evaluate_paths(distances)).iter().min().unwrap() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let distances = input
             .lines()
             .map(|l| Distance::try_from(l).unwrap())
             .collect();
-        Box::new(*lengths(&evaluate_paths(distances)).iter().max().unwrap() as i64)
+        Ok((*lengths(&evaluate_paths(distances)).iter().max().unwrap() as i64).to_string())
     }
 }
 
@@ -98,7 +98,7 @@ mod tests {
     fn test_day09() {
         let day = Day09;
         let example = "London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141";
-        assert_eq!(day.part1(example).to_string(), "605");
-        assert_eq!(day.part2(example).to_string(), "982");
+        assert_eq!(day.part1(example).unwrap(), "605");
+        assert_eq!(day.part2(example).unwrap(), "982");
     }
 }

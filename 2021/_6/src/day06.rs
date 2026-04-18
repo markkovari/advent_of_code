@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day06;
 
@@ -11,7 +11,7 @@ impl Solution for Day06 {
         6
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let initial: Vec<usize> = input
             .trim()
             .split(',')
@@ -30,10 +30,10 @@ impl Solution for Day06 {
             counts[6] += zeros;
             counts[8] = zeros;
         }
-        Box::new(counts.iter().sum::<usize>())
+        Ok((counts.iter().sum::<usize>()).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let initial: Vec<usize> = input
             .trim()
             .split(',')
@@ -52,6 +52,6 @@ impl Solution for Day06 {
             counts[6] += zeros;
             counts[8] = zeros;
         }
-        Box::new(counts.iter().sum::<usize>())
+        Ok((counts.iter().sum::<usize>()).to_string())
     }
 }

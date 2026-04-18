@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use iter_tools::Itertools;
 use rayon::prelude::*;
-use std::fmt::Display;
 
 pub struct Day17;
 
@@ -40,17 +40,17 @@ impl Solution for Day17 {
         17
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let containers = read_containers(input);
         let liters = if containers.len() < 10 { 25 } else { 150 };
-        Box::new(get_combinations(containers, liters).len() as i64)
+        Ok((get_combinations(containers, liters).len() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let containers = read_containers(input);
         let liters = if containers.len() < 10 { 25 } else { 150 };
         let combinations = get_combinations(containers, liters);
         let min_len = combinations.iter().map(|c| c.len()).min().unwrap_or(0);
-        Box::new(combinations.iter().filter(|c| c.len() == min_len).count() as i64)
+        Ok((combinations.iter().filter(|c| c.len() == min_len).count() as i64).to_string())
     }
 }

@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::fmt::Display;
 
 pub struct Day25;
 
@@ -23,17 +23,17 @@ impl Solution for Day25 {
         25
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"row (\d+), column (\d+)").unwrap();
         }
         let caps = RE.captures(input).unwrap();
         let row = caps[1].parse::<u64>().unwrap();
         let col = caps[2].parse::<u64>().unwrap();
-        Box::new(get_code(row, col))
+        Ok((get_code(row, col)).to_string())
     }
 
-    fn part2(&self, _input: &str) -> Box<dyn Display> {
-        Box::new("There is no part 2 for Day 25!")
+    fn part2(&self, _input: &str) -> Result<String> {
+        Ok(("There is no part 2 for Day 25!").to_string())
     }
 }

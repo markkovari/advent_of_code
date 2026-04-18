@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day07;
 
@@ -66,17 +66,17 @@ impl Solution for Day07 {
         7
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let commands = parse(input);
         let sizes = get_dir_sizes(&commands);
-        Box::new(sizes.iter().filter(|&&s| s <= 100_000).sum::<i64>())
+        Ok((sizes.iter().filter(|&&s| s <= 100_000).sum::<i64>()).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let commands = parse(input);
         let sizes = get_dir_sizes(&commands);
         let total_used = *sizes.iter().max().unwrap();
         let to_delete = total_used - (70_000_000 - 30_000_000);
-        Box::new(*sizes.iter().filter(|&&s| s >= to_delete).min().unwrap())
+        Ok((*sizes.iter().filter(|&&s| s >= to_delete).min().unwrap()).to_string())
     }
 }

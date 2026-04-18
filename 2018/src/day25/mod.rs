@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashSet;
-use std::fmt::Display;
 
 pub struct Day25;
 
@@ -29,7 +29,7 @@ impl Solution for Day25 {
         25
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let points: Vec<Point> = input
             .lines()
             .map(|line| {
@@ -62,10 +62,10 @@ impl Solution for Day25 {
                 }
             }
         }
-        Box::new(constellations)
+        Ok((constellations).to_string())
     }
 
-    fn part2(&self, _input: &str) -> Box<dyn Display> {
-        Box::new("There is no part 2 for Day 25!")
+    fn part2(&self, _input: &str) -> Result<String> {
+        Ok(("There is no part 2 for Day 25!").to_string())
     }
 }

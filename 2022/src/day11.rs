@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::VecDeque;
-use std::fmt::Display;
 
 pub struct Day11;
 
@@ -102,11 +102,11 @@ impl Solution for Day11 {
         11
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
-        Box::new(solve(input, 20, true))
+    fn part1(&self, input: &str) -> Result<String> {
+        Ok((solve(input, 20, true)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
-        Box::new(solve(input, 10000, false))
+    fn part2(&self, input: &str) -> Result<String> {
+        Ok((solve(input, 10000, false)).to_string())
     }
 }

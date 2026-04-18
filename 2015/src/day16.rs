@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use regex::Regex;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day16;
 
@@ -49,7 +49,7 @@ impl Solution for Day16 {
         16
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let search = get_search_elements();
         let sues: Vec<Sue> = input
             .lines()
@@ -66,13 +66,13 @@ impl Solution for Day16 {
                 }
             }
             if possible {
-                return Box::new(sue.name);
+                return Ok((sue.name).to_string());
             }
         }
-        Box::new("Not found")
+        Ok(("Not found").to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let search = get_search_elements();
         let sues: Vec<Sue> = input
             .lines()
@@ -94,9 +94,9 @@ impl Solution for Day16 {
                 }
             }
             if possible {
-                return Box::new(sue.name);
+                return Ok((sue.name).to_string());
             }
         }
-        Box::new("Not found")
+        Ok(("Not found").to_string())
     }
 }

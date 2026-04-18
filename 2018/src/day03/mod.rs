@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day03;
 
@@ -61,7 +61,7 @@ impl Solution for Day03 {
         3
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let rules: Vec<Rule> = input.lines().map(|s| Rule::try_from(s).unwrap()).collect();
         let mut touched_fields = HashMap::new();
         for rule in rules {
@@ -71,10 +71,10 @@ impl Solution for Day03 {
                 }
             }
         }
-        Box::new(touched_fields.values().filter(|&&v| v > 1).count())
+        Ok((touched_fields.values().filter(|&&v| v > 1).count()).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let rules: Vec<Rule> = input.lines().map(|s| Rule::try_from(s).unwrap()).collect();
         let mut touched_fields = HashMap::new();
         for rule in &rules {
@@ -102,9 +102,9 @@ impl Solution for Day03 {
                 }
             }
             if !is_overlapping {
-                return Box::new(rule.id.clone());
+                return Ok((rule.id.clone()).to_string());
             }
         }
-        Box::new("Not found")
+        Ok(("Not found").to_string())
     }
 }

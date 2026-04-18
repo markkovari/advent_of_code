@@ -6,6 +6,7 @@ version = 4
 name = "_1"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -13,6 +14,7 @@ dependencies = [
 name = "_2"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -20,6 +22,7 @@ dependencies = [
 name = "_3"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -27,6 +30,7 @@ dependencies = [
 name = "_4"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -34,6 +38,7 @@ dependencies = [
 name = "_5"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -41,6 +46,7 @@ dependencies = [
 name = "_6"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -48,6 +54,7 @@ dependencies = [
 name = "_7"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -121,6 +128,7 @@ dependencies = [
 name = "aoc_2015"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
  "iter_tools",
  "lazy_static",
@@ -154,6 +162,7 @@ dependencies = [
 name = "aoc_2025"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 
@@ -161,6 +170,7 @@ dependencies = [
 name = "aoc_rust"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
  "nom",
 ]
@@ -415,6 +425,7 @@ checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
 name = "first"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "aoc-rust-common",
 ]
 

@@ -10,10 +10,16 @@ pub fn run_solution<S: Solution>(solution: S) {
     let start1 = Instant::now();
     let res1 = solution.part1(&input);
     let dur1 = start1.elapsed();
-    println!("Part 1: {} ({:?})", res1, dur1);
+    match res1 {
+        Ok(res) => println!("Part 1: {} ({:?})", res, dur1),
+        Err(e) => println!("Part 1: Error: {:?} ({:?})", e, dur1),
+    }
 
     let start2 = Instant::now();
     let res2 = solution.part2(&input);
     let dur2 = start2.elapsed();
-    println!("Part 2: {} ({:?})", res2, dur2);
+    match res2 {
+        Ok(res) => println!("Part 2: {} ({:?})", res, dur2),
+        Err(e) => println!("Part 2: Error: {:?} ({:?})", e, dur2),
+    }
 }

@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day08;
 
@@ -58,19 +58,19 @@ impl Solution for Day08 {
         8
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let numbers: Vec<i32> = input
             .split_whitespace()
             .map(|s| s.parse().unwrap())
             .collect();
-        Box::new(sum_metadata(&mut &numbers[..]))
+        Ok((sum_metadata(&mut &numbers[..])).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let numbers: Vec<i32> = input
             .split_whitespace()
             .map(|s| s.parse().unwrap())
             .collect();
-        Box::new(node_value(&mut &numbers[..]))
+        Ok((node_value(&mut &numbers[..])).to_string())
     }
 }

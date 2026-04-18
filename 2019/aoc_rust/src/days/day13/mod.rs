@@ -1,7 +1,7 @@
 use crate::utils::Computer;
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day13;
 
@@ -13,7 +13,7 @@ impl Solution for Day13 {
         13
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut computer = Computer::from_string(input);
         computer.run();
         let mut map = HashMap::new();
@@ -22,10 +22,10 @@ impl Solution for Day13 {
             let b = computer.o.try_recv().unwrap();
             map.insert((x, y), b);
         }
-        Box::new(map.values().filter(|&&b| b == 2).count())
+        Ok((map.values().filter(|&&b| b == 2).count()).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut computer = Computer::from_string(input);
         computer.p[0] = 2;
         let (mut pad, mut ball, mut score) = (0, 0, 0);
@@ -45,6 +45,6 @@ impl Solution for Day13 {
             computer.i.send((ball - pad).signum()).unwrap_or_default();
             done
         } {}
-        Box::new(score)
+        Ok((score).to_string())
     }
 }

@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day14;
 
@@ -96,15 +96,15 @@ impl Solution for Day14 {
         14
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let reactions = parse_reactions(input);
         let mut buckets = Buckets::new();
         let mut ore = 0;
         ore_required(&reactions, "FUEL", &mut buckets, &mut ore, 1);
-        Box::new(ore)
+        Ok((ore).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let reactions = parse_reactions(input);
         let target_ore = 1_000_000_000_000;
         let mut lower_bound = 1;
@@ -121,6 +121,6 @@ impl Solution for Day14 {
                 lower_bound = mid;
             }
         }
-        Box::new(lower_bound)
+        Ok((lower_bound).to_string())
     }
 }

@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
-use std::fmt::Display;
 
 pub struct Day22;
 
@@ -26,7 +26,7 @@ impl Solution for Day22 {
         22
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (depth, target) = parse(input);
         let mut erosion_levels = HashMap::new();
         let mut total_risk = 0;
@@ -35,10 +35,10 @@ impl Solution for Day22 {
                 total_risk += get_erosion((x, y), depth, target, &mut erosion_levels) % 3;
             }
         }
-        Box::new(total_risk)
+        Ok((total_risk).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (depth, target) = parse(input);
         let mut erosion_levels = HashMap::new();
         let mut dists = HashMap::new();
@@ -52,7 +52,7 @@ impl Solution for Day22 {
                 continue;
             }
             if pos == target && tool == Tool::Torch {
-                return Box::new(time);
+                return Ok((time).to_string());
             }
 
             for &next_tool in &[Tool::Torch, Tool::ClimbingGear, Tool::Neither] {
@@ -83,7 +83,7 @@ impl Solution for Day22 {
                 }
             }
         }
-        Box::new("No path found")
+        Ok(("No path found").to_string())
     }
 }
 

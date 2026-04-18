@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use rayon::prelude::*;
-use std::fmt::Display;
 
 pub struct Day06;
 
@@ -111,7 +111,7 @@ impl Solution for Day06 {
         6
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let instructions = input
             .lines()
             .map(|line| Instruction::try_from(line).unwrap())
@@ -120,15 +120,15 @@ impl Solution for Day06 {
         for instruction in instructions {
             apply_on_grid(instruction, &mut grid);
         }
-        Box::new(
-            grid.par_iter()
-                .flat_map(|row| row.par_iter())
-                .filter(|&&cell| cell)
-                .count() as i64,
-        )
+        Ok((grid
+            .par_iter()
+            .flat_map(|row| row.par_iter())
+            .filter(|&&cell| cell)
+            .count() as i64)
+            .to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let instructions = input
             .lines()
             .map(|line| Instruction::try_from(line).unwrap())
@@ -137,12 +137,12 @@ impl Solution for Day06 {
         for instruction in instructions {
             apply_on_ambient_grid(instruction, &mut grid);
         }
-        Box::new(
-            grid.par_iter()
-                .flat_map(|row| row.par_iter())
-                .map(|&cell| cell as i64)
-                .sum::<i64>(),
-        )
+        Ok(grid
+            .par_iter()
+            .flat_map(|row| row.par_iter())
+            .map(|&cell| cell as i64)
+            .sum::<i64>()
+            .to_string())
     }
 }
 
@@ -153,20 +153,11 @@ mod tests {
     #[test]
     fn test_day06() {
         let day = Day06;
-        assert_eq!(
-            day.part1("turn on 0,0 through 999,999").to_string(),
-            "1000000"
-        );
-        assert_eq!(day.part1("toggle 0,0 through 999,0").to_string(), "1000");
-        assert_eq!(
-            day.part1("turn off 499,499 through 500,500").to_string(),
-            "0"
-        );
+        assert_eq!(day.part1("turn on 0,0 through 999,999").unwrap(), "1000000");
+        assert_eq!(day.part1("toggle 0,0 through 999,0").unwrap(), "1000");
+        assert_eq!(day.part1("turn off 499,499 through 500,500").unwrap(), "0");
 
-        assert_eq!(day.part2("turn on 0,0 through 0,0").to_string(), "1");
-        assert_eq!(
-            day.part2("toggle 0,0 through 999,999").to_string(),
-            "2000000"
-        );
+        assert_eq!(day.part2("turn on 0,0 through 0,0").unwrap(), "1");
+        assert_eq!(day.part2("toggle 0,0 through 999,999").unwrap(), "2000000");
     }
 }

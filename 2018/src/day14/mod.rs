@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day14;
 
@@ -11,7 +11,7 @@ impl Solution for Day14 {
         14
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let recipe_count: usize = input.trim().parse().unwrap();
         let mut scores = vec![3, 7];
         let mut elves = vec![0, 1];
@@ -30,10 +30,10 @@ impl Solution for Day14 {
             .iter()
             .map(|s| s.to_string())
             .collect();
-        Box::new(result)
+        Ok((result).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let digits: Vec<u32> = input
             .trim()
             .chars()
@@ -48,7 +48,7 @@ impl Solution for Day14 {
                 scores.push((digit - b'0') as u32);
                 if scores.len() > digits.len() {
                     if scores[scores.len() - digits.len()..] == digits[..] {
-                        return Box::new(scores.len() - digits.len());
+                        return Ok((scores.len() - digits.len()).to_string());
                     }
                 }
             }

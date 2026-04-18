@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::str::FromStr;
 
 pub struct Day01;
@@ -63,7 +63,7 @@ impl Solution for Day01 {
         1
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut dial = Dial::default();
         let mut result = 0;
         for line in input.lines() {
@@ -74,10 +74,10 @@ impl Solution for Day01 {
                 }
             }
         }
-        Box::new(result)
+        Ok((result).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut dial = Dial::default();
         let mut result = 0;
         for line in input.lines() {
@@ -85,6 +85,6 @@ impl Solution for Day01 {
                 result += dial.rotate(rot);
             }
         }
-        Box::new(result)
+        Ok((result).to_string())
     }
 }

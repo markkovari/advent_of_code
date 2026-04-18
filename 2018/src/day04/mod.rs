@@ -1,8 +1,8 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use chrono::{DateTime, NaiveDateTime, Timelike, Utc};
 use regex::Regex;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day04;
 
@@ -72,7 +72,7 @@ impl Solution for Day04 {
         4
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let sleepers = get_sleeps(input);
         let scores: HashMap<usize, u32> =
             sleepers.iter().map(|(k, v)| (*k, v.iter().sum())).collect();
@@ -83,10 +83,10 @@ impl Solution for Day04 {
             .max_by_key(|&(_, count)| count)
             .unwrap()
             .0;
-        Box::new(best_sleeper * best_minute)
+        Ok((best_sleeper * best_minute).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let sleepers = get_sleeps(input);
         let (guard, (minute, _)) = sleepers
             .iter()
@@ -102,6 +102,6 @@ impl Solution for Day04 {
             })
             .max_by_key(|&(_, (_, count))| count)
             .unwrap();
-        Box::new(guard * minute)
+        Ok((guard * minute).to_string())
     }
 }

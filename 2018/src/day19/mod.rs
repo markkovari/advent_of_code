@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::str::FromStr;
 
 pub struct Day19;
@@ -92,7 +92,7 @@ impl Solution for Day19 {
         19
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut lines = input.lines();
         let ipr: usize = lines.next().unwrap()[4..].parse().unwrap();
         let instrs: Vec<Instruction> = lines
@@ -106,10 +106,10 @@ impl Solution for Day19 {
                 (words[0].parse().unwrap(), ops)
             })
             .collect();
-        Box::new(solve(ipr, &instrs, 0))
+        Ok((solve(ipr, &instrs, 0)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut lines = input.lines();
         let ipr: usize = lines.next().unwrap()[4..].parse().unwrap();
         let instrs: Vec<Instruction> = lines
@@ -123,6 +123,6 @@ impl Solution for Day19 {
                 (words[0].parse().unwrap(), ops)
             })
             .collect();
-        Box::new(solve(ipr, &instrs, 1))
+        Ok((solve(ipr, &instrs, 1)).to_string())
     }
 }

@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day01;
 
@@ -11,29 +11,29 @@ impl Solution for Day01 {
         1
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let numbers: Vec<u32> = input.lines().filter_map(|s| s.parse().ok()).collect();
         for i in 0..numbers.len() {
             for j in i + 1..numbers.len() {
                 if numbers[i] + numbers[j] == 2020 {
-                    return Box::new(numbers[i] * numbers[j]);
+                    return Ok((numbers[i] * numbers[j]).to_string());
                 }
             }
         }
-        Box::new(0)
+        Ok((0).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let numbers: Vec<u32> = input.lines().filter_map(|s| s.parse().ok()).collect();
         for i in 0..numbers.len() {
             for j in i + 1..numbers.len() {
                 for k in j + 1..numbers.len() {
                     if numbers[i] + numbers[j] + numbers[k] == 2020 {
-                        return Box::new(numbers[i] * numbers[j] * numbers[k]);
+                        return Ok((numbers[i] * numbers[j] * numbers[k]).to_string());
                     }
                 }
             }
         }
-        Box::new(0)
+        Ok((0).to_string())
     }
 }

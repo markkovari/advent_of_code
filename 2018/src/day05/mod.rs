@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day05;
 
@@ -24,13 +24,13 @@ impl Solution for Day05 {
         5
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut polymer: Vec<char> = input.trim().chars().collect();
         react(&mut polymer);
-        Box::new(polymer.len())
+        Ok((polymer.len()).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let original_polymer: Vec<char> = input.trim().chars().collect();
         let min_len = ('a'..='z')
             .map(|unit_to_remove| {
@@ -41,6 +41,6 @@ impl Solution for Day05 {
             })
             .min()
             .unwrap_or(0);
-        Box::new(min_len)
+        Ok((min_len).to_string())
     }
 }

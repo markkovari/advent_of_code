@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day05;
 
@@ -67,7 +67,7 @@ impl Solution for Day05 {
         5
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let lines = parse(input);
         let mut counts = HashMap::new();
         for line in lines
@@ -78,10 +78,10 @@ impl Solution for Day05 {
                 *counts.entry(pt).or_insert(0) += 1;
             }
         }
-        Box::new(counts.values().filter(|&&v| v >= 2).count())
+        Ok((counts.values().filter(|&&v| v >= 2).count()).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let lines = parse(input);
         let mut counts = HashMap::new();
         for line in lines {
@@ -89,6 +89,6 @@ impl Solution for Day05 {
                 *counts.entry(pt).or_insert(0) += 1;
             }
         }
-        Box::new(counts.values().filter(|&&v| v >= 2).count())
+        Ok((counts.values().filter(|&&v| v >= 2).count()).to_string())
     }
 }

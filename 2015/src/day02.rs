@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use rayon::prelude::*;
-use std::fmt::Display;
 
 pub struct Day02;
 
@@ -33,24 +33,22 @@ impl Solution for Day02 {
         2
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
-        Box::new(
-            input
-                .par_lines()
-                .map(calculate_wrapper_needed_materials)
-                .map(|(wrapping, _)| wrapping)
-                .sum::<i64>(),
-        )
+    fn part1(&self, input: &str) -> Result<String> {
+        Ok(input
+            .par_lines()
+            .map(calculate_wrapper_needed_materials)
+            .map(|(wrapping, _)| wrapping)
+            .sum::<i64>()
+            .to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
-        Box::new(
-            input
-                .par_lines()
-                .map(calculate_wrapper_needed_materials)
-                .map(|(_, ribbon)| ribbon)
-                .sum::<i64>(),
-        )
+    fn part2(&self, input: &str) -> Result<String> {
+        Ok(input
+            .par_lines()
+            .map(calculate_wrapper_needed_materials)
+            .map(|(_, ribbon)| ribbon)
+            .sum::<i64>()
+            .to_string())
     }
 }
 
@@ -61,10 +59,10 @@ mod tests {
     #[test]
     fn test_day02() {
         let day = Day02;
-        assert_eq!(day.part1("2x3x4").to_string(), "58");
-        assert_eq!(day.part1("1x1x10").to_string(), "43");
+        assert_eq!(day.part1("2x3x4").unwrap(), "58");
+        assert_eq!(day.part1("1x1x10").unwrap(), "43");
 
-        assert_eq!(day.part2("2x3x4").to_string(), "34");
-        assert_eq!(day.part2("1x1x10").to_string(), "14");
+        assert_eq!(day.part2("2x3x4").unwrap(), "34");
+        assert_eq!(day.part2("1x1x10").unwrap(), "14");
     }
 }

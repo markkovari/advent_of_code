@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::fmt::Display;
 use std::collections::HashSet;
@@ -16,7 +17,7 @@ impl Solution for Day03 {
     fn year(&self) -> u32 { 2022 }
     fn day(&self) -> u32 { 3 }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let sum: u32 = input.lines().map(|line| {
             let (first, second) = line.split_at(line.len() / 2);
             let set1: HashSet<char> = first.chars().collect();
@@ -24,10 +25,10 @@ impl Solution for Day03 {
             let common = set1.intersection(&set2).next().unwrap();
             priority(*common)
         }).sum();
-        Box::new(sum)
+        Ok((sum).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let lines: Vec<&str> = input.lines().collect();
         let sum: u32 = lines.chunks(3).map(|chunk| {
             let set1: HashSet<char> = chunk[0].chars().collect();
@@ -38,6 +39,6 @@ impl Solution for Day03 {
             let badge = *common.intersection(&set3).next().unwrap();
             priority(badge)
         }).sum();
-        Box::new(sum)
+        Ok((sum).to_string())
     }
 }

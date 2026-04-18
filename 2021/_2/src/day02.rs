@@ -1,5 +1,5 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 
 pub struct Day02;
 
@@ -11,7 +11,7 @@ impl Solution for Day02 {
         2
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (x, y, _) = input.lines().fold((0, 0, 0), |(px, py, aim), line| {
             let parts: Vec<&str> = line.split(' ').collect();
             let d = parts[0].chars().next().unwrap();
@@ -23,10 +23,10 @@ impl Solution for Day02 {
                 _ => (px, py, aim),
             }
         });
-        Box::new(x * y)
+        Ok((x * y).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (x, y, _) = input.lines().fold((0, 0, 0), |(px, py, aim), line| {
             let parts: Vec<&str> = line.split(' ').collect();
             let d = parts[0].chars().next().unwrap();
@@ -38,6 +38,6 @@ impl Solution for Day02 {
                 _ => (px, py, aim),
             }
         });
-        Box::new(x * y)
+        Ok((x * y).to_string())
     }
 }

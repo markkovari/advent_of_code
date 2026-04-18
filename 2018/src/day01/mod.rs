@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashSet;
-use std::fmt::Display;
 
 pub struct Day01;
 
@@ -12,12 +12,12 @@ impl Solution for Day01 {
         1
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let sum: i32 = input.lines().map(|s| s.parse::<i32>().unwrap()).sum();
-        Box::new(sum)
+        Ok((sum).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let numbers: Vec<i32> = input.lines().map(|s| s.parse::<i32>().unwrap()).collect();
         let mut visited = HashSet::new();
         let mut current = 0;
@@ -26,7 +26,7 @@ impl Solution for Day01 {
             for i in numbers.iter() {
                 current += i;
                 if visited.contains(&current) {
-                    return Box::new(current);
+                    return Ok((current).to_string());
                 }
                 visited.insert(current);
             }

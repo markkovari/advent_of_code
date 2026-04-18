@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
-use std::fmt::Display;
 
 pub struct Day24;
 
@@ -164,13 +164,13 @@ impl Solution for Day24 {
         24
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut groups = parse(input);
         let (_, score) = fight(&mut groups);
-        Box::new(score)
+        Ok((score).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let initial_groups = parse(input);
         for boost in 1.. {
             let mut groups = initial_groups.clone();
@@ -181,9 +181,9 @@ impl Solution for Day24 {
             }
             let (winner, score) = fight(&mut groups);
             if winner == Some(Team::ImmuneSystem) {
-                return Box::new(score);
+                return Ok((score).to_string());
             }
         }
-        Box::new("No solution found")
+        Ok(("No solution found").to_string())
     }
 }

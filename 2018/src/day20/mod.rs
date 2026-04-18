@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day20;
 
@@ -12,14 +12,14 @@ impl Solution for Day20 {
         20
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let distances = get_distances(input);
-        Box::new(*distances.values().max().unwrap_or(&0))
+        Ok((*distances.values().max().unwrap_or(&0)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let distances = get_distances(input);
-        Box::new(distances.values().filter(|&&d| d >= 1000).count())
+        Ok((distances.values().filter(|&&d| d >= 1000).count()).to_string())
     }
 }
 

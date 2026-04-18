@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::{BTreeMap, HashSet, VecDeque};
-use std::fmt::Display;
 
 pub struct Day15;
 
@@ -206,22 +206,22 @@ impl Solution for Day15 {
         15
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (grid, mut units) = parse_input(input, 3);
-        Box::new(simulate(&grid, &mut units).unwrap_or(0))
+        Ok((simulate(&grid, &mut units).unwrap_or(0)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         for elf_attack in 4.. {
             let (grid, mut units) = parse_input(input, elf_attack);
             let initial_elves = units.iter().filter(|u| u.kind == UnitKind::Elf).count();
             if let Some(outcome) = simulate(&grid, &mut units) {
                 let final_elves = units.iter().filter(|u| u.kind == UnitKind::Elf).count();
                 if initial_elves == final_elves {
-                    return Box::new(outcome);
+                    return Ok((outcome).to_string());
                 }
             }
         }
-        Box::new("No solution found")
+        Ok(("No solution found").to_string())
     }
 }

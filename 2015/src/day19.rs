@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashSet;
-use std::fmt::Display;
 
 pub struct Day19;
 
@@ -58,7 +58,7 @@ impl Solution for Day19 {
         19
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (rules, molecule) = read_rules_and_molecule(input);
         let mut results = HashSet::new();
         for rule in rules {
@@ -66,10 +66,10 @@ impl Solution for Day19 {
                 results.insert(res);
             }
         }
-        Box::new(results.len() as i64)
+        Ok((results.len() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (rules, molecule) = read_rules_and_molecule(input);
         // Greedy reduction from target molecule back to 'e'
         let mut target = molecule;
@@ -88,6 +88,6 @@ impl Solution for Day19 {
                 break;
             }
         }
-        Box::new(steps as i64)
+        Ok((steps as i64).to_string())
     }
 }

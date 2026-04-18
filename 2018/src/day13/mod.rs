@@ -1,6 +1,6 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use std::collections::HashSet;
-use std::fmt::Display;
 
 pub struct Day13;
 
@@ -132,7 +132,7 @@ impl Solution for Day13 {
         13
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let (grid, mut carts) = parse_input(input);
         loop {
             carts.sort_by_key(|c| c.pos);
@@ -150,7 +150,7 @@ impl Solution for Day13 {
                 }
 
                 if !positions.insert(next_pos) {
-                    return Box::new(format!("{},{}", next_pos.x, next_pos.y));
+                    return Ok((format!("{},{}", next_pos.x, next_pos.y)).to_string());
                 }
 
                 let mut next_cart = Cart {
@@ -169,7 +169,7 @@ impl Solution for Day13 {
         }
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let (grid, mut carts) = parse_input(input);
         while carts.len() > 1 {
             carts.sort_by_key(|c| c.pos);
@@ -212,9 +212,9 @@ impl Solution for Day13 {
             carts = next_carts;
         }
         if let Some(last_cart) = carts.first() {
-            Box::new(format!("{},{}", last_cart.pos.x, last_cart.pos.y))
+            Ok((format!("{},{}", last_cart.pos.x, last_cart.pos.y)).to_string())
         } else {
-            Box::new("No cart left")
+            Ok(("No cart left").to_string())
         }
     }
 }

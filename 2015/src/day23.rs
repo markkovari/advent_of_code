@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::fmt::Display;
 
 pub struct Day23;
 
@@ -112,17 +112,17 @@ impl Solution for Day23 {
         23
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let instructions = input.lines().map(Instruction::parse).collect::<Vec<_>>();
         let mut computer = Computer::new(0);
         computer.run(&instructions);
-        Box::new(computer.get(Register::B))
+        Ok((computer.get(Register::B)).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let instructions = input.lines().map(Instruction::parse).collect::<Vec<_>>();
         let mut computer = Computer::new(1);
         computer.run(&instructions);
-        Box::new(computer.get(Register::B))
+        Ok((computer.get(Register::B)).to_string())
     }
 }

@@ -1,7 +1,7 @@
+use anyhow::Result;
 use aoc_rust_common::Solution;
 use rayon::prelude::*;
 use std::collections::HashMap;
-use std::fmt::Display;
 
 pub struct Day18;
 
@@ -83,16 +83,16 @@ impl Solution for Day18 {
         18
     }
 
-    fn part1(&self, input: &str) -> Box<dyn Display> {
+    fn part1(&self, input: &str) -> Result<String> {
         let mut grid = read_grid(input);
         let steps = if grid.len() < 100 { 4 } else { 100 };
         for _ in 0..steps {
             grid = evolve(&grid);
         }
-        Box::new(grid.values().filter(|e| **e == Cell::Alive).count() as i64)
+        Ok((grid.values().filter(|e| **e == Cell::Alive).count() as i64).to_string())
     }
 
-    fn part2(&self, input: &str) -> Box<dyn Display> {
+    fn part2(&self, input: &str) -> Result<String> {
         let mut grid = read_grid(input);
         let steps = if grid.len() < 100 { 5 } else { 100 };
         for _ in 0..steps {
@@ -100,6 +100,6 @@ impl Solution for Day18 {
             grid = evolve(&grid);
         }
         setup_corners(&mut grid);
-        Box::new(grid.values().filter(|e| **e == Cell::Alive).count() as i64)
+        Ok((grid.values().filter(|e| **e == Cell::Alive).count() as i64).to_string())
     }
 }
