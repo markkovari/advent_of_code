@@ -1,7 +1,7 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use regex::Regex;
 use std::collections::VecDeque;
+use std::fmt::Display;
 
 pub struct Day09;
 
@@ -25,11 +25,16 @@ fn play_game(num_players: usize, last_marble: u32) -> u32 {
 }
 
 impl Solution for Day09 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 9 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        9
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
-        let re = Regex::new(r"(\d+)\s*players;\s*last\s*marble\s*is\s*worth\s*(\d+)\s*points?").unwrap();
+        let re =
+            Regex::new(r"(\d+)\s*players;\s*last\s*marble\s*is\s*worth\s*(\d+)\s*points?").unwrap();
         let caps = re.captures(input).unwrap();
         let players: usize = caps[1].parse().unwrap();
         let marbles: u32 = caps[2].parse().unwrap();
@@ -37,7 +42,8 @@ impl Solution for Day09 {
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
-        let re = Regex::new(r"(\d+)\s*players;\s*last\s*marble\s*is\s*worth\s*(\d+)\s*points?").unwrap();
+        let re =
+            Regex::new(r"(\d+)\s*players;\s*last\s*marble\s*is\s*worth\s*(\d+)\s*points?").unwrap();
         let caps = re.captures(input).unwrap();
         let players: usize = caps[1].parse().unwrap();
         let marbles: u32 = caps[2].parse().unwrap();

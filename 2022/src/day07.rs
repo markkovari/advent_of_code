@@ -13,23 +13,30 @@ enum Command {
 }
 
 fn parse(input: &str) -> Vec<Command> {
-    input.lines().map(|line| {
-        if line.starts_with("$ cd ..") { Command::CdOut }
-        else if line.starts_with("$ cd ") { Command::CdIn(line[5..].to_string()) }
-        else if line.starts_with("$ ls") { Command::Ls }
-        else if line.starts_with("dir ") { Command::Dir(line[4..].to_string()) }
-        else {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            Command::Size(parts[0].parse().unwrap())
-        }
-    }).collect()
+    input
+        .lines()
+        .map(|line| {
+            if line.starts_with("$ cd ..") {
+                Command::CdOut
+            } else if line.starts_with("$ cd ") {
+                Command::CdIn(line[5..].to_string())
+            } else if line.starts_with("$ ls") {
+                Command::Ls
+            } else if line.starts_with("dir ") {
+                Command::Dir(line[4..].to_string())
+            } else {
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                Command::Size(parts[0].parse().unwrap())
+            }
+        })
+        .collect()
 }
 
 fn get_dir_sizes(commands: &[Command]) -> Vec<i64> {
     let mut dir_sizes = Vec::new();
     let mut stack = Vec::new();
     let mut current_size = 0;
-    
+
     let mut i = 0;
     while i < commands.len() {
         match &commands[i] {
@@ -52,8 +59,12 @@ fn get_dir_sizes(commands: &[Command]) -> Vec<i64> {
 }
 
 impl Solution for Day07 {
-    fn year(&self) -> u32 { 2022 }
-    fn day(&self) -> u32 { 7 }
+    fn year(&self) -> u32 {
+        2022
+    }
+    fn day(&self) -> u32 {
+        7
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let commands = parse(input);

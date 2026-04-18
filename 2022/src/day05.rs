@@ -5,20 +5,33 @@ use std::str::FromStr;
 pub struct Day05;
 
 #[derive(Debug, Clone)]
-struct CargoStack { elements: Vec<String> }
+struct CargoStack {
+    elements: Vec<String>,
+}
 
 #[derive(Debug, Clone)]
-struct Shipment { stacks: Vec<CargoStack> }
+struct Shipment {
+    stacks: Vec<CargoStack>,
+}
 
 #[derive(Debug, Clone, Copy)]
-struct Instruction { amount: usize, from: usize, to: usize }
+struct Instruction {
+    amount: usize,
+    from: usize,
+    to: usize,
+}
 
 impl FromStr for Shipment {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let lines: Vec<&str> = s.lines().collect();
         let num_stacks = (lines.last().unwrap().len() + 2) / 4;
-        let mut stacks = vec![CargoStack { elements: Vec::new() }; num_stacks];
+        let mut stacks = vec![
+            CargoStack {
+                elements: Vec::new()
+            };
+            num_stacks
+        ];
         for line in lines.iter().rev().skip(1) {
             for i in 0..num_stacks {
                 let char_idx = 1 + i * 4;
@@ -46,8 +59,12 @@ impl FromStr for Instruction {
 }
 
 impl Solution for Day05 {
-    fn year(&self) -> u32 { 2022 }
-    fn day(&self) -> u32 { 5 }
+    fn year(&self) -> u32 {
+        2022
+    }
+    fn day(&self) -> u32 {
+        5
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let (mut shipment, instructions) = parse(input);
@@ -57,7 +74,13 @@ impl Solution for Day05 {
                 shipment.stacks[inst.to].elements.push(item);
             }
         }
-        Box::new(shipment.stacks.iter().map(|s| s.elements.last().unwrap_or(&"".to_string()).clone()).collect::<String>())
+        Box::new(
+            shipment
+                .stacks
+                .iter()
+                .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
+                .collect::<String>(),
+        )
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
@@ -71,7 +94,13 @@ impl Solution for Day05 {
                 shipment.stacks[inst.to].elements.push(item);
             }
         }
-        Box::new(shipment.stacks.iter().map(|s| s.elements.last().unwrap_or(&"".to_string()).clone()).collect::<String>())
+        Box::new(
+            shipment
+                .stacks
+                .iter()
+                .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
+                .collect::<String>(),
+        )
     }
 }
 

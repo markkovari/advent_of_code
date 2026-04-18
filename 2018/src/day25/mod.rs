@@ -1,28 +1,47 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashSet;
+use std::fmt::Display;
 
 pub struct Day25;
 
 #[derive(Clone, Copy, Debug)]
-struct Point { x: i32, y: i32, z: i32, t: i32 }
+struct Point {
+    x: i32,
+    y: i32,
+    z: i32,
+    t: i32,
+}
 
 impl Point {
     fn dist(&self, other: &Point) -> i32 {
-        (self.x - other.x).abs() + (self.y - other.y).abs() + 
-        (self.z - other.z).abs() + (self.t - other.t).abs()
+        (self.x - other.x).abs()
+            + (self.y - other.y).abs()
+            + (self.z - other.z).abs()
+            + (self.t - other.t).abs()
     }
 }
 
 impl Solution for Day25 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 25 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        25
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
-        let points: Vec<Point> = input.lines().map(|line| {
-            let coords: Vec<i32> = line.split(',').map(|s| s.parse().unwrap()).collect();
-            Point { x: coords[0], y: coords[1], z: coords[2], t: coords[3] }
-        }).collect();
+        let points: Vec<Point> = input
+            .lines()
+            .map(|line| {
+                let coords: Vec<i32> = line.split(',').map(|s| s.parse().unwrap()).collect();
+                Point {
+                    x: coords[0],
+                    y: coords[1],
+                    z: coords[2],
+                    t: coords[3],
+                }
+            })
+            .collect();
 
         let mut constellations = 0;
         let mut visited = HashSet::new();

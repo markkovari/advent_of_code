@@ -67,7 +67,9 @@ fn increment_password(password: String) -> String {
         let new_character = increment(character);
         chars[index] = new_character;
         if new_character == 'a' {
-            if index == 0 { break; }
+            if index == 0 {
+                break;
+            }
             index -= 1;
         } else {
             break;
@@ -77,8 +79,12 @@ fn increment_password(password: String) -> String {
 }
 
 impl Solution for Day11 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 11 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        11
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         Box::new(create_new_password(input.trim().to_owned()))

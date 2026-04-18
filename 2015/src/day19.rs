@@ -1,14 +1,8 @@
-use std::{collections::HashSet, fmt::Debug};
+use aoc_rust_common::Solution;
+use std::collections::HashSet;
+use std::fmt::Display;
 
-use iter_tools::Itertools;
-
-use crate::Exercise;
-// use iter_tools::{dependency::itertools::Product, Itertools};
-// use regex::Regex;
-
-struct NineteenthDay {
-    exercise: Exercise,
-}
+pub struct Day19;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
 struct Rule {
@@ -16,146 +10,84 @@ struct Rule {
     to: String,
 }
 
-impl TryFrom<&str> for Rule {
-    type Error = String;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let mut split = value.split(" => ");
-        let from = split.next().ok_or("No from")?;
-        let to = split.next().ok_or("No to")?;
-        Ok(Rule {
-            from: from.to_owned(),
-            to: to.to_owned(),
-        })
-    }
-}
-
-fn read_rules(content: &str) -> Vec<Rule> {
-    content
-        .lines()
-        .map(|line| Rule::try_from(line).unwrap())
-        .collect()
-}
-
-fn apply(replacements: &[Rule], puzzle: &str) -> HashSet<String> {
-    let mut mols: HashSet<String> = HashSet::new();
-    for Rule { from, to } in replacements.iter() {
-        for res in variants(puzzle, from, to) {
-            mols.insert(res);
+fn read_rules_and_molecule(input: &str) -> (Vec<Rule>, String) {
+    let mut rules = Vec::new();
+    let mut molecule = String::new();
+    let mut reading_rules = true;
+    for line in input.lines() {
+        if line.is_empty() {
+            if !rules.is_empty() {
+                reading_rules = false;
+            }
+            continue;
         }
-    }
-    mols
-}
-
-fn variants(puzzle: &str, from: &str, to: &str) -> HashSet<String> {
-    HashSet::from_iter(
-        puzzle
-            .single_replacements(from, to)
-            .iter()
-            .map(|s| s.to_owned()),
-    )
-}
-
-trait SingleReplacements {
-    fn single_replacements(&self, from: &str, to: &str) -> Vec<String>;
-}
-
-impl SingleReplacements for &str {
-    fn single_replacements(&self, from: &str, to: &str) -> Vec<String> {
-        let mut results = Vec::new();
-        for (start, part) in self.match_indices(from) {
-            let mut string = String::new();
-            string.push_str(self.get(0..start).unwrap());
-            string.push_str(to);
-            string.push_str(self.get(start + part.len()..self.len()).unwrap());
-            results.push(string);
-        }
-        results
-    }
-}
-
-fn find_production(replacements: &Vec<Rule>, input: String, depth: usize) -> Option<usize> {
-    let input = input.as_str();
-    if input == "e" {
-        return Some(depth);
-    }
-    for next_step in replacements
-        .iter()
-        .flat_map(|Rule { from, to }| input.single_replacements(to, from).into_iter())
-        .unique()
-    {
-        if let Some(count) = find_production(replacements, next_step, depth + 1) {
-            return Some(count);
-        }
-    }
-    None
-}
-
-impl NineteenthDay {
-    fn solve_first(&self, is_prod: bool, starting: String) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content, starting)
+        if reading_rules {
+            if let Some(pos) = line.find(" => ") {
+                rules.push(Rule {
+                    from: line[..pos].to_owned(),
+                    to: line[pos + 4..].to_owned(),
+                });
+            } else {
+                molecule = line.to_owned();
+                reading_rules = false;
+            }
         } else {
-            self.first(&self.exercise.example, starting)
+            molecule = line.to_owned();
         }
     }
-
-    fn solve_second(&self, is_prod: bool, starting: String) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content, starting)
-        } else {
-            self.second(&self.exercise.example, starting)
-        }
-    }
-
-    fn first(&self, content: &str, starting: String) -> i64 {
-        let rules = read_rules(content);
-        let mols = apply(&rules, &starting);
-        mols.len() as i64
-    }
-
-    fn second(&self, content: &str, starting: String) -> i64 {
-        let rules = read_rules(content);
-
-        find_production(&rules, starting, 0).unwrap() as i64
-    }
+    (rules, molecule)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    const EXAMPLE: &str = include_str!("inputs/19_test.txt");
-    const PROD: &str = include_str!("inputs/19_prod.txt");
+fn single_replacements(s: &str, from: &str, to: &str) -> Vec<String> {
+    let mut results = Vec::new();
+    for (start, part) in s.match_indices(from) {
+        let mut string = String::new();
+        string.push_str(&s[0..start]);
+        string.push_str(to);
+        string.push_str(&s[start + part.len()..]);
+        results.push(string);
+    }
+    results
+}
 
-    #[test]
-    fn first_test() {
-        let BASE: std::string::String = "CRnSiRnCaPTiMgYCaPTiRnFArSiThFArCaSiThSiThPBCaCaSiRnSiRnTiTiMgArPBCaPMgYPTiRnFArFArCaSiRnBPMgArPRnCaPTiRnFArCaSiThCaCaFArPBCaCaPTiTiRnFArCaSiRnSiAlYSiThRnFArArCaSiRnBFArCaCaSiRnSiThCaCaCaFYCaPTiBCaSiThCaSiThPMgArSiRnCaPBFYCaCaFArCaCaCaCaSiThCaSiRnPRnFArPBSiThPRnFArSiRnMgArCaFYFArCaSiRnSiAlArTiTiTiTiTiTiTiRnPMgArPTiTiTiBSiRnSiAlArTiTiRnPMgArCaFYBPBPTiRnSiRnMgArSiThCaFArCaSiThFArPRnFArCaSiRnTiBSiThSiRnSiAlYCaFArPRnFArSiThCaFArCaCaSiThCaCaCaSiRnPRnCaFArFYPMgArCaPBCaPBSiRnFYPBCaFArCaSiAl".to_owned();
-        let example_second: std::string::String = "e => H
-e => O
-H => HO
-H => OH
-O => HH"
-            .to_owned();
+impl Solution for Day19 {
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        19
+    }
 
-        let mut first_exercise = NineteenthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
+    fn part1(&self, input: &str) -> Box<dyn Display> {
+        let (rules, molecule) = read_rules_and_molecule(input);
+        let mut results = HashSet::new();
+        for rule in rules {
+            for res in single_replacements(&molecule, &rule.from, &rule.to) {
+                results.insert(res);
+            }
+        }
+        Box::new(results.len() as i64)
+    }
 
-        let expected_example = 7;
-        let expected_prod = 518;
-        let result_example = first_exercise.solve_first(false, "HOHOHO".to_owned());
-        let result_prod = first_exercise.solve_first(true, BASE.clone());
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        let expected_example = 3;
-        let expected_prod = 200;
-        let result_example = first_exercise.second(&example_second, "HOH".to_owned());
-        let result_prod = first_exercise.solve_second(true, BASE);
-        assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let (rules, molecule) = read_rules_and_molecule(input);
+        // Greedy reduction from target molecule back to 'e'
+        let mut target = molecule;
+        let mut steps = 0;
+        while target != "e" {
+            let mut changed = false;
+            for rule in &rules {
+                if let Some(pos) = target.find(&rule.to) {
+                    target.replace_range(pos..pos + rule.to.len(), &rule.from);
+                    steps += 1;
+                    changed = true;
+                    break;
+                }
+            }
+            if !changed {
+                break;
+            }
+        }
+        Box::new(steps as i64)
     }
 }

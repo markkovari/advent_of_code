@@ -4,8 +4,12 @@ use std::fmt::Display;
 pub struct Day14;
 
 impl Solution for Day14 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 14 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        14
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let recipe_count: usize = input.trim().parse().unwrap();
@@ -21,13 +25,20 @@ impl Solution for Day14 {
                 *e = (*e + scores[*e] as usize + 1) % scores.len();
             }
         }
-        
-        let result: String = scores[recipe_count..recipe_count + 10].iter().map(|s| s.to_string()).collect();
+
+        let result: String = scores[recipe_count..recipe_count + 10]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
         Box::new(result)
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
-        let digits: Vec<u32> = input.trim().chars().map(|c| c.to_digit(10).unwrap()).collect();
+        let digits: Vec<u32> = input
+            .trim()
+            .chars()
+            .map(|c| c.to_digit(10).unwrap())
+            .collect();
         let mut scores = vec![3, 7];
         let mut elves = vec![0, 1];
 

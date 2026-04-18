@@ -1,6 +1,6 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashMap;
+use std::fmt::Display;
 
 pub struct Day03;
 
@@ -21,18 +21,45 @@ impl TryFrom<&str> for Rule {
         let id = parts.next().ok_or("No id")?.to_owned();
         let _ = parts.next(); // @
         let mut coords = parts.next().ok_or("No coords")?.split(',');
-        let x = coords.next().ok_or("No x")?.parse::<i32>().map_err(|e| e.to_string())?;
-        let y = coords.next().ok_or("No y")?.trim_end_matches(':').parse::<i32>().map_err(|e| e.to_string())?;
+        let x = coords
+            .next()
+            .ok_or("No x")?
+            .parse::<i32>()
+            .map_err(|e| e.to_string())?;
+        let y = coords
+            .next()
+            .ok_or("No y")?
+            .trim_end_matches(':')
+            .parse::<i32>()
+            .map_err(|e| e.to_string())?;
         let mut size = parts.next().ok_or("No size")?.split('x');
-        let width = size.next().ok_or("No width")?.parse::<i32>().map_err(|e| e.to_string())?;
-        let height = size.next().ok_or("No height")?.parse::<i32>().map_err(|e| e.to_string())?;
-        Ok(Rule { id, x, y, width, height })
+        let width = size
+            .next()
+            .ok_or("No width")?
+            .parse::<i32>()
+            .map_err(|e| e.to_string())?;
+        let height = size
+            .next()
+            .ok_or("No height")?
+            .parse::<i32>()
+            .map_err(|e| e.to_string())?;
+        Ok(Rule {
+            id,
+            x,
+            y,
+            width,
+            height,
+        })
     }
 }
 
 impl Solution for Day03 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 3 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        3
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let rules: Vec<Rule> = input.lines().map(|s| Rule::try_from(s).unwrap()).collect();
@@ -53,7 +80,10 @@ impl Solution for Day03 {
         for rule in &rules {
             for x in rule.x..rule.x + rule.width {
                 for y in rule.y..rule.y + rule.height {
-                    touched_fields.entry((x, y)).or_insert_with(Vec::new).push(rule.id.clone());
+                    touched_fields
+                        .entry((x, y))
+                        .or_insert_with(Vec::new)
+                        .push(rule.id.clone());
                 }
             }
         }
@@ -67,9 +97,13 @@ impl Solution for Day03 {
                         break;
                     }
                 }
-                if is_overlapping { break; }
+                if is_overlapping {
+                    break;
+                }
             }
-            if !is_overlapping { return Box::new(rule.id.clone()); }
+            if !is_overlapping {
+                return Box::new(rule.id.clone());
+            }
         }
         Box::new("Not found")
     }

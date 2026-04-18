@@ -1,14 +1,18 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
+use iter_tools::Itertools;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::cmp;
-use iter_tools::Itertools;
+use std::fmt::Display;
 
 pub struct Day21;
 
 #[derive(Debug, Eq, PartialEq)]
-enum ItemType { Weapon, Armor, Ring }
+enum ItemType {
+    Weapon,
+    Armor,
+    Ring,
+}
 
 #[derive(Debug, Eq, PartialEq)]
 struct Item {
@@ -40,18 +44,35 @@ fn is_valid_item_combination(items: &[&Item]) -> bool {
 }
 
 fn all_valid_item_combinations(items: &[Item]) -> impl Iterator<Item = Vec<&Item>> {
-    (1..=items.len()).flat_map(move |n| items.iter().combinations(n)).filter(|c| is_valid_item_combination(c))
+    (1..=items.len())
+        .flat_map(move |n| items.iter().combinations(n))
+        .filter(|c| is_valid_item_combination(c))
 }
 
-struct Fighter { hit_points: i32, damage: i32, armor: i32 }
+struct Fighter {
+    hit_points: i32,
+    damage: i32,
+    armor: i32,
+}
 
 impl Fighter {
-    fn new(hit_points: i32, damage: i32, armor: i32) -> Self { Self { hit_points, damage, armor } }
+    fn new(hit_points: i32, damage: i32, armor: i32) -> Self {
+        Self {
+            hit_points,
+            damage,
+            armor,
+        }
+    }
 
     fn parse(specs: &str) -> Fighter {
-        lazy_static! { static ref RE: Regex = Regex::new(r"Hit Points: (?P<hps>\d+)
+        lazy_static! {
+            static ref RE: Regex = Regex::new(
+                r"Hit Points: (?P<hps>\d+)
 Damage: (?P<damage>\d+)
-Armor: (?P<armor>\d+)").unwrap(); }
+Armor: (?P<armor>\d+)"
+            )
+            .unwrap();
+        }
         let captures = RE.captures(specs).unwrap();
         Fighter::new(
             captures.name("hps").unwrap().as_str().parse().unwrap(),
@@ -72,26 +93,36 @@ Armor: (?P<armor>\d+)").unwrap(); }
 }
 
 impl Solution for Day21 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 21 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        21
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let player = Fighter::new(100, 0, 0);
         let boss = Fighter::parse(input);
         let items = all_items();
-        Box::new(all_valid_item_combinations(&items)
-            .filter(|i| player.fight(&boss, i))
-            .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
-            .min().unwrap_or(0))
+        Box::new(
+            all_valid_item_combinations(&items)
+                .filter(|i| player.fight(&boss, i))
+                .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
+                .min()
+                .unwrap_or(0),
+        )
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
         let player = Fighter::new(100, 0, 0);
         let boss = Fighter::parse(input);
         let items = all_items();
-        Box::new(all_valid_item_combinations(&items)
-            .filter(|i| !player.fight(&boss, i))
-            .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
-            .max().unwrap_or(0))
+        Box::new(
+            all_valid_item_combinations(&items)
+                .filter(|i| !player.fight(&boss, i))
+                .map(|i| i.iter().map(|item| item.cost).sum::<i32>())
+                .max()
+                .unwrap_or(0),
+        )
     }
 }

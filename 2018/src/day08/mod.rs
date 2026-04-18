@@ -7,7 +7,7 @@ fn sum_metadata(data: &mut &[i32]) -> i32 {
     let child_count = data[0];
     let meta_count = data[1];
     *data = &data[2..];
-    
+
     let mut sum = 0;
     for _ in 0..child_count {
         sum += sum_metadata(data);
@@ -33,12 +33,12 @@ fn node_value(data: &mut &[i32]) -> i32 {
         }
         return sum;
     }
-    
+
     let mut child_values = Vec::new();
     for _ in 0..child_count {
         child_values.push(node_value(data));
     }
-    
+
     let mut value = 0;
     for _ in 0..meta_count {
         let meta_val = data[0] as usize;
@@ -51,16 +51,26 @@ fn node_value(data: &mut &[i32]) -> i32 {
 }
 
 impl Solution for Day08 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 8 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        8
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
-        let numbers: Vec<i32> = input.split_whitespace().map(|s| s.parse().unwrap()).collect();
+        let numbers: Vec<i32> = input
+            .split_whitespace()
+            .map(|s| s.parse().unwrap())
+            .collect();
         Box::new(sum_metadata(&mut &numbers[..]))
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
-        let numbers: Vec<i32> = input.split_whitespace().map(|s| s.parse().unwrap()).collect();
+        let numbers: Vec<i32> = input
+            .split_whitespace()
+            .map(|s| s.parse().unwrap())
+            .collect();
         Box::new(node_value(&mut &numbers[..]))
     }
 }

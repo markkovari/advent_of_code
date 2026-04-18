@@ -1,14 +1,9 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::i64 as nom_i64,
-    multi::separated_list0,
-    sequence::delimited,
-    IResult,
-    Parser,
+    branch::alt, bytes::complete::tag, character::complete::i64 as nom_i64, multi::separated_list0,
+    sequence::delimited, IResult, Parser,
 };
+use std::fmt::Display;
 
 pub struct Day13;
 
@@ -21,17 +16,17 @@ enum Packet {
 fn parse_packet(input: &str) -> IResult<&str, Packet> {
     alt((
         nom_i64.map(Packet::Int),
-        delimited(
-            tag("["),
-            separated_list0(tag(","), parse_packet),
-            tag("]"),
-        ).map(Packet::List),
+        delimited(tag("["), separated_list0(tag(","), parse_packet), tag("]")).map(Packet::List),
     ))(input)
 }
 
 impl Solution for Day13 {
-    fn year(&self) -> u32 { 2022 }
-    fn day(&self) -> u32 { 13 }
+    fn year(&self) -> u32 {
+        2022
+    }
+    fn day(&self) -> u32 {
+        13
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut count = 0;
@@ -39,7 +34,9 @@ impl Solution for Day13 {
             let mut lines = pair.lines();
             let left = parse_packet(lines.next().unwrap()).unwrap().1;
             let right = parse_packet(lines.next().unwrap()).unwrap().1;
-            if left < right { count += i + 1; }
+            if left < right {
+                count += i + 1;
+            }
         }
         Box::new(count)
     }

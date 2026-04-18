@@ -1,11 +1,7 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
+use nom::{bytes::complete::tag, character::complete::anychar, IResult};
 use std::collections::{HashMap, HashSet};
-use nom::{
-    bytes::complete::tag,
-    character::complete::anychar,
-    IResult,
-};
+use std::fmt::Display;
 
 pub struct Day07;
 
@@ -34,8 +30,12 @@ fn get_deps(input: &str) -> (HashSet<Step>, HashMap<Step, HashSet<Step>>) {
 }
 
 impl Solution for Day07 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 7 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        7
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let (all_steps, requirements) = get_deps(input);
@@ -43,10 +43,16 @@ impl Solution for Day07 {
         let mut ordered = String::new();
 
         while done.len() < all_steps.len() {
-            let mut available: Vec<Step> = all_steps.iter()
+            let mut available: Vec<Step> = all_steps
+                .iter()
                 .filter(|s| !done.contains(s))
-                .filter(|s| requirements.get(s).map_or(true, |reqs| reqs.is_subset(&done)))
-                .copied().collect();
+                .filter(|s| {
+                    requirements
+                        .get(s)
+                        .map_or(true, |reqs| reqs.is_subset(&done))
+                })
+                .copied()
+                .collect();
             available.sort_unstable();
 
             if let Some(next_step) = available.first() {
@@ -67,22 +73,34 @@ impl Solution for Day07 {
         let base_duration = if input.lines().count() < 10 { 0 } else { 60 };
 
         while done.len() < all_steps.len() {
-            let mut available: Vec<Step> = all_steps.iter()
+            let mut available: Vec<Step> = all_steps
+                .iter()
                 .filter(|s| !done.contains(s) && !workers.iter().any(|&(_, w)| w == **s))
-                .filter(|s| requirements.get(s).map_or(true, |reqs| reqs.is_subset(&done)))
-                .copied().collect();
+                .filter(|s| {
+                    requirements
+                        .get(s)
+                        .map_or(true, |reqs| reqs.is_subset(&done))
+                })
+                .copied()
+                .collect();
             available.sort_unstable_by(|a, b| b.cmp(a)); // So we can pop from the end
 
             for (time_free, step) in workers.iter_mut().filter(|(tf, _)| *tf <= time) {
-                 if *step != '.' { done.insert(*step); }
+                if *step != '.' {
+                    done.insert(*step);
+                }
                 *step = '.';
                 if let Some(next_step) = available.pop() {
                     *step = next_step;
                     *time_free = time + base_duration + (next_step as u32 - 'A' as u32 + 1);
                 }
             }
-            
-            let next_event_time = workers.iter().filter(|&&(_, s)| s != '.').map(|(tf, _)| *tf).min();
+
+            let next_event_time = workers
+                .iter()
+                .filter(|&&(_, s)| s != '.')
+                .map(|(tf, _)| *tf)
+                .min();
             if let Some(t) = next_event_time {
                 time = t;
             } else if !available.is_empty() {
@@ -93,7 +111,7 @@ impl Solution for Day07 {
                 break;
             }
         }
-        
+
         let final_time = workers.iter().map(|(tf, _)| *tf).max().unwrap_or(time);
         Box::new(final_time)
     }

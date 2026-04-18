@@ -1,6 +1,6 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashSet;
+use std::fmt::Display;
 
 pub struct Day21;
 
@@ -10,8 +10,12 @@ pub struct Day21;
 // Part 2 asks for the last number generated before the sequence repeats.
 
 impl Solution for Day21 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 21 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        21
+    }
 
     fn part1(&self, _input: &str) -> Box<dyn Display> {
         // The value in register 5 when instruction 28 (eqrr 5 0 2) is first hit.
@@ -42,7 +46,7 @@ impl Solution for Day21 {
         let mut seen = HashSet::new();
         let mut last_unique = 0;
         let mut r5: u64 = 0;
-        
+
         loop {
             let mut r3: u64 = r5 | 65536;
             r5 = 1533496;

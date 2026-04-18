@@ -1,7 +1,7 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::fmt::Display;
 
 pub struct Day25;
 
@@ -16,11 +16,17 @@ fn get_code(row: u64, col: u64) -> u64 {
 }
 
 impl Solution for Day25 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 25 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        25
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
-        lazy_static! { static ref RE: Regex = Regex::new(r"row (\d+), column (\d+)").unwrap(); }
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"row (\d+), column (\d+)").unwrap();
+        }
         let caps = RE.captures(input).unwrap();
         let row = caps[1].parse::<u64>().unwrap();
         let col = caps[2].parse::<u64>().unwrap();

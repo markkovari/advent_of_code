@@ -1,12 +1,15 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
-use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
+use std::collections::{HashMap, HashSet};
+use std::fmt::Display;
 
 pub struct Day15;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-struct Coord { col: i32, row: i32 }
+struct Coord {
+    col: i32,
+    row: i32,
+}
 
 impl Coord {
     fn manhattan(&self, other: &Self) -> i32 {
@@ -15,26 +18,48 @@ impl Coord {
 }
 
 fn parse(input: &str) -> Vec<[Coord; 2]> {
-    input.lines().map(|line| {
-        let (s_str, b_str) = line.split_once(": ").unwrap();
-        let (sx, sy) = s_str.strip_prefix("Sensor at ").unwrap().split_once(", ").unwrap();
-        let (bx, by) = b_str.strip_prefix("closest beacon is at ").unwrap().split_once(", ").unwrap();
-        [
-            Coord { col: sx.strip_prefix("x=").unwrap().parse().unwrap(), row: sy.strip_prefix("y=").unwrap().parse().unwrap() },
-            Coord { col: bx.strip_prefix("x=").unwrap().parse().unwrap(), row: by.strip_prefix("y=").unwrap().parse().unwrap() },
-        ]
-    }).collect()
+    input
+        .lines()
+        .map(|line| {
+            let (s_str, b_str) = line.split_once(": ").unwrap();
+            let (sx, sy) = s_str
+                .strip_prefix("Sensor at ")
+                .unwrap()
+                .split_once(", ")
+                .unwrap();
+            let (bx, by) = b_str
+                .strip_prefix("closest beacon is at ")
+                .unwrap()
+                .split_once(", ")
+                .unwrap();
+            [
+                Coord {
+                    col: sx.strip_prefix("x=").unwrap().parse().unwrap(),
+                    row: sy.strip_prefix("y=").unwrap().parse().unwrap(),
+                },
+                Coord {
+                    col: bx.strip_prefix("x=").unwrap().parse().unwrap(),
+                    row: by.strip_prefix("y=").unwrap().parse().unwrap(),
+                },
+            ]
+        })
+        .collect()
 }
 
 fn get_row_ranges(row: i32, pairs: &[[Coord; 2]]) -> Vec<std::ops::RangeInclusive<i32>> {
-    let mut ranges: Vec<std::ops::RangeInclusive<i32>> = pairs.iter().filter_map(|p| {
-        let radius = p[0].manhattan(&p[1]);
-        let dist_to_row = (p[0].row - row).abs();
-        if dist_to_row <= radius {
-            let offset = radius - dist_to_row;
-            Some(p[0].col - offset..=p[0].col + offset)
-        } else { None }
-    }).collect();
+    let mut ranges: Vec<std::ops::RangeInclusive<i32>> = pairs
+        .iter()
+        .filter_map(|p| {
+            let radius = p[0].manhattan(&p[1]);
+            let dist_to_row = (p[0].row - row).abs();
+            if dist_to_row <= radius {
+                let offset = radius - dist_to_row;
+                Some(p[0].col - offset..=p[0].col + offset)
+            } else {
+                None
+            }
+        })
+        .collect();
     ranges.sort_unstable_by_key(|r| *r.start());
 
     let mut merged = Vec::new();
@@ -54,15 +79,23 @@ fn get_row_ranges(row: i32, pairs: &[[Coord; 2]]) -> Vec<std::ops::RangeInclusiv
 }
 
 impl Solution for Day15 {
-    fn year(&self) -> u32 { 2022 }
-    fn day(&self) -> u32 { 15 }
+    fn year(&self) -> u32 {
+        2022
+    }
+    fn day(&self) -> u32 {
+        15
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let pairs = parse(input);
         let row = 2_000_000;
         let ranges = get_row_ranges(row, &pairs);
         let count: i32 = ranges.iter().map(|r| r.end() - r.start() + 1).sum();
-        let beacons: HashSet<i32> = pairs.iter().filter(|p| p[1].row == row).map(|p| p[1].col).collect();
+        let beacons: HashSet<i32> = pairs
+            .iter()
+            .filter(|p| p[1].row == row)
+            .map(|p| p[1].col)
+            .collect();
         Box::new(count as usize - beacons.len())
     }
 

@@ -1,8 +1,8 @@
-pub mod solution;
+pub mod geometry;
 pub mod input;
 pub mod runner;
-pub mod geometry;
+pub mod solution;
 
-pub use solution::Solution;
+pub use geometry::{Direction, Point};
 pub use runner::run_solution;
-pub use geometry::{Point, Direction};
+pub use solution::Solution;

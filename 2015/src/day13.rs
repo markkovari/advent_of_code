@@ -1,9 +1,9 @@
-use std::collections::HashMap;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use iter_tools::Itertools;
 use rayon::prelude::*;
 use regex::Regex;
+use std::collections::HashMap;
+use std::fmt::Display;
 
 pub struct Day13;
 
@@ -23,11 +23,24 @@ impl TryFrom<&str> for Relation {
                 .unwrap();
         let caps = re.captures(value).ok_or("No match")?;
         let from = caps.name("from").ok_or("No from")?.as_str().to_owned();
-        let signum = if caps.name("signum").ok_or("No signum")?.as_str() == "gain" { 1 } else { -1 };
-        let mut happiness = caps.name("amount").ok_or("No happiness")?.as_str().parse::<i32>().unwrap();
+        let signum = if caps.name("signum").ok_or("No signum")?.as_str() == "gain" {
+            1
+        } else {
+            -1
+        };
+        let mut happiness = caps
+            .name("amount")
+            .ok_or("No happiness")?
+            .as_str()
+            .parse::<i32>()
+            .unwrap();
         let to = caps.name("to").ok_or("No to")?.as_str().to_owned();
         happiness *= signum;
-        Ok(Relation { from, to, happiness })
+        Ok(Relation {
+            from,
+            to,
+            happiness,
+        })
     }
 }
 
@@ -36,7 +49,10 @@ type SittingMap = HashMap<String, HashMap<String, i32>>;
 fn evaluate_sitting(relations: Vec<Relation>) -> SittingMap {
     let mut sitting: SittingMap = HashMap::new();
     for relation in relations {
-        sitting.entry(relation.from).or_default().insert(relation.to, relation.happiness);
+        sitting
+            .entry(relation.from)
+            .or_default()
+            .insert(relation.to, relation.happiness);
     }
     sitting
 }
@@ -53,24 +69,40 @@ fn calc_happiness(sitting: &SittingMap, order: &[&String]) -> i32 {
 }
 
 impl Solution for Day13 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 13 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        13
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
-        let relations_vec: Vec<Relation> = input.lines().map(|l| Relation::try_from(l).unwrap()).collect();
+        let relations_vec: Vec<Relation> = input
+            .lines()
+            .map(|l| Relation::try_from(l).unwrap())
+            .collect();
         let relations = evaluate_sitting(relations_vec);
         let people: Vec<String> = relations.keys().map(|k| k.to_owned()).collect();
         let amount = people.len();
-        Box::new(people.iter().permutations(amount).par_bridge()
-            .map(|permutation| calc_happiness(&relations, &permutation) as i64)
-            .max().unwrap_or(0))
+        Box::new(
+            people
+                .iter()
+                .permutations(amount)
+                .par_bridge()
+                .map(|permutation| calc_happiness(&relations, &permutation) as i64)
+                .max()
+                .unwrap_or(0),
+        )
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
-        let relations_vec: Vec<Relation> = input.lines().map(|l| Relation::try_from(l).unwrap()).collect();
+        let relations_vec: Vec<Relation> = input
+            .lines()
+            .map(|l| Relation::try_from(l).unwrap())
+            .collect();
         let mut relations = evaluate_sitting(relations_vec);
         let people: Vec<String> = relations.keys().map(|k| k.to_owned()).collect();
-        
+
         relations.insert("me".to_owned(), HashMap::new());
         for name in people {
             relations.get_mut(&name).unwrap().insert("me".to_owned(), 0);
@@ -79,8 +111,14 @@ impl Solution for Day13 {
 
         let people: Vec<String> = relations.keys().map(|k| k.to_owned()).collect();
         let amount = people.len();
-        Box::new(people.iter().permutations(amount).par_bridge()
-            .map(|permutation| calc_happiness(&relations, &permutation) as i64)
-            .max().unwrap_or(0))
+        Box::new(
+            people
+                .iter()
+                .permutations(amount)
+                .par_bridge()
+                .map(|permutation| calc_happiness(&relations, &permutation) as i64)
+                .max()
+                .unwrap_or(0),
+        )
     }
 }

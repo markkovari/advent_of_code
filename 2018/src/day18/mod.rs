@@ -1,21 +1,30 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashMap;
+use std::fmt::Display;
 
 pub struct Day18;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-enum Acre { Open, Trees, Lumberyard }
+enum Acre {
+    Open,
+    Trees,
+    Lumberyard,
+}
 
 fn parse(input: &str) -> Vec<Vec<Acre>> {
-    input.lines().map(|line| {
-        line.chars().map(|c| match c {
-            '.' => Acre::Open,
-            '|' => Acre::Trees,
-            '#' => Acre::Lumberyard,
-            _ => panic!("Invalid acre type"),
-        }).collect()
-    }).collect()
+    input
+        .lines()
+        .map(|line| {
+            line.chars()
+                .map(|c| match c {
+                    '.' => Acre::Open,
+                    '|' => Acre::Trees,
+                    '#' => Acre::Lumberyard,
+                    _ => panic!("Invalid acre type"),
+                })
+                .collect()
+        })
+        .collect()
 }
 
 fn step(area: &Vec<Vec<Acre>>) -> Vec<Vec<Acre>> {
@@ -26,7 +35,9 @@ fn step(area: &Vec<Vec<Acre>>) -> Vec<Vec<Acre>> {
             let mut lumber_count = 0;
             for dy in -1..=1 {
                 for dx in -1..=1 {
-                    if dx == 0 && dy == 0 { continue; }
+                    if dx == 0 && dy == 0 {
+                        continue;
+                    }
                     let ny = y as i32 + dy;
                     let nx = x as i32 + dx;
                     if ny >= 0 && ny < area.len() as i32 && nx >= 0 && nx < area[y].len() as i32 {
@@ -52,13 +63,21 @@ fn step(area: &Vec<Vec<Acre>>) -> Vec<Vec<Acre>> {
 
 fn resource_value(area: &Vec<Vec<Acre>>) -> usize {
     let wooded = area.iter().flatten().filter(|&&a| a == Acre::Trees).count();
-    let lumberyards = area.iter().flatten().filter(|&&a| a == Acre::Lumberyard).count();
+    let lumberyards = area
+        .iter()
+        .flatten()
+        .filter(|&&a| a == Acre::Lumberyard)
+        .count();
     wooded * lumberyards
 }
 
 impl Solution for Day18 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 18 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        18
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut area = parse(input);

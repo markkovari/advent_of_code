@@ -9,16 +9,45 @@ type Regs = [Word; 6];
 type Instruction = (Insn, [usize; 3]);
 
 #[derive(Clone, Copy, Debug)]
-enum Insn { Addr, Addi, Mulr, Muli, Banr, Bani, Borr, Bori, Setr, Seti, Gtir, Gtri, Gtrr, Eqir, Eqri, Eqrr, }
+enum Insn {
+    Addr,
+    Addi,
+    Mulr,
+    Muli,
+    Banr,
+    Bani,
+    Borr,
+    Bori,
+    Setr,
+    Seti,
+    Gtir,
+    Gtri,
+    Gtrr,
+    Eqir,
+    Eqri,
+    Eqrr,
+}
 
 impl FromStr for Insn {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
-            "addr" => Insn::Addr, "addi" => Insn::Addi, "mulr" => Insn::Mulr, "muli" => Insn::Muli,
-            "banr" => Insn::Banr, "bani" => Insn::Bani, "borr" => Insn::Borr, "bori" => Insn::Bori,
-            "setr" => Insn::Setr, "seti" => Insn::Seti, "gtir" => Insn::Gtir, "gtri" => Insn::Gtri,
-            "gtrr" => Insn::Gtrr, "eqir" => Insn::Eqir, "eqri" => Insn::Eqri, "eqrr" => Insn::Eqrr,
+            "addr" => Insn::Addr,
+            "addi" => Insn::Addi,
+            "mulr" => Insn::Mulr,
+            "muli" => Insn::Muli,
+            "banr" => Insn::Banr,
+            "bani" => Insn::Bani,
+            "borr" => Insn::Borr,
+            "bori" => Insn::Bori,
+            "setr" => Insn::Setr,
+            "seti" => Insn::Seti,
+            "gtir" => Insn::Gtir,
+            "gtri" => Insn::Gtri,
+            "gtrr" => Insn::Gtrr,
+            "eqir" => Insn::Eqir,
+            "eqri" => Insn::Eqri,
+            "eqrr" => Insn::Eqrr,
             _ => return Err(()),
         })
     }
@@ -56,28 +85,44 @@ fn solve(ipr: usize, opcodes: &[Instruction], r0: Word) -> Word {
 }
 
 impl Solution for Day19 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 19 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        19
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut lines = input.lines();
         let ipr: usize = lines.next().unwrap()[4..].parse().unwrap();
-        let instrs: Vec<Instruction> = lines.map(|l| {
-            let words: Vec<_> = l.split(' ').collect();
-            let ops = [words[1].parse().unwrap(), words[2].parse().unwrap(), words[3].parse().unwrap()];
-            (words[0].parse().unwrap(), ops)
-        }).collect();
+        let instrs: Vec<Instruction> = lines
+            .map(|l| {
+                let words: Vec<_> = l.split(' ').collect();
+                let ops = [
+                    words[1].parse().unwrap(),
+                    words[2].parse().unwrap(),
+                    words[3].parse().unwrap(),
+                ];
+                (words[0].parse().unwrap(), ops)
+            })
+            .collect();
         Box::new(solve(ipr, &instrs, 0))
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
         let mut lines = input.lines();
         let ipr: usize = lines.next().unwrap()[4..].parse().unwrap();
-        let instrs: Vec<Instruction> = lines.map(|l| {
-            let words: Vec<_> = l.split(' ').collect();
-            let ops = [words[1].parse().unwrap(), words[2].parse().unwrap(), words[3].parse().unwrap()];
-            (words[0].parse().unwrap(), ops)
-        }).collect();
+        let instrs: Vec<Instruction> = lines
+            .map(|l| {
+                let words: Vec<_> = l.split(' ').collect();
+                let ops = [
+                    words[1].parse().unwrap(),
+                    words[2].parse().unwrap(),
+                    words[3].parse().unwrap(),
+                ];
+                (words[0].parse().unwrap(), ops)
+            })
+            .collect();
         Box::new(solve(ipr, &instrs, 1))
     }
 }

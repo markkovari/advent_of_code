@@ -4,8 +4,12 @@ use std::fmt::Display;
 pub struct Day01;
 
 impl Solution for Day01 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 1 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        1
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         Box::new(input.chars().fold(0, |acc, c| match c {

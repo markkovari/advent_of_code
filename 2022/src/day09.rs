@@ -1,11 +1,14 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashSet;
+use std::fmt::Display;
 
 pub struct Day09;
 
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash)]
-struct Pos { x: i32, y: i32 }
+struct Pos {
+    x: i32,
+    y: i32,
+}
 
 impl Pos {
     fn move_in(&mut self, direction: &str) {
@@ -50,8 +53,12 @@ fn simulate(input: &str, rope_len: usize) -> usize {
 }
 
 impl Solution for Day09 {
-    fn year(&self) -> u32 { 2022 }
-    fn day(&self) -> u32 { 9 }
+    fn year(&self) -> u32 {
+        2022
+    }
+    fn day(&self) -> u32 {
+        9
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         Box::new(simulate(input, 2))

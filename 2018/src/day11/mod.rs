@@ -18,7 +18,9 @@ fn build_summed_area_table(serial_number: i32) -> Vec<Vec<i32>> {
     for y in 1..=GRID_SIZE {
         for x in 1..=GRID_SIZE {
             let power = get_power(x, y, serial_number);
-            sat[y as usize][x as usize] = power + sat[y as usize - 1][x as usize] + sat[y as usize][x as usize - 1] - sat[y as usize - 1][x as usize - 1];
+            sat[y as usize][x as usize] =
+                power + sat[y as usize - 1][x as usize] + sat[y as usize][x as usize - 1]
+                    - sat[y as usize - 1][x as usize - 1];
         }
     }
     sat
@@ -26,12 +28,17 @@ fn build_summed_area_table(serial_number: i32) -> Vec<Vec<i32>> {
 
 fn get_square_power(sat: &[Vec<i32>], x: i32, y: i32, size: i32) -> i32 {
     let (x1, y1, x2, y2) = (x - 1, y - 1, x + size - 1, y + size - 1);
-    sat[y2 as usize][x2 as usize] - sat[y1 as usize][x2 as usize] - sat[y2 as usize][x1 as usize] + sat[y1 as usize][x1 as usize]
+    sat[y2 as usize][x2 as usize] - sat[y1 as usize][x2 as usize] - sat[y2 as usize][x1 as usize]
+        + sat[y1 as usize][x1 as usize]
 }
 
 impl Solution for Day11 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 11 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        11
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let serial_number: i32 = input.trim().parse().unwrap();
@@ -66,6 +73,9 @@ impl Solution for Day11 {
                 }
             }
         }
-        Box::new(format!("{},{},{}", max_details.0, max_details.1, max_details.2))
+        Box::new(format!(
+            "{},{},{}",
+            max_details.0, max_details.1, max_details.2
+        ))
     }
 }

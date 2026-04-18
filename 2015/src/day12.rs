@@ -1,6 +1,6 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use serde_json::Value;
+use std::fmt::Display;
 
 pub struct Day12;
 
@@ -29,8 +29,12 @@ fn skip_red(value: &Value) -> i32 {
 }
 
 impl Solution for Day12 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 12 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        12
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let value: Value = serde_json::from_str(input).unwrap();

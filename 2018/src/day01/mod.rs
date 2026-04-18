@@ -1,12 +1,16 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashSet;
+use std::fmt::Display;
 
 pub struct Day01;
 
 impl Solution for Day01 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 1 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        1
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let sum: i32 = input.lines().map(|s| s.parse::<i32>().unwrap()).sum();

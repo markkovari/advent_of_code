@@ -1,6 +1,6 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use rayon::prelude::*;
+use std::fmt::Display;
 
 pub struct Day06;
 
@@ -89,15 +89,27 @@ impl TryFrom<&str> for Point {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let mut split = value.split(',');
-        let x = split.next().ok_or("Missing x")?.parse::<i32>().map_err(|e| e.to_string())?;
-        let y = split.next().ok_or("Missing y")?.parse::<i32>().map_err(|e| e.to_string())?;
+        let x = split
+            .next()
+            .ok_or("Missing x")?
+            .parse::<i32>()
+            .map_err(|e| e.to_string())?;
+        let y = split
+            .next()
+            .ok_or("Missing y")?
+            .parse::<i32>()
+            .map_err(|e| e.to_string())?;
         Ok(Point::new(x, y))
     }
 }
 
 impl Solution for Day06 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 6 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        6
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let instructions = input
@@ -108,10 +120,12 @@ impl Solution for Day06 {
         for instruction in instructions {
             apply_on_grid(instruction, &mut grid);
         }
-        Box::new(grid.par_iter()
-            .flat_map(|row| row.par_iter())
-            .filter(|&&cell| cell)
-            .count() as i64)
+        Box::new(
+            grid.par_iter()
+                .flat_map(|row| row.par_iter())
+                .filter(|&&cell| cell)
+                .count() as i64,
+        )
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
@@ -123,10 +137,12 @@ impl Solution for Day06 {
         for instruction in instructions {
             apply_on_ambient_grid(instruction, &mut grid);
         }
-        Box::new(grid.par_iter()
-            .flat_map(|row| row.par_iter())
-            .map(|&cell| cell as i64)
-            .sum::<i64>())
+        Box::new(
+            grid.par_iter()
+                .flat_map(|row| row.par_iter())
+                .map(|&cell| cell as i64)
+                .sum::<i64>(),
+        )
     }
 }
 
@@ -137,11 +153,20 @@ mod tests {
     #[test]
     fn test_day06() {
         let day = Day06;
-        assert_eq!(day.part1("turn on 0,0 through 999,999").to_string(), "1000000");
+        assert_eq!(
+            day.part1("turn on 0,0 through 999,999").to_string(),
+            "1000000"
+        );
         assert_eq!(day.part1("toggle 0,0 through 999,0").to_string(), "1000");
-        assert_eq!(day.part1("turn off 499,499 through 500,500").to_string(), "0");
+        assert_eq!(
+            day.part1("turn off 499,499 through 500,500").to_string(),
+            "0"
+        );
 
         assert_eq!(day.part2("turn on 0,0 through 0,0").to_string(), "1");
-        assert_eq!(day.part2("toggle 0,0 through 999,999").to_string(), "2000000");
+        assert_eq!(
+            day.part2("toggle 0,0 through 999,999").to_string(),
+            "2000000"
+        );
     }
 }

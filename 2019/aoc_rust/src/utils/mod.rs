@@ -1,4 +1,4 @@
-use std::sync::mpsc::{channel, Sender, Receiver};
+use std::sync::mpsc::{channel, Receiver, Sender};
 
 pub struct Computer {
     pub p: Vec<isize>,
@@ -17,7 +17,10 @@ impl Clone for Computer {
             p: self.p.clone(),
             n: self.n,
             rb: self.rb,
-            i, o, _i, _o
+            i,
+            o,
+            _i,
+            _o,
         }
     }
 }
@@ -64,12 +67,14 @@ impl Computer {
 
             self.n = match opcode {
                 1 => {
-                    let v = *self.acc(self.n + 1, modes.get(0).copied()) + *self.acc(self.n + 2, modes.get(1).copied());
+                    let v = *self.acc(self.n + 1, modes.get(0).copied())
+                        + *self.acc(self.n + 2, modes.get(1).copied());
                     *self.acc(self.n + 3, modes.get(2).copied()) = v;
                     self.n + 4
                 }
                 2 => {
-                    let v = *self.acc(self.n + 1, modes.get(0).copied()) * *self.acc(self.n + 2, modes.get(1).copied());
+                    let v = *self.acc(self.n + 1, modes.get(0).copied())
+                        * *self.acc(self.n + 2, modes.get(1).copied());
                     *self.acc(self.n + 3, modes.get(2).copied()) = v;
                     self.n + 4
                 }
@@ -94,19 +99,31 @@ impl Computer {
                 }
                 6 => self.n + 3,
                 7 => {
-                    let v = if *self.acc(self.n + 1, modes.get(0).copied()) < *self.acc(self.n + 2, modes.get(1).copied()) { 1 } else { 0 };
+                    let v = if *self.acc(self.n + 1, modes.get(0).copied())
+                        < *self.acc(self.n + 2, modes.get(1).copied())
+                    {
+                        1
+                    } else {
+                        0
+                    };
                     *self.acc(self.n + 3, modes.get(2).copied()) = v;
                     self.n + 4
                 }
                 8 => {
-                    let v = if *self.acc(self.n + 1, modes.get(0).copied()) == *self.acc(self.n + 2, modes.get(1).copied()) { 1 } else { 0 };
+                    let v = if *self.acc(self.n + 1, modes.get(0).copied())
+                        == *self.acc(self.n + 2, modes.get(1).copied())
+                    {
+                        1
+                    } else {
+                        0
+                    };
                     *self.acc(self.n + 3, modes.get(2).copied()) = v;
                     self.n + 4
                 }
                 9 => {
                     self.rb += *self.acc(self.n + 1, modes.get(0).copied());
                     self.n + 2
-                },
+                }
                 99 => return true,
                 _ => panic!("Unknown OPCODE: {} at {}", self.p[self.n as usize], self.n),
             };

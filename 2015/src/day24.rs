@@ -1,6 +1,6 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use iter_tools::Itertools;
+use std::fmt::Display;
 
 pub struct Day24;
 
@@ -18,14 +18,20 @@ fn find_qe(packages: &[u64], groups: usize) -> u64 {
                 best_qe = best_qe.min(c.iter().copied().product::<u64>());
             }
         }
-        if found { return best_qe; }
+        if found {
+            return best_qe;
+        }
     }
     0
 }
 
 impl Solution for Day24 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 24 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        24
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let packages: Vec<u64> = input.lines().map(|l| l.parse().unwrap()).collect();

@@ -1,5 +1,5 @@
-use onig::Regex;
 use aoc_rust_common::Solution;
+use onig::Regex;
 use std::fmt::Display;
 
 pub struct Day08;
@@ -27,8 +27,12 @@ pub fn raw_and_reescaped_len(s: &str) -> (usize, usize) {
 }
 
 impl Solution for Day08 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 8 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        8
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         Box::new(input.lines().fold(0, |extra_chars, line| {

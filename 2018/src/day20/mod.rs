@@ -1,12 +1,16 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashMap;
+use std::fmt::Display;
 
 pub struct Day20;
 
 impl Solution for Day20 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 20 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        20
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let distances = get_distances(input);
@@ -32,8 +36,10 @@ fn get_distances(input: &str) -> HashMap<(i32, i32), usize> {
             ')' => current_pos = stack.pop().unwrap(),
             'N' | 'S' | 'E' | 'W' => {
                 let (dx, dy) = match char {
-                    'N' => (0, -1), 'S' => (0, 1),
-                    'E' => (1, 0), 'W' => (-1, 0),
+                    'N' => (0, -1),
+                    'S' => (0, 1),
+                    'E' => (1, 0),
+                    'W' => (-1, 0),
                     _ => unreachable!(),
                 };
                 let dist = distances[&current_pos] + 1;

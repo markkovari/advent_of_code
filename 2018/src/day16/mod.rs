@@ -1,21 +1,47 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::{HashMap, HashSet};
+use std::fmt::Display;
 use text_io::scan;
 
 pub struct Day16;
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 enum OpCode {
-    AddR, AddI, MulR, MulI, BanR, BanI, BorR, BorI,
-    SetR, SetI, GtIR, GtRI, GtRR, EqIR, EqRI, EqRR,
+    AddR,
+    AddI,
+    MulR,
+    MulI,
+    BanR,
+    BanI,
+    BorR,
+    BorI,
+    SetR,
+    SetI,
+    GtIR,
+    GtRI,
+    GtRR,
+    EqIR,
+    EqRI,
+    EqRR,
 }
 
 const ALL_OP_CODES: &[OpCode] = &[
-    OpCode::AddR, OpCode::AddI, OpCode::MulR, OpCode::MulI,
-    OpCode::BanR, OpCode::BanI, OpCode::BorR, OpCode::BorI,
-    OpCode::SetR, OpCode::SetI, OpCode::GtIR, OpCode::GtRI, OpCode::GtRR,
-    OpCode::EqIR, OpCode::EqRI, OpCode::EqRR,
+    OpCode::AddR,
+    OpCode::AddI,
+    OpCode::MulR,
+    OpCode::MulI,
+    OpCode::BanR,
+    OpCode::BanI,
+    OpCode::BorR,
+    OpCode::BorI,
+    OpCode::SetR,
+    OpCode::SetI,
+    OpCode::GtIR,
+    OpCode::GtRI,
+    OpCode::GtRR,
+    OpCode::EqIR,
+    OpCode::EqRI,
+    OpCode::EqRR,
 ];
 
 impl OpCode {
@@ -51,7 +77,7 @@ fn parse_input(input: &str) -> (Vec<Sample>, Vec<[usize; 4]>) {
     let mut samples = Vec::new();
     let mut program = Vec::new();
     let mut lines = input.lines();
-    
+
     loop {
         let l1 = match lines.next() {
             Some(l) if !l.is_empty() => l,
@@ -72,8 +98,12 @@ fn parse_input(input: &str) -> (Vec<Sample>, Vec<[usize; 4]>) {
         let (s0, s1, s2, s3): (usize, usize, usize, usize);
         scan!(l3.bytes() => "After:  [{}, {}, {}, {}]", s0, s1, s2, s3);
         let after = [s0, s1, s2, s3];
-        
-        samples.push(Sample { before, instruction, after });
+
+        samples.push(Sample {
+            before,
+            instruction,
+            after,
+        });
     }
 
     // After the samples, there are two blank lines, then the test program
@@ -87,28 +117,40 @@ fn parse_input(input: &str) -> (Vec<Sample>, Vec<[usize; 4]>) {
     (samples, program)
 }
 
-
 impl Solution for Day16 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 16 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        16
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let (samples, _) = parse_input(input);
-        let result = samples.iter().filter(|sample| {
-            let [_, a, b, c] = sample.instruction;
-            ALL_OP_CODES.iter().filter(|opcode| {
-                let mut registers = sample.before;
-                opcode.apply(&mut registers, a, b, c);
-                registers == sample.after
-            }).count() >= 3
-        }).count();
+        let result = samples
+            .iter()
+            .filter(|sample| {
+                let [_, a, b, c] = sample.instruction;
+                ALL_OP_CODES
+                    .iter()
+                    .filter(|opcode| {
+                        let mut registers = sample.before;
+                        opcode.apply(&mut registers, a, b, c);
+                        registers == sample.after
+                    })
+                    .count()
+                    >= 3
+            })
+            .count();
         Box::new(result)
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
         let (samples, program) = parse_input(input);
         let mut op_map: HashMap<usize, OpCode> = HashMap::new();
-        let mut possible_ops: HashMap<usize, HashSet<OpCode>> = (0..16).map(|i| (i, ALL_OP_CODES.iter().cloned().collect())).collect();
+        let mut possible_ops: HashMap<usize, HashSet<OpCode>> = (0..16)
+            .map(|i| (i, ALL_OP_CODES.iter().cloned().collect()))
+            .collect();
 
         for sample in &samples {
             let [op_num, a, b, c] = sample.instruction;
@@ -119,7 +161,7 @@ impl Solution for Day16 {
                 registers == sample.after
             });
         }
-        
+
         while op_map.len() < 16 {
             for (op_num, possibilities) in &possible_ops {
                 if possibilities.len() == 1 {
@@ -133,7 +175,7 @@ impl Solution for Day16 {
                 }
             }
         }
-        
+
         let mut registers = [0, 0, 0, 0];
         for instruction in &program {
             let [op_num, a, b, c] = *instruction;

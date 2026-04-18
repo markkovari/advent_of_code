@@ -1,6 +1,6 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashMap;
+use std::fmt::Display;
 
 pub struct Day02;
 
@@ -9,8 +9,14 @@ fn get_two_closest(of_ids: &[String]) -> (String, String) {
     let mut min = usize::max_value();
     for (i, id) in of_ids.iter().enumerate() {
         for (j, other) in of_ids.iter().enumerate() {
-            if i == j { continue; }
-            let diff = id.chars().zip(other.chars()).filter(|(c1, c2)| c1 != c2).count();
+            if i == j {
+                continue;
+            }
+            let diff = id
+                .chars()
+                .zip(other.chars())
+                .filter(|(c1, c2)| c1 != c2)
+                .count();
             if diff < min {
                 min = diff;
                 closest = (id.clone(), other.clone());
@@ -21,12 +27,20 @@ fn get_two_closest(of_ids: &[String]) -> (String, String) {
 }
 
 fn get_common_chars(a: &str, b: &str) -> String {
-    a.chars().zip(b.chars()).filter(|(c1, c2)| c1 == c2).map(|(c, _)| c).collect()
+    a.chars()
+        .zip(b.chars())
+        .filter(|(c1, c2)| c1 == c2)
+        .map(|(c, _)| c)
+        .collect()
 }
 
 impl Solution for Day02 {
-    fn year(&self) -> u32 { 2018 }
-    fn day(&self) -> u32 { 2 }
+    fn year(&self) -> u32 {
+        2018
+    }
+    fn day(&self) -> u32 {
+        2
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let (twos, threes) = input.lines().fold((0, 0), |(mut twos, mut threes), line| {
@@ -34,8 +48,12 @@ impl Solution for Day02 {
             for c in line.chars() {
                 *counts.entry(c).or_insert(0) += 1;
             }
-            if counts.values().any(|&v| v == 2) { twos += 1; }
-            if counts.values().any(|&v| v == 3) { threes += 1; }
+            if counts.values().any(|&v| v == 2) {
+                twos += 1;
+            }
+            if counts.values().any(|&v| v == 3) {
+                threes += 1;
+            }
             (twos, threes)
         });
         Box::new(twos * threes)

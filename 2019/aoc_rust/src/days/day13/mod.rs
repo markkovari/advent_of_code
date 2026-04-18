@@ -1,13 +1,17 @@
-use aoc_rust_common::Solution;
-use std::fmt::Display;
-use std::collections::HashMap;
 use crate::utils::Computer;
+use aoc_rust_common::Solution;
+use std::collections::HashMap;
+use std::fmt::Display;
 
 pub struct Day13;
 
 impl Solution for Day13 {
-    fn year(&self) -> u32 { 2019 }
-    fn day(&self) -> u32 { 13 }
+    fn year(&self) -> u32 {
+        2019
+    }
+    fn day(&self) -> u32 {
+        13
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut computer = Computer::from_string(input);

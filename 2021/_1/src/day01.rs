@@ -4,8 +4,12 @@ use std::fmt::Display;
 pub struct Day01;
 
 impl Solution for Day01 {
-    fn year(&self) -> u32 { 2021 }
-    fn day(&self) -> u32 { 1 }
+    fn year(&self) -> u32 {
+        2021
+    }
+    fn day(&self) -> u32 {
+        1
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let numbers: Vec<i32> = input.lines().filter_map(|l| l.parse().ok()).collect();

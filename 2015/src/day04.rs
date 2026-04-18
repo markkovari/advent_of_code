@@ -1,12 +1,16 @@
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use md5;
+use std::fmt::Display;
 
 pub struct Day04;
 
 impl Solution for Day04 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 4 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        4
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut counter = 0;

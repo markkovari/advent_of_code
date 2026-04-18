@@ -28,8 +28,12 @@ fn look_and_say(current: &str) -> String {
 }
 
 impl Solution for Day10 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 10 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        10
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut result = input.trim().to_string();

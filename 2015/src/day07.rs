@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use aoc_rust_common::Solution;
+use std::collections::HashMap;
 use std::fmt::Display;
 
 pub struct Day07;
@@ -80,17 +80,11 @@ fn resolve_operand(operand: &str, values: &HashMap<String, u16>) -> Option<u16> 
         .or_else(|| values.get(operand).copied())
 }
 
-fn apply_binary_op<F>(
-    left: &str,
-    right: &str,
-    values: &HashMap<String, u16>,
-    op: F,
-) -> Option<u16>
+fn apply_binary_op<F>(left: &str, right: &str, values: &HashMap<String, u16>, op: F) -> Option<u16>
 where
     F: Fn(u16, u16) -> u16,
 {
-    resolve_operand(left, values)
-        .and_then(|l| resolve_operand(right, values).map(|r| op(l, r)))
+    resolve_operand(left, values).and_then(|l| resolve_operand(right, values).map(|r| op(l, r)))
 }
 
 fn calculate_values(instructions: &[Instruction]) -> HashMap<String, u16> {
@@ -109,12 +103,8 @@ fn calculate_values(instructions: &[Instruction]) -> HashMap<String, u16> {
                 Operation::AssignmentFromRefence(reference) => values.get(reference).copied(),
                 Operation::And(left, right) => apply_binary_op(left, right, &values, |l, r| l & r),
                 Operation::Or(left, right) => apply_binary_op(left, right, &values, |l, r| l | r),
-                Operation::LShift(left, amount) => {
-                    values.get(left).map(|v| v << amount)
-                }
-                Operation::RShift(left, amount) => {
-                    values.get(left).map(|v| v >> amount)
-                }
+                Operation::LShift(left, amount) => values.get(left).map(|v| v << amount),
+                Operation::RShift(left, amount) => values.get(left).map(|v| v >> amount),
                 Operation::Not(left) => values.get(left).map(|v| !v),
             };
 
@@ -124,7 +114,9 @@ fn calculate_values(instructions: &[Instruction]) -> HashMap<String, u16> {
             }
         }
 
-        if resolved.is_empty() { break; }
+        if resolved.is_empty() {
+            break;
+        }
 
         for target in resolved {
             pending.remove(&target);
@@ -135,11 +127,16 @@ fn calculate_values(instructions: &[Instruction]) -> HashMap<String, u16> {
 }
 
 impl Solution for Day07 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 7 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        7
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
-        let instructions: Vec<Instruction> = input.lines()
+        let instructions: Vec<Instruction> = input
+            .lines()
             .map(|l| Instruction::try_from(l).unwrap())
             .collect();
         let values = calculate_values(&instructions);
@@ -147,7 +144,8 @@ impl Solution for Day07 {
     }
 
     fn part2(&self, input: &str) -> Box<dyn Display> {
-        let instructions: Vec<Instruction> = input.lines()
+        let instructions: Vec<Instruction> = input
+            .lines()
             .map(|l| Instruction::try_from(l).unwrap())
             .collect();
         let values = calculate_values(&instructions);

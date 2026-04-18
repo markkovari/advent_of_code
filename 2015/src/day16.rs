@@ -1,12 +1,9 @@
-use std::collections::HashMap;
-
-use crate::Exercise;
-use iter_tools::Itertools;
+use aoc_rust_common::Solution;
 use regex::Regex;
+use std::collections::HashMap;
+use std::fmt::Display;
 
-struct SixteenthDay {
-    exercise: Exercise,
-}
+pub struct Day16;
 
 struct Sue {
     name: String,
@@ -16,14 +13,10 @@ struct Sue {
 impl TryFrom<&str> for Sue {
     type Error = &'static str;
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let re = Regex::new(r"^Sue (?P<name>\d+): (?P<items>.+)$");
-
-        if re.is_err() {
-            return Err("Regex is not valid");
-        }
-        let caps = re.unwrap().captures(value).unwrap();
-        let name = caps.name("name").unwrap().as_str().parse().unwrap();
-        let data = caps.name("items").unwrap().as_str().to_string();
+        let re = Regex::new(r"^Sue (?P<name>\d+): (?P<items>.+)$").map_err(|_| "Invalid regex")?;
+        let caps = re.captures(value).ok_or("No match")?;
+        let name = caps.name("name").unwrap().as_str().to_owned();
+        let data = caps.name("items").unwrap().as_str();
         let mut map = HashMap::new();
         for datum in data.split(", ") {
             let parts: Vec<&str> = datum.split(": ").collect();
@@ -48,99 +41,62 @@ fn get_search_elements() -> HashMap<String, i64> {
     ])
 }
 
-impl SixteenthDay {
-    fn solve_first(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.first(&self.exercise.content)
-        } else {
-            self.first(&self.exercise.example)
-        }
+impl Solution for Day16 {
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        16
     }
 
-    fn solve_second(&self, is_prod: bool) -> i64 {
-        if is_prod {
-            self.second(&self.exercise.content)
-        } else {
-            self.second(&self.exercise.example)
-        }
-    }
-
-    fn first(&self, content: &str) -> i64 {
+    fn part1(&self, input: &str) -> Box<dyn Display> {
         let search = get_search_elements();
-        let sues = content
+        let sues: Vec<Sue> = input
             .lines()
             .map(|line| Sue::try_from(line).unwrap())
-            .collect_vec();
+            .collect();
         for sue in sues {
             let mut possible = true;
-            for key in search.keys() {
-                if sue.items.contains_key(key) && sue.items.get(key) != search.get(key) {
-                    possible = false;
-                    break;
-                }
-            }
-            if possible {
-                return sue.name.parse().unwrap();
-            }
-        }
-        -1
-    }
-
-    fn second(&self, content: &str) -> i64 {
-        let search = get_search_elements();
-        let sues = content
-            .lines()
-            .map(|line| Sue::try_from(line).unwrap())
-            .collect_vec();
-        for sue in sues {
-            let mut possible = true;
-            for key in search.keys() {
-                if sue.items.contains_key(key)
-                    && match key.as_str() {
-                        "cats" | "trees" => sue.items.get(key) <= search.get(key),
-                        "pomeranians" | "goldfish" => sue.items.get(key) >= search.get(key),
-                        _ => sue.items.get(key) != search.get(key),
+            for (key, val) in &search {
+                if let Some(&sue_val) = sue.items.get(key) {
+                    if sue_val != *val {
+                        possible = false;
+                        break;
                     }
-                {
-                    possible = false;
-                    break;
                 }
             }
             if possible {
-                return sue.name.parse().unwrap();
+                return Box::new(sue.name);
             }
         }
-        -1
+        Box::new("Not found")
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    const EXAMPLE: &str = include_str!("inputs/16_test.txt");
-    const PROD: &str = include_str!("inputs/16_prod.txt");
-
-    #[test]
-    fn first_test() {
-        let mut first_exercise = SixteenthDay {
-            exercise: Exercise {
-                content: String::from(PROD),
-                example: String::from(EXAMPLE),
-            },
-        };
-
-        // let expected_example = 62842880;
-        let expected_prod = 103;
-        // let result_example = first_exercise.solve_first(false);
-        let result_prod = first_exercise.solve_first(true);
-        // assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
-
-        // let expected_example = 57600000;
-        let expected_prod = 405;
-        // let result_example = first_exercise.solve_second(false);
-        let result_prod = first_exercise.solve_second(true);
-        // assert_eq!(expected_example, result_example);
-        assert_eq!(expected_prod, result_prod);
+    fn part2(&self, input: &str) -> Box<dyn Display> {
+        let search = get_search_elements();
+        let sues: Vec<Sue> = input
+            .lines()
+            .map(|line| Sue::try_from(line).unwrap())
+            .collect();
+        for sue in sues {
+            let mut possible = true;
+            for (key, val) in &search {
+                if let Some(&sue_val) = sue.items.get(key) {
+                    let match_ok = match key.as_str() {
+                        "cats" | "trees" => sue_val > *val,
+                        "pomeranians" | "goldfish" => sue_val < *val,
+                        _ => sue_val == *val,
+                    };
+                    if !match_ok {
+                        possible = false;
+                        break;
+                    }
+                }
+            }
+            if possible {
+                return Box::new(sue.name);
+            }
+        }
+        Box::new("Not found")
     }
 }

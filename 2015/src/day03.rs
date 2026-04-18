@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use aoc_rust_common::Solution;
+use std::collections::HashMap;
 use std::fmt::Display;
 
 type Position = (i32, i32);
@@ -62,8 +62,12 @@ fn get_visited_multiple_times(first: Santa, second: Santa) -> usize {
 }
 
 impl Solution for Day03 {
-    fn year(&self) -> u32 { 2015 }
-    fn day(&self) -> u32 { 3 }
+    fn year(&self) -> u32 {
+        2015
+    }
+    fn day(&self) -> u32 {
+        3
+    }
 
     fn part1(&self, input: &str) -> Box<dyn Display> {
         let mut santa = Santa::new();
@@ -95,7 +99,7 @@ mod tests {
     fn test_day03() {
         let day = Day03;
         const PROD: &str = include_str!("inputs/3_prod.txt");
-        
+
         assert_eq!(day.part1(">").to_string(), "2");
         assert_eq!(day.part1("^>v<").to_string(), "4");
         assert_eq!(day.part1("^v^v^v^v^v").to_string(), "2");
