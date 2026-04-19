@@ -16,6 +16,7 @@ pub fn get_input(year: u32, day: u32) -> String {
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string());
 
     let paths_to_try = [
+        format!("{}/../inputs/{}/prod.txt", manifest_dir, day_unpadded),
         // aoc_rust specific path
         format!("{}/inputs/{}/prod.txt", manifest_dir, day_unpadded),
         // General paths relative to manifest dir

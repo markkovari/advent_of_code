@@ -47,4 +47,4 @@ impl Solution for Day12 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day12, "6", "6");
+aoc_rust_common::aoc_test!(Day12);

@@ -91,4 +91,4 @@ impl Solution for Day03 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day03, "2572", "2631");
+aoc_rust_common::aoc_test!(Day03);

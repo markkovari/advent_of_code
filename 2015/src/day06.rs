@@ -146,4 +146,4 @@ impl Solution for Day06 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day06, "1000000", "1");
+aoc_rust_common::aoc_test!(Day06);

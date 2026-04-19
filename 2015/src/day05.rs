@@ -47,4 +47,4 @@ impl Solution for Day05 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day05, "1", "1");
+aoc_rust_common::aoc_test!(Day05);
