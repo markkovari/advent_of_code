@@ -9,3 +9,6 @@ pub use algorithms::{bfs, dijkstra};
 pub use geometry::{Direction, Point};
 pub use runner::run_solution;
 pub use solution::Solution;
+
+// Re-export insta for macros
+pub use insta;

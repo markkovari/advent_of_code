@@ -38,24 +38,4 @@ impl Solution for Day01 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day01() {
-        let day = Day01;
-        assert_eq!(day.part1("(())").unwrap(), "0");
-        assert_eq!(day.part1("()()").unwrap(), "0");
-        assert_eq!(day.part1("(((").unwrap(), "3");
-        assert_eq!(day.part1("(()(()(").unwrap(), "3");
-        assert_eq!(day.part1("))(((((").unwrap(), "3");
-        assert_eq!(day.part1("())").unwrap(), "-1");
-        assert_eq!(day.part1("))(").unwrap(), "-1");
-        assert_eq!(day.part1(")))").unwrap(), "-3");
-        assert_eq!(day.part1(")())())").unwrap(), "-3");
-
-        assert_eq!(day.part2(")").unwrap(), "1");
-        assert_eq!(day.part2("()())").unwrap(), "5");
-    }
-}
+aoc_rust_common::aoc_test!(Day01, "232", "1783");

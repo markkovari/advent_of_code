@@ -24,92 +24,54 @@ jobs:
       - name: Detect changed projects
         id: filter
         run: |
-          # Get changed files
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
           else
-            # Handle first push or null before hash
             BEFORE="${{ github.event.before }}"
             if [ "$BEFORE" == "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE" ]; then
-              # Get files changed in the last commit
               CHANGED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null || git ls-files)
             else
               CHANGED_FILES=$(git diff --name-only $BEFORE ${{ github.sha }})
             fi
           fi
 
-          echo "Changed files:"
-          echo "$CHANGED_FILES"
+          echo "Changed files: $CHANGED_FILES"
 
-          # Define all projects
-          ALL_RUST_PROJECTS=("2015" "2018" "2019/aoc_rust" "2020/01" "2021/_1" "2021/_2" "2021/_3" "2021/_4" "2021/_5" "2021/_6" "2021/_7" "2022")
+          # Shared files that trigger all tests
+          TRIGGER_ALL="^.github/workflows/|^aoc-rust-common/|^Cargo.toml|^Cargo.lock"
+
+          ALL_RUST_PROJECTS=("2015" "2018" "2019/aoc_rust" "2020/01" "2021/_1" "2021/_2" "2021/_3" "2021/_4" "2021/_5" "2021/_6" "2021/_7" "2022" "2025/rust" "runner")
           ALL_GO_PROJECTS=("2017" "2019/go" "2020/02" "2024/golang")
           ALL_CSHARP_PROJECTS=("2021/cs/1" "2021/cs/2")
           ALL_ZIG_PROJECTS=("2024/zig")
 
-          # Check for workflow changes - if workflow changed, run all tests
-          if echo "$CHANGED_FILES" | grep -q "^.github/workflows/tests.yml"; then
-            echo "Workflow changed, running all tests"
+          if echo "$CHANGED_FILES" | grep -qE "$TRIGGER_ALL"; then
             RUST_PROJECTS=$(printf '%s\n' "${ALL_RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
             GO_PROJECTS=$(printf '%s\n' "${ALL_GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
             CSHARP_PROJECTS=$(printf '%s\n' "${ALL_CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
             ZIG_PROJECTS=$(printf '%s\n' "${ALL_ZIG_PROJECTS[@]}" | jq -R . | jq -s -c .)
           else
-            # Detect Rust projects
             RUST_PROJECTS=()
             for project in "${ALL_RUST_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then
-                RUST_PROJECTS+=("$project")
-              fi
+              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then RUST_PROJECTS+=("$project"); fi
             done
-
-            # Detect Go projects
             GO_PROJECTS=()
             for project in "${ALL_GO_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then
-                GO_PROJECTS+=("$project")
-              fi
+              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then GO_PROJECTS+=("$project"); fi
             done
-
-            # Detect C# projects
             CSHARP_PROJECTS=()
             for project in "${ALL_CSHARP_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then
-                CSHARP_PROJECTS+=("$project")
-              fi
+              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then CSHARP_PROJECTS+=("$project"); fi
             done
-
-            # Detect Zig projects
             ZIG_PROJECTS=()
             for project in "${ALL_ZIG_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then
-                ZIG_PROJECTS+=("$project")
-              fi
+              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then ZIG_PROJECTS+=("$project"); fi
             done
 
-            if [ ${#RUST_PROJECTS[@]} -eq 0 ]; then
-              RUST_PROJECTS="[]"
-            else
-              RUST_PROJECTS=$(printf '%s\n' "${RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            fi
-
-            if [ ${#GO_PROJECTS[@]} -eq 0 ]; then
-              GO_PROJECTS="[]"
-            else
-              GO_PROJECTS=$(printf '%s\n' "${GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            fi
-
-            if [ ${#CSHARP_PROJECTS[@]} -eq 0 ]; then
-              CSHARP_PROJECTS="[]"
-            else
-              CSHARP_PROJECTS=$(printf '%s\n' "${CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            fi
-
-            if [ ${#ZIG_PROJECTS[@]} -eq 0 ]; then
-              ZIG_PROJECTS="[]"
-            else
-              ZIG_PROJECTS=$(printf '%s\n' "${ZIG_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            fi
+            RUST_PROJECTS=$(printf '%s\n' "${RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            GO_PROJECTS=$(printf '%s\n' "${GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            CSHARP_PROJECTS=$(printf '%s\n' "${CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
+            ZIG_PROJECTS=$(printf '%s\n' "${ZIG_PROJECTS[@]}" | jq -R . | jq -s -c .)
           fi
 
           echo "rust_projects=$RUST_PROJECTS" >> $GITHUB_OUTPUT
@@ -117,16 +79,10 @@ jobs:
           echo "csharp_projects=$CSHARP_PROJECTS" >> $GITHUB_OUTPUT
           echo "zig_projects=$ZIG_PROJECTS" >> $GITHUB_OUTPUT
 
-          echo "Rust projects to test: $RUST_PROJECTS"
-          echo "Go projects to test: $GO_PROJECTS"
-          echo "C# projects to test: $CSHARP_PROJECTS"
-          echo "Zig projects to test: $ZIG_PROJECTS"
-
   rust_tests:
     needs: detect_changes
     if: needs.detect_changes.outputs.rust_projects != '[]'
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -141,27 +97,17 @@ jobs:
         if: ${{ matrix.project == '2021/_4' }}
       - name: Set up cargo-nextest
         uses: taiki-e/install-action@nextest
-      - name: Build 2015 binary
-        if: ${{ matrix.project == '2015' }}
-        run: cargo build --release
-        working-directory: ${{ matrix.project }}
       - name: Run Clippy
         run: cargo clippy --workspace -- -D warnings
         working-directory: ${{ matrix.project }}
-      - name: Run Rust tests in 2015 with cargo-nextest
-        if: ${{ matrix.project == '2015' }}
+      - name: Run Rust tests
         run: cargo nextest run
-        working-directory: ${{ matrix.project }}
-      - name: Run Rust tests in ${{ matrix.project }}
-        if: ${{ matrix.project != '2015' }}
-        run: cargo test
         working-directory: ${{ matrix.project }}
 
   go_tests:
     needs: detect_changes
     if: needs.detect_changes.outputs.go_projects != '[]'
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -172,28 +118,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '^1.18'
-      - name: Run Go tests in 2017
-        if: ${{ matrix.project == '2017' }}
+      - name: Run Go tests
         run: go test ./...
-        working-directory: 2017
-      - name: Run Go tests in 2019/go
-        if: ${{ matrix.project == '2019/go' }}
-        run: go test ./cmd/...
-        working-directory: 2019/go
-      - name: Run Go tests in 2020/02
-        if: ${{ matrix.project == '2020/02' }}
-        run: go test ./...
-        working-directory: 2020/02
-      - name: Run Go tests in 2024/golang
-        if: ${{ matrix.project == '2024/golang' }}
-        run: go test ./cmd/...
-        working-directory: 2024/golang
+        working-directory: ${{ matrix.project }}
 
   csharp_tests:
     needs: detect_changes
     if: needs.detect_changes.outputs.csharp_projects != '[]'
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -204,10 +136,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '6.0.x'
-      - name: Restore dependencies for ${{ matrix.project }}
+      - name: Restore dependencies
         run: dotnet restore
         working-directory: ${{ matrix.project }}
-      - name: Run C# tests in ${{ matrix.project }}
+      - name: Run C# tests
         run: dotnet test
         working-directory: ${{ matrix.project }}
 
@@ -215,7 +147,6 @@ jobs:
     needs: detect_changes
     if: needs.detect_changes.outputs.zig_projects != '[]'
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -226,6 +157,6 @@ jobs:
         uses: goto-bus-stop/setup-zig@v2
         with:
           version: master
-      - name: Run Zig tests in ${{ matrix.project }}
+      - name: Run Zig tests
         run: zig build test
         working-directory: ${{ matrix.project }}
