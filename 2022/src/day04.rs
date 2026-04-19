@@ -75,3 +75,5 @@ fn parse_ranges(line: &str) -> Result<(Range, Range)> {
         .parse()?;
     Ok((r1, r2))
 }
+
+aoc_rust_common::aoc_test!(Day04);

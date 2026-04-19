@@ -68,3 +68,5 @@ impl Solution for Day09 {
         Ok((simulate(input, 10)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day09);

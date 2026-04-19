@@ -109,3 +109,5 @@ impl Solution for Day04 {
         Ok((0).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day04);

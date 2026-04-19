@@ -153,3 +153,5 @@ impl Solution for Day17 {
         Ok((still_water).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day17);

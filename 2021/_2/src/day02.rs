@@ -41,3 +41,5 @@ impl Solution for Day02 {
         Ok((x * y).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day02);

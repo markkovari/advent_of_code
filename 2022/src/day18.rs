@@ -129,3 +129,5 @@ impl Solution for Day18 {
         Ok((count).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day18);

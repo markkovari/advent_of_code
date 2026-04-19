@@ -100,3 +100,5 @@ impl Solution for Day16 {
         Ok(("Not found").to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day16);

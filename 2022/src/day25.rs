@@ -51,3 +51,5 @@ impl Solution for Day25 {
         Ok(("There is no part 2 for Day 25!").to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day25);

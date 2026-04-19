@@ -200,3 +200,5 @@ impl Solution for Day22 {
         Ok((find_min_mana(start_state)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day22);

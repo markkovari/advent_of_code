@@ -55,18 +55,4 @@ impl Solution for Day08 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day08() {
-        let day = Day08;
-        let example = r#"""
-"abc"
-"aaa\"aaa"
-"\x27""#;
-        assert_eq!(day.part1(example).unwrap(), "12");
-        assert_eq!(day.part2(example).unwrap(), "19");
-    }
-}
+aoc_rust_common::aoc_test!(Day08, "12", "19");

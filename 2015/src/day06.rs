@@ -146,18 +146,4 @@ impl Solution for Day06 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day06() {
-        let day = Day06;
-        assert_eq!(day.part1("turn on 0,0 through 999,999").unwrap(), "1000000");
-        assert_eq!(day.part1("toggle 0,0 through 999,0").unwrap(), "1000");
-        assert_eq!(day.part1("turn off 499,499 through 500,500").unwrap(), "0");
-
-        assert_eq!(day.part2("turn on 0,0 through 0,0").unwrap(), "1");
-        assert_eq!(day.part2("toggle 0,0 through 999,999").unwrap(), "2000000");
-    }
-}
+aoc_rust_common::aoc_test!(Day06, "1000000", "1");

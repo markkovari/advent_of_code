@@ -103,3 +103,5 @@ impl Solution for Day18 {
         Ok((grid.values().filter(|e| **e == Cell::Alive).count() as i64).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day18);

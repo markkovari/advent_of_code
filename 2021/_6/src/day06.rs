@@ -55,3 +55,5 @@ impl Solution for Day06 {
         Ok((counts.iter().sum::<usize>()).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day06);

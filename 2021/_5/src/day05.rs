@@ -92,3 +92,5 @@ impl Solution for Day05 {
         Ok((counts.values().filter(|&&v| v >= 2).count()).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day05);

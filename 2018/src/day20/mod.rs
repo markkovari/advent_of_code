@@ -51,3 +51,5 @@ fn get_distances(input: &str) -> HashMap<(i32, i32), usize> {
     }
     distances
 }
+
+aoc_rust_common::aoc_test!(Day20);

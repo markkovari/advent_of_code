@@ -119,3 +119,5 @@ fn max(a: i32, b: i32) -> i32 {
         b
     }
 }
+
+aoc_rust_common::aoc_test!(Day14);

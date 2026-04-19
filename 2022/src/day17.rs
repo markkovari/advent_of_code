@@ -174,3 +174,5 @@ fn solve_remainder(
     }
     height
 }
+
+aoc_rust_common::aoc_test!(Day17);

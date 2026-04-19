@@ -84,3 +84,5 @@ impl Solution for Day06 {
         Ok((safe_region_size).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day06);

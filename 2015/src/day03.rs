@@ -91,23 +91,4 @@ impl Solution for Day03 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day03() {
-        let day = Day03;
-        const PROD: &str = include_str!("inputs/3_prod.txt");
-
-        assert_eq!(day.part1(">").unwrap(), "2");
-        assert_eq!(day.part1("^>v<").unwrap(), "4");
-        assert_eq!(day.part1("^v^v^v^v^v").unwrap(), "2");
-        assert_eq!(day.part1(PROD).unwrap(), "2572");
-
-        assert_eq!(day.part2("^v").unwrap(), "3");
-        assert_eq!(day.part2("^>v<").unwrap(), "3");
-        assert_eq!(day.part2("^v^v^v^v^v").unwrap(), "11");
-        assert_eq!(day.part2(PROD).unwrap(), "2631");
-    }
-}
+aoc_rust_common::aoc_test!(Day03, "2572", "2631");

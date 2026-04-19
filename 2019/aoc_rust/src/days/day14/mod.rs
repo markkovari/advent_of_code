@@ -124,3 +124,5 @@ impl Solution for Day14 {
         Ok((lower_bound).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day14);

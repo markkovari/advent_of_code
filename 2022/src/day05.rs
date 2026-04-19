@@ -128,3 +128,5 @@ fn parse(input: &str) -> Result<(Shipment, Vec<Instruction>)> {
         .collect::<Result<Vec<Instruction>>>()?;
     Ok((shipment, instructions))
 }
+
+aoc_rust_common::aoc_test!(Day05);

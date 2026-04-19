@@ -80,3 +80,5 @@ impl Solution for Day07 {
         Ok((*sizes.iter().filter(|&&s| s >= to_delete).min().unwrap()).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day07);

@@ -94,3 +94,5 @@ impl Solution for Day08 {
         Ok((max_score).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day08);

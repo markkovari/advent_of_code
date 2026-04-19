@@ -95,3 +95,5 @@ impl Solution for Day14 {
         Ok((*scores.values().max().unwrap() as i64).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day14);

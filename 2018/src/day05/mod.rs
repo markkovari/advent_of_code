@@ -44,3 +44,5 @@ impl Solution for Day05 {
         Ok((min_len).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day05);

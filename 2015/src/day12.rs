@@ -47,16 +47,4 @@ impl Solution for Day12 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day12() {
-        let day = Day12;
-        assert_eq!(day.part1("[1,2,3]").unwrap(), "6");
-        assert_eq!(day.part1(r#"{"a":2,"b":4}"#).unwrap(), "6");
-        assert_eq!(day.part2("[1,2,3]").unwrap(), "6");
-        assert_eq!(day.part2(r#"[1,{"c":"red","a":2},3]"#).unwrap(), "4");
-    }
-}
+aoc_rust_common::aoc_test!(Day12, "6", "6");

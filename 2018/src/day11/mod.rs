@@ -79,3 +79,5 @@ impl Solution for Day11 {
         ))
     }
 }
+
+aoc_rust_common::aoc_test!(Day11);

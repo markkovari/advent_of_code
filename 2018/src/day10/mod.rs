@@ -91,3 +91,5 @@ impl Solution for Day10 {
         Ok((seconds).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day10);

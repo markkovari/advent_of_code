@@ -96,3 +96,5 @@ impl Solution for Day10 {
         Ok((format!("\n{}", crt)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day10);

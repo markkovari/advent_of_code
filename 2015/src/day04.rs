@@ -41,15 +41,4 @@ impl Solution for Day04 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[ignore = "Takes too long"]
-    fn test_day04() {
-        let day = Day04;
-        assert_eq!(day.part1("abcdef").unwrap(), "609043");
-        assert_eq!(day.part1("pqrstuv").unwrap(), "1048970");
-    }
-}
+aoc_rust_common::aoc_test!(Day04);

@@ -81,3 +81,5 @@ where
     }
     i32::from_str_radix(current_lines[0], 2).unwrap()
 }
+
+aoc_rust_common::aoc_test!(Day03);

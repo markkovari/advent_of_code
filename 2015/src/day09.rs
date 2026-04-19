@@ -90,15 +90,4 @@ impl Solution for Day09 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day09() {
-        let day = Day09;
-        let example = "London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141";
-        assert_eq!(day.part1(example).unwrap(), "605");
-        assert_eq!(day.part2(example).unwrap(), "982");
-    }
-}
+aoc_rust_common::aoc_test!(Day09, "605", "982");

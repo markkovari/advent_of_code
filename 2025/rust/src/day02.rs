@@ -72,3 +72,5 @@ impl Solution for Day02 {
         Ok((sum).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day02);

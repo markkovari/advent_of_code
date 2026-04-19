@@ -93,3 +93,5 @@ fn run_simulation(initial_state: Vec<bool>, rules: [bool; 32], generations: i64)
         .map(|(i, _)| i as i64 + zero_offset)
         .sum()
 }
+
+aoc_rust_common::aoc_test!(Day12);

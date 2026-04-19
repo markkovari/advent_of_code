@@ -50,3 +50,5 @@ impl Solution for Day09 {
         Ok((play_game(players, marbles * 100)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day09);

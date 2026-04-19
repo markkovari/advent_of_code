@@ -65,3 +65,5 @@ impl Solution for Day02 {
         Ok((get_common_chars(&a, &b)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day02);

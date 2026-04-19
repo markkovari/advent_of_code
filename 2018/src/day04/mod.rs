@@ -105,3 +105,5 @@ impl Solution for Day04 {
         Ok((guard * minute).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day04);

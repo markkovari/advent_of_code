@@ -59,3 +59,5 @@ impl Solution for Day14 {
         }
     }
 }
+
+aoc_rust_common::aoc_test!(Day14);

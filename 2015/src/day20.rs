@@ -62,3 +62,5 @@ impl Solution for Day20 {
         Ok((0).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day20);

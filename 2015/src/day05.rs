@@ -47,22 +47,4 @@ impl Solution for Day05 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day05() {
-        let day = Day05;
-        assert_eq!(day.part1("ugknbfddgicrmopn").unwrap(), "1");
-        assert_eq!(day.part1("aaa").unwrap(), "1");
-        assert_eq!(day.part1("jchzalrnumimnmhp").unwrap(), "0");
-        assert_eq!(day.part1("haegwjzuvuyypxyu").unwrap(), "0");
-        assert_eq!(day.part1("dvszwmarrgswjxmb").unwrap(), "0");
-
-        assert_eq!(day.part2("qjhvhtzxzqqjkmpb").unwrap(), "1");
-        assert_eq!(day.part2("xxyxx").unwrap(), "1");
-        assert_eq!(day.part2("uurcxstgmygtbstg").unwrap(), "0");
-        assert_eq!(day.part2("ieodomkazucvgmuy").unwrap(), "0");
-    }
-}
+aoc_rust_common::aoc_test!(Day05, "1", "1");

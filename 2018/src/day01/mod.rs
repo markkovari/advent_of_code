@@ -33,3 +33,5 @@ impl Solution for Day01 {
         }
     }
 }
+
+aoc_rust_common::aoc_test!(Day01);

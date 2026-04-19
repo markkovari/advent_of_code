@@ -43,3 +43,5 @@ impl Solution for Day24 {
         Ok((find_qe(&packages, 4)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day24);

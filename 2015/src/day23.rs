@@ -126,3 +126,5 @@ impl Solution for Day23 {
         Ok((computer.get(Register::B)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day23);

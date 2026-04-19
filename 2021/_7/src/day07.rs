@@ -54,3 +54,5 @@ impl Solution for Day07 {
         Ok((min_fuel).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day07);

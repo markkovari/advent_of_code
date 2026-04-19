@@ -18,3 +18,5 @@ impl Solution for Day26 {
         Ok(("Not implemented").to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day26);

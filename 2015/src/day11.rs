@@ -96,15 +96,4 @@ impl Solution for Day11 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day11() {
-        assert!(is_valid_password("abcdffaa"));
-        assert!(!is_valid_password("hijklmmn"));
-        assert!(!is_valid_password("abbceffg"));
-        assert!(!is_valid_password("abbcegjk"));
-    }
-}
+aoc_rust_common::aoc_test!(Day11);

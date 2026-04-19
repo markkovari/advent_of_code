@@ -70,3 +70,5 @@ impl Solution for Day21 {
         }
     }
 }
+
+aoc_rust_common::aoc_test!(Day21);

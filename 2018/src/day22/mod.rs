@@ -154,3 +154,5 @@ fn is_valid_tool(tool: Tool, region: Region) -> bool {
         Region::Narrow => tool == Tool::Torch || tool == Tool::Neither,
     }
 }
+
+aoc_rust_common::aoc_test!(Day22);

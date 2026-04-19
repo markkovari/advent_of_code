@@ -110,3 +110,5 @@ impl Solution for Day11 {
         Ok((solve(input, 10000, false)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day11);

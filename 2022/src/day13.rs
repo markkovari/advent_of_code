@@ -59,3 +59,5 @@ impl Solution for Day13 {
         Ok((pos1 * pos2).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day13);

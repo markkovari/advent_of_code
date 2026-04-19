@@ -120,3 +120,5 @@ impl Solution for Day13 {
             .to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day13);

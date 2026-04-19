@@ -198,3 +198,5 @@ fn max_pressure_two<'a>(
     memo.insert(key, res);
     res
 }
+
+aoc_rust_common::aoc_test!(Day16);

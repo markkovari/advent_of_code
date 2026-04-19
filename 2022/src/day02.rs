@@ -88,3 +88,5 @@ impl Solution for Day02 {
         Ok((score).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day02);

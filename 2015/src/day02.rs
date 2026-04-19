@@ -72,17 +72,4 @@ impl Solution for Day02 {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_day02() {
-        let day = Day02;
-        assert_eq!(day.part1("2x3x4").unwrap(), "58");
-        assert_eq!(day.part1("1x1x10").unwrap(), "43");
-
-        assert_eq!(day.part2("2x3x4").unwrap(), "34");
-        assert_eq!(day.part2("1x1x10").unwrap(), "14");
-    }
-}
+aoc_rust_common::aoc_test!(Day02, "58", "34");

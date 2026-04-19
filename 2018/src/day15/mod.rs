@@ -225,3 +225,5 @@ impl Solution for Day15 {
         Ok(("No solution found").to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day15);

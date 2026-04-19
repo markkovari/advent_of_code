@@ -116,3 +116,5 @@ impl Solution for Day07 {
         Ok((final_time).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day07);

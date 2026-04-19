@@ -74,3 +74,5 @@ impl Solution for Day08 {
         Ok((node_value(&mut &numbers[..])).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day08);

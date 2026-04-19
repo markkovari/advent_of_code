@@ -166,3 +166,5 @@ impl Solution for Day07 {
         Ok((*values.get("a").unwrap_or(&0) as i64).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day07);

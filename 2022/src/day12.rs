@@ -91,3 +91,5 @@ impl Solution for Day12 {
         Ok((bfs(&grid, end, None, false)).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day12);
