@@ -14,5 +14,10 @@ members = [
     "2021/_7",
     "2022",
     "2025/rust",
-    "aoc-rust-common",
+    "aoc-rust-common", "runner",
 ]
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"

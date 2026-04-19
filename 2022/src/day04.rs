@@ -11,9 +11,18 @@ struct Range {
 }
 
 impl FromStr for Range {
-    type Err = String;
+    type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parts: Vec<i32> = s.split('-').map(|p| p.parse().unwrap()).collect();
+        let parts: Vec<i32> = s
+            .split('-')
+            .map(|p| {
+                p.parse()
+                    .map_err(|e| anyhow::anyhow!("failed to parse range part: {}", e))
+            })
+            .collect::<Result<Vec<i32>>>()?;
+        if parts.len() < 2 {
+            return Err(anyhow::anyhow!("invalid range: {}", s));
+        }
         Ok(Range {
             from: parts[0],
             until: parts[1],
@@ -30,33 +39,39 @@ impl Solution for Day04 {
     }
 
     fn part1(&self, input: &str) -> Result<String> {
-        let count = input
-            .lines()
-            .filter(|line| {
-                let (r1, r2) = parse_ranges(line);
-                (r1.from <= r2.from && r1.until >= r2.until)
-                    || (r2.from <= r1.from && r2.until >= r1.until)
-            })
-            .count();
+        let mut count = 0;
+        for line in input.lines() {
+            let (r1, r2) = parse_ranges(line)?;
+            if (r1.from <= r2.from && r1.until >= r2.until)
+                || (r2.from <= r1.from && r2.until >= r1.until)
+            {
+                count += 1;
+            }
+        }
         Ok((count).to_string())
     }
 
     fn part2(&self, input: &str) -> Result<String> {
-        let count = input
-            .lines()
-            .filter(|line| {
-                let (r1, r2) = parse_ranges(line);
-                r1.from <= r2.until && r1.until >= r2.from
-            })
-            .count();
+        let mut count = 0;
+        for line in input.lines() {
+            let (r1, r2) = parse_ranges(line)?;
+            if r1.from <= r2.until && r1.until >= r2.from {
+                count += 1;
+            }
+        }
         Ok((count).to_string())
     }
 }
 
-fn parse_ranges(line: &str) -> (Range, Range) {
+fn parse_ranges(line: &str) -> Result<(Range, Range)> {
     let mut parts = line.split(',');
-    (
-        parts.next().unwrap().parse().unwrap(),
-        parts.next().unwrap().parse().unwrap(),
-    )
+    let r1 = parts
+        .next()
+        .ok_or_else(|| anyhow::anyhow!("missing first range"))?
+        .parse()?;
+    let r2 = parts
+        .next()
+        .ok_or_else(|| anyhow::anyhow!("missing second range"))?
+        .parse()?;
+    Ok((r1, r2))
 }

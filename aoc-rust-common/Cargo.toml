@@ -6,3 +6,10 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0"
 chrono = "0.4"
+
+[dev-dependencies]
+divan = "0.1.21"
+
+[[bench]]
+name = "main"
+harness = false

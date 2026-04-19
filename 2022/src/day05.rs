@@ -22,10 +22,13 @@ struct Instruction {
 }
 
 impl FromStr for Shipment {
-    type Err = String;
+    type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let lines: Vec<&str> = s.lines().collect();
-        let num_stacks = (lines.last().unwrap().len() + 2) / 4;
+        let last_line = lines
+            .last()
+            .ok_or_else(|| anyhow::anyhow!("empty shipment input"))?;
+        let num_stacks = (last_line.len() + 2) / 4;
         let mut stacks = vec![
             CargoStack {
                 elements: Vec::new()
@@ -47,13 +50,16 @@ impl FromStr for Shipment {
 }
 
 impl FromStr for Instruction {
-    type Err = String;
+    type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let parts: Vec<&str> = s.split_whitespace().collect();
+        if parts.len() < 6 {
+            return Err(anyhow::anyhow!("invalid instruction: {}", s));
+        }
         Ok(Instruction {
-            amount: parts[1].parse().unwrap(),
-            from: parts[3].parse::<usize>().unwrap() - 1,
-            to: parts[5].parse::<usize>().unwrap() - 1,
+            amount: parts[1].parse()?,
+            from: parts[3].parse::<usize>()? - 1,
+            to: parts[5].parse::<usize>()? - 1,
         })
     }
 }
@@ -67,26 +73,34 @@ impl Solution for Day05 {
     }
 
     fn part1(&self, input: &str) -> Result<String> {
-        let (mut shipment, instructions) = parse(input);
+        let (mut shipment, instructions) = parse(input)?;
         for inst in instructions {
             for _ in 0..inst.amount {
-                let item = shipment.stacks[inst.from].elements.pop().unwrap();
+                let item = shipment.stacks[inst.from]
+                    .elements
+                    .pop()
+                    .ok_or_else(|| anyhow::anyhow!("popping from empty stack"))?;
                 shipment.stacks[inst.to].elements.push(item);
             }
         }
         Ok(shipment
             .stacks
             .iter()
-            .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
+            .map(|s| s.elements.last().cloned().unwrap_or_default())
             .collect::<String>())
     }
 
     fn part2(&self, input: &str) -> Result<String> {
-        let (mut shipment, instructions) = parse(input);
+        let (mut shipment, instructions) = parse(input)?;
         for inst in instructions {
             let mut moved = Vec::new();
             for _ in 0..inst.amount {
-                moved.push(shipment.stacks[inst.from].elements.pop().unwrap());
+                moved.push(
+                    shipment.stacks[inst.from]
+                        .elements
+                        .pop()
+                        .ok_or_else(|| anyhow::anyhow!("popping from empty stack"))?,
+                );
             }
             while let Some(item) = moved.pop() {
                 shipment.stacks[inst.to].elements.push(item);
@@ -95,14 +109,22 @@ impl Solution for Day05 {
         Ok(shipment
             .stacks
             .iter()
-            .map(|s| s.elements.last().unwrap_or(&"".to_string()).clone())
+            .map(|s| s.elements.last().cloned().unwrap_or_default())
             .collect::<String>())
     }
 }
 
-fn parse(input: &str) -> (Shipment, Vec<Instruction>) {
+fn parse(input: &str) -> Result<(Shipment, Vec<Instruction>)> {
     let parts: Vec<&str> = input.split("\n\n").collect();
-    let shipment = parts[0].parse().unwrap();
-    let instructions = parts[1].lines().map(|l| l.parse().unwrap()).collect();
-    (shipment, instructions)
+    if parts.len() < 2 {
+        return Err(anyhow::anyhow!(
+            "invalid input: missing shipment or instructions"
+        ));
+    }
+    let shipment = parts[0].parse()?;
+    let instructions = parts[1]
+        .lines()
+        .map(|l| l.parse())
+        .collect::<Result<Vec<Instruction>>>()?;
+    Ok((shipment, instructions))
 }

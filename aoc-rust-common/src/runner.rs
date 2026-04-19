@@ -2,6 +2,10 @@ use crate::input::get_input;
 use crate::solution::Solution;
 use std::time::Instant;
 
+/// Executes a solution and prints the results and execution time for both parts.
+///
+/// This is the primary entry point for running a specific day's puzzle. It handles
+/// input fetching, timing the execution, and reporting errors.
 pub fn run_solution<S: Solution>(solution: S) {
     println!("--- Year {} Day {} ---", solution.year(), solution.day());
 

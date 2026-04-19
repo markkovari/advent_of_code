@@ -114,8 +114,8 @@ impl Solution for Day06 {
     fn part1(&self, input: &str) -> Result<String> {
         let instructions = input
             .lines()
-            .map(|line| Instruction::try_from(line).unwrap())
-            .collect::<Vec<Instruction>>();
+            .map(|line| Instruction::try_from(line).map_err(|e| anyhow::anyhow!(e)))
+            .collect::<Result<Vec<Instruction>>>()?;
         let mut grid: Grid = [[false; 1000]; 1000];
         for instruction in instructions {
             apply_on_grid(instruction, &mut grid);
@@ -131,8 +131,8 @@ impl Solution for Day06 {
     fn part2(&self, input: &str) -> Result<String> {
         let instructions = input
             .lines()
-            .map(|line| Instruction::try_from(line).unwrap())
-            .collect::<Vec<Instruction>>();
+            .map(|line| Instruction::try_from(line).map_err(|e| anyhow::anyhow!(e)))
+            .collect::<Result<Vec<Instruction>>>()?;
         let mut grid: GridAmbient = [[0; 1000]; 1000];
         for instruction in instructions {
             apply_on_ambient_grid(instruction, &mut grid);

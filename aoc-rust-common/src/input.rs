@@ -1,6 +1,14 @@
 use std::env;
 use std::fs;
 
+/// Retrieves the input for a given puzzle.
+///
+/// This function attempts to find the puzzle input by checking several common locations
+/// relative to both the crate's manifest directory and the current working directory.
+/// It supports various naming conventions used throughout the repository (e.g., `prod.txt`, `day01.txt`).
+///
+/// # Panics
+/// Panics if the input file cannot be found in any of the predefined paths.
 pub fn get_input(year: u32, day: u32) -> String {
     let day_padded = format!("{:02}", day);
     let day_unpadded = format!("{}", day);

@@ -1,6 +1,5 @@
 use anyhow::Result;
 use aoc_rust_common::Solution;
-use std::fmt::Display;
 use std::collections::HashSet;
 
 pub struct Day03;
@@ -14,31 +13,54 @@ fn priority(c: char) -> u32 {
 }
 
 impl Solution for Day03 {
-    fn year(&self) -> u32 { 2022 }
-    fn day(&self) -> u32 { 3 }
+    fn year(&self) -> u32 {
+        2022
+    }
+    fn day(&self) -> u32 {
+        3
+    }
 
     fn part1(&self, input: &str) -> Result<String> {
-        let sum: u32 = input.lines().map(|line| {
-            let (first, second) = line.split_at(line.len() / 2);
-            let set1: HashSet<char> = first.chars().collect();
-            let set2: HashSet<char> = second.chars().collect();
-            let common = set1.intersection(&set2).next().unwrap();
-            priority(*common)
-        }).sum();
+        let sum: u32 = input
+            .lines()
+            .map(|line| {
+                let (first, second) = line.split_at(line.len() / 2);
+                let set1: HashSet<char> = first.chars().collect();
+                let set2: HashSet<char> = second.chars().collect();
+                let common = set1
+                    .intersection(&set2)
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("no common item found"))?;
+                Ok(priority(*common))
+            })
+            .collect::<Result<Vec<u32>>>()?
+            .into_iter()
+            .sum();
         Ok((sum).to_string())
     }
 
     fn part2(&self, input: &str) -> Result<String> {
         let lines: Vec<&str> = input.lines().collect();
-        let sum: u32 = lines.chunks(3).map(|chunk| {
-            let set1: HashSet<char> = chunk[0].chars().collect();
-            let set2: HashSet<char> = chunk[1].chars().collect();
-            let set3: HashSet<char> = chunk[2].chars().collect();
-            
-            let common: HashSet<char> = set1.intersection(&set2).cloned().collect();
-            let badge = *common.intersection(&set3).next().unwrap();
-            priority(badge)
-        }).sum();
+        let sum: u32 = lines
+            .chunks(3)
+            .map(|chunk| {
+                if chunk.len() < 3 {
+                    return Err(anyhow::anyhow!("invalid chunk size"));
+                }
+                let set1: HashSet<char> = chunk[0].chars().collect();
+                let set2: HashSet<char> = chunk[1].chars().collect();
+                let set3: HashSet<char> = chunk[2].chars().collect();
+
+                let common: HashSet<char> = set1.intersection(&set2).cloned().collect();
+                let badge = *common
+                    .intersection(&set3)
+                    .next()
+                    .ok_or_else(|| anyhow::anyhow!("no badge found"))?;
+                Ok(priority(badge))
+            })
+            .collect::<Result<Vec<u32>>>()?
+            .into_iter()
+            .sum();
         Ok((sum).to_string())
     }
 }
