@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-
-	"github.com/markkovari/advent_of_code/aoc-go-common"
 )
 
 type Day03 struct{}
@@ -15,7 +13,7 @@ func (d Day03) Part1(input string) string {
 	matches := pattern.FindAllStringSubmatch(input, -1)
 	var sum int64
 	for _, m := range matches {
-		sum += toInt(m[1]) * toInt(m[2])
+		sum += d.toInt(m[1]) * d.toInt(m[2])
 	}
 	return fmt.Sprintf("%d", sum)
 }
@@ -33,18 +31,14 @@ func (d Day03) Part2(input string) string {
 			enabled = false
 		default:
 			if enabled {
-				sum += toInt(m[1]) * toInt(m[2])
+				sum += d.toInt(m[1]) * d.toInt(m[2])
 			}
 		}
 	}
 	return fmt.Sprintf("%d", sum)
 }
 
-func toInt(s string) int64 {
+func (d Day03) toInt(s string) int64 {
 	val, _ := strconv.ParseInt(s, 10, 64)
 	return val
-}
-
-func main() {
-	common.Run(2024, 3, Day03{})
 }

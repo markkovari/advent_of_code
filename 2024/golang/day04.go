@@ -3,14 +3,12 @@ package main
 import (
 	"fmt"
 	"strings"
-
-	"github.com/markkovari/advent_of_code/aoc-go-common"
 )
 
 type Day04 struct{}
 
 func (d Day04) Part1(input string) string {
-	grid := parse(input)
+	grid := d.parse(input)
 	count := 0
 	word := "XMAS"
 	rows := len(grid)
@@ -24,7 +22,7 @@ func (d Day04) Part1(input string) string {
 	for r := 0; r < rows; r++ {
 		for c := 0; c < cols; c++ {
 			for _, dir := range dirs {
-				if check(grid, r, c, dir, word) {
+				if d.check(grid, r, c, dir, word) {
 					count++
 				}
 			}
@@ -34,7 +32,7 @@ func (d Day04) Part1(input string) string {
 }
 
 func (d Day04) Part2(input string) string {
-	grid := parse(input)
+	grid := d.parse(input)
 	count := 0
 	rows := len(grid)
 	cols := len(grid[0])
@@ -51,7 +49,7 @@ func (d Day04) Part2(input string) string {
 				br := grid[r+1][c+1]
 
 				if ((tl == 'M' && br == 'S') || (tl == 'S' && br == 'M')) &&
-				   ((tr == 'M' && bl == 'S') || (tr == 'S' && bl == 'M')) {
+					((tr == 'M' && bl == 'S') || (tr == 'S' && bl == 'M')) {
 					count++
 				}
 			}
@@ -60,16 +58,18 @@ func (d Day04) Part2(input string) string {
 	return fmt.Sprintf("%d", count)
 }
 
-func parse(input string) [][]rune {
+func (d Day04) parse(input string) [][]rune {
 	var grid [][]rune
 	for _, line := range strings.Split(input, "\n") {
-		if line == "" { continue }
+		if line == "" {
+			continue
+		}
 		grid = append(grid, []rune(line))
 	}
 	return grid
 }
 
-func check(grid [][]rune, r, c int, dir [2]int, word string) bool {
+func (d Day04) check(grid [][]rune, r, c int, dir [2]int, word string) bool {
 	for i := 0; i < len(word); i++ {
 		nr, nc := r+dir[0]*i, c+dir[1]*i
 		if nr < 0 || nr >= len(grid) || nc < 0 || nc >= len(grid[0]) || grid[nr][nc] != rune(word[i]) {
@@ -77,8 +77,4 @@ func check(grid [][]rune, r, c int, dir [2]int, word string) bool {
 		}
 	}
 	return true
-}
-
-func main() {
-	common.Run(2024, 4, Day04{})
 }

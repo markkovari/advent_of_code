@@ -5,17 +5,15 @@ import (
 	"math"
 	"strconv"
 	"strings"
-
-	"github.com/markkovari/advent_of_code/aoc-go-common"
 )
 
 type Day02 struct{}
 
 func (d Day02) Part1(input string) string {
-	levels := parse(input)
+	levels := d.parse(input)
 	count := 0
 	for _, row := range levels {
-		if isLevelSafe(row) {
+		if d.isLevelSafe(row) {
 			count++
 		}
 	}
@@ -23,17 +21,17 @@ func (d Day02) Part1(input string) string {
 }
 
 func (d Day02) Part2(input string) string {
-	levels := parse(input)
+	levels := d.parse(input)
 	count := 0
 	for _, row := range levels {
-		if isLevelSafeTolerate(row) {
+		if d.isLevelSafeTolerate(row) {
 			count++
 		}
 	}
 	return fmt.Sprintf("%d", count)
 }
 
-func isLevelSafe(row []int) bool {
+func (d Day02) isLevelSafe(row []int) bool {
 	if len(row) < 2 {
 		return false
 	}
@@ -53,28 +51,32 @@ func isLevelSafe(row []int) bool {
 	return true
 }
 
-func isLevelSafeTolerate(row []int) bool {
+func (d Day02) isLevelSafeTolerate(row []int) bool {
 	for i := 0; i < len(row); i++ {
-		if isLevelSafe(skipAtFrom(i, row)) {
+		if d.isLevelSafe(d.skipAtFrom(i, row)) {
 			return true
 		}
 	}
 	return false
 }
 
-func skipAtFrom(index int, elements []int) []int {
+func (d Day02) skipAtFrom(index int, elements []int) []int {
 	newElements := make([]int, 0)
 	for i := range elements {
-		if i == index { continue }
+		if i == index {
+			continue
+		}
 		newElements = append(newElements, elements[i])
 	}
 	return newElements
 }
 
-func parse(input string) [][]int {
+func (d Day02) parse(input string) [][]int {
 	matrix := make([][]int, 0)
 	for _, line := range strings.Split(input, "\n") {
-		if line == "" { continue }
+		if line == "" {
+			continue
+		}
 		parts := strings.Fields(line)
 		row := make([]int, 0)
 		for _, part := range parts {
@@ -84,8 +86,4 @@ func parse(input string) [][]int {
 		matrix = append(matrix, row)
 	}
 	return matrix
-}
-
-func main() {
-	common.Run(2024, 2, Day02{})
 }
