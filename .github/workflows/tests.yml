@@ -92,7 +92,7 @@ jobs:
         working-directory: ${{ matrix.project }}
         continue-on-error: true
       - name: Run Rust tests
-        run: cargo nextest run
+        run: cargo nextest run --no-tests=pass
         working-directory: ${{ matrix.project }}
         env:
           RUSTFLAGS: --cfg advent_of_code_ci

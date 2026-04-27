@@ -15,3 +15,6 @@ insta = { version = "1.47.2", features = ["yaml"] }
 [[bench]]
 name = "main"
 harness = false
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }
