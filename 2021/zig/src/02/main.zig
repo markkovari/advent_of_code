@@ -53,7 +53,7 @@ fn part2(input: []const u8) !u32 {
 }
 
 test "day 2 prod" {
-    const input = @embedFile("../../inputs/2/prod.txt");
+    const input = @embedFile("../../../inputs/2/prod.txt");
     try std.testing.expectEqual(@as(u32, 150), try part1(input));
     try std.testing.expectEqual(@as(u32, 900), try part2(input));
 }
