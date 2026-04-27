@@ -39,9 +39,9 @@ jobs:
           # Shared files that trigger all tests
           TRIGGER_ALL="^.github/workflows/|^rust/common/|^rust/Cargo.toml|^rust/Cargo.lock|^golang/common/|^justfile"
 
-          ALL_RUST_PROJECTS=("rust/2015" "rust/2018" "rust/2019" "rust/2020" "rust/2021" "rust/2022" "rust/2023" "rust/2025" "rust/runner")
-          ALL_GO_PROJECTS=("golang/2017" "golang/2019" "golang/2020" "golang/2024")
-          ALL_ZIG_PROJECTS=("zig/2021" "zig/2024")
+          ALL_RUST_PROJECTS=("2015" "2018" "2019" "2020" "2021" "2022" "2023" "2025" "runner")
+          ALL_GO_PROJECTS=("2017" "2019" "2020" "2024")
+          ALL_ZIG_PROJECTS=("2021" "2024")
 
           if echo "$CHANGED_FILES" | grep -qE "$TRIGGER_ALL"; then
             RUST_PROJECTS=$(printf '%s\n' "${ALL_RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
@@ -50,15 +50,15 @@ jobs:
           else
             RUST_PROJECTS=()
             for project in "${ALL_RUST_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then RUST_PROJECTS+=("$project"); fi
+              if echo "$CHANGED_FILES" | grep -q "^rust/${project}/"; then RUST_PROJECTS+=("$project"); fi
             done
             GO_PROJECTS=()
             for project in "${ALL_GO_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then GO_PROJECTS+=("$project"); fi
+              if echo "$CHANGED_FILES" | grep -q "^golang/${project}/"; then GO_PROJECTS+=("$project"); fi
             done
             ZIG_PROJECTS=()
             for project in "${ALL_ZIG_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then ZIG_PROJECTS+=("$project"); fi
+              if echo "$CHANGED_FILES" | grep -q "^zig/${project}/"; then ZIG_PROJECTS+=("$project"); fi
             done
 
             RUST_PROJECTS=$(printf '%s\n' "${RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
@@ -84,7 +84,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: Install Rust Nightly for 2021/_4
         uses: dtolnay/rust-toolchain@nightly
-        if: ${{ matrix.project == '2021/_4' }}
+        if: ${{ matrix.project == '2021' }}
       - name: Set up cargo-nextest
         uses: taiki-e/install-action@nextest
       - name: Install just
@@ -93,12 +93,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .cache
-          key: ${{ runner.os }}-rust-cache-${{ hashFiles('**/Cargo.lock', 'aoc-rust-common/src/**') }}-${{ matrix.project }}
+          key: ${{ runner.os }}-rust-cache-${{ hashFiles('rust/Cargo.lock', 'rust/common/src/**') }}-${{ matrix.project }}
           restore-keys: |
             ${{ runner.os }}-rust-cache-
       - name: Run Clippy
         run: cargo clippy --workspace -- -A warnings
-        working-directory: ${{ matrix.project }}
+        working-directory: rust/
         continue-on-error: true
       - name: Run Rust tests
         run: just test-project-rust ${{ matrix.project }}
@@ -126,7 +126,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .cache
-          key: ${{ runner.os }}-go-cache-${{ hashFiles('**/go.mod', 'aoc-go-common/**') }}-${{ matrix.project }}
+          key: ${{ runner.os }}-go-cache-${{ hashFiles('golang/**/go.mod', 'golang/common/**') }}-${{ matrix.project }}
           restore-keys: |
             ${{ runner.os }}-go-cache-
       - name: Run Go tests
