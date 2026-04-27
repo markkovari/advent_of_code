@@ -1,4 +1,4 @@
-module markkovari/advent-of-code/2019
+module github.com/markkovari/advent_of_code/2019
 
 go 1.22
 

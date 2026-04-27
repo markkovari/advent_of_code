@@ -1,4 +1,4 @@
-module markkovari/advent-of-code-2024
+module github.com/markkovari/advent_of_code/2024
 
 go 1.22
 
