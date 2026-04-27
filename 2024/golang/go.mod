@@ -1,6 +1,6 @@
 module markkovari/advent-of-code-2024
 
-go 1.26.2
+go 1.22
 
 replace github.com/markkovari/advent_of_code/aoc-go-common => ../../aoc-go-common
 
