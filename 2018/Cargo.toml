@@ -19,3 +19,6 @@ regex = "1.9.1"
 regex-syntax = { version = "0.7.5", features = ["arbitrary"] }
 serde_scan = "0.4.1"
 text_io = "0.1.12"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }

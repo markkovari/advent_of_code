@@ -20,3 +20,6 @@ aoc_2022 = { path = "../2022" }
 aoc_2025 = { path = "../2025/rust" }
 clap = { version = "4.0", features = ["derive"] }
 anyhow = "1.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }
