@@ -13,6 +13,7 @@ members = [
     "2021/_6",
     "2021/_7",
     "2022",
+    "2023/rust",
     "2025/rust",
     "aoc-rust-common", "runner",
 ]

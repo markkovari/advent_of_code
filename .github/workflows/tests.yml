@@ -39,7 +39,7 @@ jobs:
           # Shared files that trigger all tests
           TRIGGER_ALL="^.github/workflows/|^aoc-rust-common/|^Cargo.toml|^Cargo.lock"
 
-          ALL_RUST_PROJECTS=("2015" "2018" "2019/aoc_rust" "2020/01" "2021/_1" "2021/_2" "2021/_3" "2021/_4" "2021/_5" "2021/_6" "2021/_7" "2022" "2025/rust" "runner")
+          ALL_RUST_PROJECTS=("2015" "2018" "2019/aoc_rust" "2020/01" "2021/_1" "2021/_2" "2021/_3" "2021/_4" "2021/_5" "2021/_6" "2021/_7" "2022" "2023/rust" "2025/rust" "runner")
           ALL_GO_PROJECTS=("2017" "2019/go" "2020/02" "2024/golang")
           ALL_ZIG_PROJECTS=("2021/zig" "2024/zig")
 
