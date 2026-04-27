@@ -17,7 +17,10 @@ macro_rules! aoc_test {
                 let day = $day_struct;
                 let input = $crate::input::get_input(day.year(), day.day());
                 let result = day.part1(&input).unwrap();
-                $crate::insta::assert_snapshot!(format!("{}_part1", stringify!($day_struct).to_lowercase()), result);
+                $crate::insta::assert_snapshot!(
+                    format!("{}_part1", stringify!($day_struct).to_lowercase()),
+                    result
+                );
             }
 
             #[test]
@@ -25,7 +28,10 @@ macro_rules! aoc_test {
                 let day = $day_struct;
                 let input = $crate::input::get_input(day.year(), day.day());
                 let result = day.part2(&input).unwrap();
-                $crate::insta::assert_snapshot!(format!("{}_part2", stringify!($day_struct).to_lowercase()), result);
+                $crate::insta::assert_snapshot!(
+                    format!("{}_part2", stringify!($day_struct).to_lowercase()),
+                    result
+                );
             }
         }
     };
@@ -39,14 +45,14 @@ macro_rules! aoc_test {
             fn test_part1_regression() {
                 let day = $day_struct;
                 let input = $crate::input::get_input(day.year(), day.day());
-                assert_eq!(day.part1(&input).unwrap(), $part1_want);
+                assert_eq!(day.part1(&input).unwrap(), $part1_want.to_string());
             }
 
             #[test]
             fn test_part2_regression() {
                 let day = $day_struct;
                 let input = $crate::input::get_input(day.year(), day.day());
-                assert_eq!(day.part2(&input).unwrap(), $part2_want);
+                assert_eq!(day.part2(&input).unwrap(), $part2_want.to_string());
             }
 
             #[test]
@@ -54,7 +60,10 @@ macro_rules! aoc_test {
                 let day = $day_struct;
                 let input = $crate::input::get_input(day.year(), day.day());
                 let result = day.part1(&input).unwrap();
-                $crate::insta::assert_snapshot!(format!("{}_part1", stringify!($day_struct).to_lowercase()), result);
+                $crate::insta::assert_snapshot!(
+                    format!("{}_part1", stringify!($day_struct).to_lowercase()),
+                    result
+                );
             }
 
             #[test]
@@ -62,7 +71,57 @@ macro_rules! aoc_test {
                 let day = $day_struct;
                 let input = $crate::input::get_input(day.year(), day.day());
                 let result = day.part2(&input).unwrap();
-                $crate::insta::assert_snapshot!(format!("{}_part2", stringify!($day_struct).to_lowercase()), result);
+                $crate::insta::assert_snapshot!(
+                    format!("{}_part2", stringify!($day_struct).to_lowercase()),
+                    result
+                );
+            }
+        }
+    };
+    ($day_struct:ident, $part1_want:expr, $part2_want:expr, slow) => {
+        #[cfg(test)]
+        mod tests {
+            use super::*;
+            use $crate::Solution;
+
+            #[test]
+            #[ignore]
+            fn test_part1_regression() {
+                let day = $day_struct;
+                let input = $crate::input::get_input(day.year(), day.day());
+                assert_eq!(day.part1(&input).unwrap(), $part1_want.to_string());
+            }
+
+            #[test]
+            #[ignore]
+            fn test_part2_regression() {
+                let day = $day_struct;
+                let input = $crate::input::get_input(day.year(), day.day());
+                assert_eq!(day.part2(&input).unwrap(), $part2_want.to_string());
+            }
+
+            #[test]
+            #[ignore]
+            fn test_part1_snapshot() {
+                let day = $day_struct;
+                let input = $crate::input::get_input(day.year(), day.day());
+                let result = day.part1(&input).unwrap();
+                $crate::insta::assert_snapshot!(
+                    format!("{}_part1", stringify!($day_struct).to_lowercase()),
+                    result
+                );
+            }
+
+            #[test]
+            #[ignore]
+            fn test_part2_snapshot() {
+                let day = $day_struct;
+                let input = $crate::input::get_input(day.year(), day.day());
+                let result = day.part2(&input).unwrap();
+                $crate::insta::assert_snapshot!(
+                    format!("{}_part2", stringify!($day_struct).to_lowercase()),
+                    result
+                );
             }
         }
     };

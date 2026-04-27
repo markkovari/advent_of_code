@@ -226,4 +226,4 @@ impl Solution for Day15 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day15);
+aoc_rust_common::aoc_test!(Day15, 239010, 62468);
