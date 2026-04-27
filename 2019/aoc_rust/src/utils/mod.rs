@@ -1,5 +1,7 @@
 use std::sync::mpsc::{channel, Receiver, Sender};
 
+pub mod intcode;
+
 pub struct Computer {
     pub p: Vec<isize>,
     pub n: isize,

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::HashMap;
+use std::collections::HashMap;
 use num::ToPrimitive;
 use std::collections::VecDeque;
 use std::convert::TryFrom;
@@ -289,6 +289,7 @@ impl<M: Memory> VM<M> {
                     io(IoOperation::Write(self.registers.pending_out.unwrap()))?;
                     self.registers.pending_out = None;
                     self.state = State::Idle;
+                    break Ok(false);
                 }
             }
         }
@@ -482,12 +483,8 @@ pub mod util {
         let mut iter = iter.into_iter();
         move || iter.next().ok_or(Error::ReadingNotSupported)
     }
-
-    pub fn parse_intcode(s: &str) -> nom::IResult<&str, Vec<Value>> {
-        use crate::utils::parsers::*;
-        separated_list1(char(','), i64_str)(s)
     }
-}
+
 
 pub mod ascii {
     use super::*;

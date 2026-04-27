@@ -1,3 +1,0 @@
-(library
- (name intcode)
- (libraries oseq containers))

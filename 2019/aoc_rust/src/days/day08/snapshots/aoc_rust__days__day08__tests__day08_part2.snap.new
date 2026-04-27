@@ -1,0 +1,11 @@
+---
+source: 2019/aoc_rust/src/days/day08/mod.rs
+assertion_line: 70
+expression: result
+---
+###   ##  #   ##  # ###  
+#  # #  # #   ## #  #  # 
+#  # #     # # ##   #  # 
+###  #      #  # #  ###  
+# #  #  #   #  # #  # #  
+#  #  ##    #  #  # #  #

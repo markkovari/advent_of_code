@@ -1,0 +1,6 @@
+---
+source: 2019/aoc_rust/src/days/day06/mod.rs
+assertion_line: 70
+expression: result
+---
+294191

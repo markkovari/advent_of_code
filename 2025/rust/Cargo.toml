@@ -7,3 +7,6 @@ edition = "2024"
 anyhow = "1.0"
 
 aoc-rust-common = { path = "../../aoc-rust-common" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }

@@ -9,3 +9,6 @@ aoc-rust-common = { path = "../../aoc-rust-common" }
 itertools = "0.12"
 regex = "1.10"
 lazy_static = "1.4.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }

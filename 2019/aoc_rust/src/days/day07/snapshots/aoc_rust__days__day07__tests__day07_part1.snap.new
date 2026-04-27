@@ -1,0 +1,6 @@
+---
+source: 2019/aoc_rust/src/days/day07/mod.rs
+assertion_line: 76
+expression: result
+---
+398674

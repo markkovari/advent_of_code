@@ -42,7 +42,7 @@ impl Solution for Day13 {
                     _ => {}
                 }
             }
-            computer.i.send((ball - pad).signum()).unwrap_or_default();
+            computer.i.send((ball - pad).signum() as isize).unwrap_or_default();
             done
         } {}
         Ok((score).to_string())
