@@ -42,13 +42,11 @@ jobs:
 
           ALL_RUST_PROJECTS=("2015" "2018" "2019/aoc_rust" "2020/01" "2021/_1" "2021/_2" "2021/_3" "2021/_4" "2021/_5" "2021/_6" "2021/_7" "2022" "2025/rust" "runner")
           ALL_GO_PROJECTS=("2017" "2019/go" "2020/02" "2024/golang")
-          ALL_CSHARP_PROJECTS=("2021/cs/1" "2021/cs/2")
-          ALL_ZIG_PROJECTS=("2024/zig")
+          ALL_ZIG_PROJECTS=("2021/zig" "2024/zig")
 
           if echo "$CHANGED_FILES" | grep -qE "$TRIGGER_ALL"; then
             RUST_PROJECTS=$(printf '%s\n' "${ALL_RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
             GO_PROJECTS=$(printf '%s\n' "${ALL_GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            CSHARP_PROJECTS=$(printf '%s\n' "${ALL_CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
             ZIG_PROJECTS=$(printf '%s\n' "${ALL_ZIG_PROJECTS[@]}" | jq -R . | jq -s -c .)
           else
             RUST_PROJECTS=()
@@ -59,10 +57,6 @@ jobs:
             for project in "${ALL_GO_PROJECTS[@]}"; do
               if echo "$CHANGED_FILES" | grep -q "^${project}/"; then GO_PROJECTS+=("$project"); fi
             done
-            CSHARP_PROJECTS=()
-            for project in "${ALL_CSHARP_PROJECTS[@]}"; do
-              if echo "$CHANGED_FILES" | grep -q "^${project}/"; then CSHARP_PROJECTS+=("$project"); fi
-            done
             ZIG_PROJECTS=()
             for project in "${ALL_ZIG_PROJECTS[@]}"; do
               if echo "$CHANGED_FILES" | grep -q "^${project}/"; then ZIG_PROJECTS+=("$project"); fi
@@ -70,13 +64,11 @@ jobs:
 
             RUST_PROJECTS=$(printf '%s\n' "${RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)
             GO_PROJECTS=$(printf '%s\n' "${GO_PROJECTS[@]}" | jq -R . | jq -s -c .)
-            CSHARP_PROJECTS=$(printf '%s\n' "${CSHARP_PROJECTS[@]}" | jq -R . | jq -s -c .)
             ZIG_PROJECTS=$(printf '%s\n' "${ZIG_PROJECTS[@]}" | jq -R . | jq -s -c .)
           fi
 
           echo "rust_projects=$RUST_PROJECTS" >> $GITHUB_OUTPUT
           echo "go_projects=$GO_PROJECTS" >> $GITHUB_OUTPUT
-          echo "csharp_projects=$CSHARP_PROJECTS" >> $GITHUB_OUTPUT
           echo "zig_projects=$ZIG_PROJECTS" >> $GITHUB_OUTPUT
 
   rust_tests:
@@ -122,27 +114,6 @@ jobs:
           cache: false
       - name: Run Go tests
         run: go test ./...
-        working-directory: ${{ matrix.project }}
-
-  csharp_tests:
-    needs: detect_changes
-    if: needs.detect_changes.outputs.csharp_projects != '[]'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        project: ${{ fromJson(needs.detect_changes.outputs.csharp_projects) }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '6.0.x'
-      - name: Restore dependencies
-        run: dotnet restore
-        working-directory: ${{ matrix.project }}
-      - name: Run C# tests
-        run: dotnet test || true
         working-directory: ${{ matrix.project }}
 
   zig_tests:
