@@ -87,13 +87,21 @@ jobs:
         if: ${{ matrix.project == '2021/_4' }}
       - name: Set up cargo-nextest
         uses: taiki-e/install-action@nextest
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: ${{ runner.os }}-rust-cache-${{ hashFiles('**/Cargo.lock', 'aoc-rust-common/src/**') }}-${{ matrix.project }}
+          restore-keys: |
+            ${{ runner.os }}-rust-cache-
       - name: Run Clippy
         run: cargo clippy --workspace -- -A warnings
         working-directory: ${{ matrix.project }}
         continue-on-error: true
       - name: Run Rust tests
-        run: cargo test
-        working-directory: ${{ matrix.project }}
+        run: just test-project-rust ${{ matrix.project }}
         env:
           RUSTFLAGS: --cfg advent_of_code_ci
 
@@ -112,9 +120,17 @@ jobs:
         with:
           go-version: '1.22.x'
           cache: false
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: ${{ runner.os }}-go-cache-${{ hashFiles('**/go.mod', 'aoc-go-common/**') }}-${{ matrix.project }}
+          restore-keys: |
+            ${{ runner.os }}-go-cache-
       - name: Run Go tests
-        run: go test ./...
-        working-directory: ${{ matrix.project }}
+        run: just test-project-go ${{ matrix.project }}
 
   zig_tests:
     needs: detect_changes
@@ -130,7 +146,15 @@ jobs:
         uses: goto-bus-stop/setup-zig@v2
         with:
           version: 0.14.0
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: ${{ runner.os }}-zig-cache-${{ matrix.project }}
+          restore-keys: |
+            ${{ runner.os }}-zig-cache-
       - name: Run Zig tests
-        run: zig build test
-        working-directory: ${{ matrix.project }}
+        run: just test-project-zig ${{ matrix.project }}
         continue-on-error: true
