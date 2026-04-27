@@ -39,3 +39,5 @@ impl Solution for Day01 {
         Ok((sums.iter().take(3).sum::<i32>()).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day01);

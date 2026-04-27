@@ -24,3 +24,5 @@ impl Solution for Day01 {
         Ok((increments).to_string())
     }
 }
+
+aoc_rust_common::aoc_test!(Day01);
