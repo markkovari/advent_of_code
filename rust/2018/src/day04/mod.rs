@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use chrono::{DateTime, NaiveDateTime, Timelike, Utc};
 use regex::Regex;
 use std::collections::HashMap;
@@ -106,4 +106,4 @@ impl Solution for Day04 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day04);
+aoc_common::aoc_test!(Day04);

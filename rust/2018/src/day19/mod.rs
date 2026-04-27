@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use std::str::FromStr;
 
 pub struct Day19;
@@ -127,4 +127,4 @@ impl Solution for Day19 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day19);
+aoc_common::aoc_test!(Day19);

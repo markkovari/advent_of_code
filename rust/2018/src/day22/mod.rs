@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
 
@@ -155,4 +155,4 @@ fn is_valid_tool(tool: Tool, region: Region) -> bool {
     }
 }
 
-aoc_rust_common::aoc_test!(Day22);
+aoc_common::aoc_test!(Day22);

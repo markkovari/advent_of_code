@@ -1,5 +1,5 @@
 [package]
-name = "aoc_2021"
+name = "aoc-rust-2021"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0"
 
-aoc-rust-common = { path = "../common" }
+aoc-common = { path = "../common" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }

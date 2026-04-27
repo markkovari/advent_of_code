@@ -20,7 +20,7 @@ impl Point {
     ///
     /// # Example
     /// ```
-    /// use aoc_rust_common::Point;
+    /// use aoc_common::Point;
     /// let p1 = Point::new(0, 0);
     /// let p2 = Point::new(3, 4);
     /// assert_eq!(p1.manhattan_distance(&p2), 7);
@@ -33,7 +33,7 @@ impl Point {
     ///
     /// # Example
     /// ```
-    /// use aoc_rust_common::Point;
+    /// use aoc_common::Point;
     /// let p = Point::new(-1, 10);
     /// assert_eq!(p.rem_euclid(7, 7), Point::new(6, 3));
     /// ```

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -92,4 +92,4 @@ impl Solution for Day10 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day10);
+aoc_common::aoc_test!(Day10);

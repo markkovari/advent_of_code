@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use std::collections::{BTreeMap, HashSet, VecDeque};
 
 pub struct Day15;
@@ -226,4 +226,4 @@ impl Solution for Day15 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day15, 239010, 62468);
+aoc_common::aoc_test!(Day15, 239010, 62468);

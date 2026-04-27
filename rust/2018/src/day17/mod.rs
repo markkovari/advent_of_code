@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use regex::Regex;
 use std::cmp::{max, min};
 
@@ -167,4 +167,4 @@ impl Solution for Day17 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day17, 162, 144, slow);
+aoc_common::aoc_test!(Day17, 162, 144, slow);

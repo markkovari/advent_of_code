@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/markkovari/advent_of_code/aoc-go-common"
+	"github.com/markkovari/advent_of_code/common"
 )
 
 func main() {

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use regex::Regex;
 use std::collections::VecDeque;
 
@@ -51,4 +51,4 @@ impl Solution for Day09 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day09);
+aoc_common::aoc_test!(Day09);

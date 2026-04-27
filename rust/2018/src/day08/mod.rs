@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 
 pub struct Day08;
 
@@ -75,4 +75,4 @@ impl Solution for Day08 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day08);
+aoc_common::aoc_test!(Day08);

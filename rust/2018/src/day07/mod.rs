@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use nom::{bytes::complete::tag, character::complete::anychar, IResult};
 use std::collections::{HashMap, HashSet};
 
@@ -117,4 +117,4 @@ impl Solution for Day07 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day07);
+aoc_common::aoc_test!(Day07);

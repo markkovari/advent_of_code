@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use std::collections::{HashMap, HashSet};
 use text_io::scan;
 
@@ -185,4 +185,4 @@ impl Solution for Day16 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day16);
+aoc_common::aoc_test!(Day16);

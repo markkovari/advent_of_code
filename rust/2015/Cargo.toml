@@ -1,5 +1,5 @@
 [package]
-name = "aoc_2015"
+name = "aoc-rust-2015"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0"
 
-aoc-rust-common = { path = "../common" }
+aoc-common = { path = "../common" }
 iter_tools = "0.1.4"
 lazy_static = "1.4.0"
 md5 = "0.7.0"

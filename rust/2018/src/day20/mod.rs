@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use std::collections::HashMap;
 
 pub struct Day20;
@@ -52,4 +52,4 @@ fn get_distances(input: &str) -> HashMap<(i32, i32), usize> {
     distances
 }
 
-aoc_rust_common::aoc_test!(Day20);
+aoc_common::aoc_test!(Day20);

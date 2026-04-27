@@ -1,18 +1,18 @@
 [package]
-name = "runner"
+name = "aoc-rust-runner"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aoc-rust-common = { path = "../common" }
-aoc_2015 = { path = "../2015" }
-aoc_2018 = { package = "aoc", path = "../2018" }
-aoc_2019 = { package = "aoc_rust", path = "../2019" }
-aoc_2020 = { package = "first", path = "../2020" }
-aoc_2021 = { package = "aoc_2021", path = "../2021" }
-aoc_2022 = { path = "../2022" }
-aoc_2023 = { path = "../2023" }
-aoc_2025 = { path = "../2025" }
+aoc-common = { path = "../common" }
+aoc-rust-2015 = { path = "../2015" }
+aoc-rust-2018 = { path = "../2018" }
+aoc-rust-2019 = { path = "../2019" }
+aoc-rust-2020 = { path = "../2020" }
+aoc-rust-2021 = { path = "../2021" }
+aoc-rust-2022 = { path = "../2022" }
+aoc-rust-2023 = { path = "../2023" }
+aoc-rust-2025 = { path = "../2025" }
 clap = { version = "4.0", features = ["derive"] }
 anyhow = "1.0"
 

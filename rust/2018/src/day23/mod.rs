@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use regex::Regex;
 
 pub struct Day23;
@@ -54,4 +54,4 @@ impl Solution for Day23 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day23);
+aoc_common::aoc_test!(Day23);

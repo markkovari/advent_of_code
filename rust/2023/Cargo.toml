@@ -1,11 +1,11 @@
 [package]
-name = "aoc_2023"
+name = "aoc-rust-2023"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
-aoc-rust-common = { path = "../common" }
+aoc-common = { path = "../common" }
 itertools = "0.12"
 regex = "1.10"
 lazy_static = "1.4.0"

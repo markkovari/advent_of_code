@@ -26,7 +26,7 @@ fn main() {
 }
 
 fn run_2015(day: u32) {
-    use aoc_2015::*;
+    use aoc_rust_2015::*;
     match day {
         1 => run_solution(day01::Day01),
         2 => run_solution(day02::Day02),
@@ -59,7 +59,7 @@ fn run_2015(day: u32) {
 }
 
 fn run_2018(day: u32) {
-    use aoc_2018::*;
+    use aoc_rust_2018::*;
     match day {
         1 => run_solution(day01::Day01),
         2 => run_solution(day02::Day02),
@@ -100,7 +100,7 @@ fn run_2019(day: u32) {
 }
 
 fn run_2020(day: u32) {
-    use aoc_2020_01::*;
+    use aoc_rust_2020::*;
     match day {
         1 => run_solution(day01::Day01),
         _ => eprintln!("2020 Day {} not found.", day),
@@ -109,19 +109,19 @@ fn run_2020(day: u32) {
 
 fn run_2021(day: u32) {
     match day {
-        1 => run_solution(aoc_2021_01::day01::Day01),
-        2 => run_solution(aoc_2021_02::day02::Day02),
-        3 => run_solution(aoc_2021_03::day03::Day03),
-        4 => run_solution(aoc_2021_04::day04::Day04),
-        5 => run_solution(aoc_2021_05::day05::Day05),
-        6 => run_solution(aoc_2021_06::day06::Day06),
-        7 => run_solution(aoc_2021_07::day07::Day07),
+        1 => run_solution(aoc_rust_2021::day01::Day01),
+        2 => run_solution(aoc_rust_2021::day02::Day02),
+        3 => run_solution(aoc_rust_2021::day03::Day03),
+        4 => run_solution(aoc_rust_2021::day04::Day04),
+        5 => run_solution(aoc_rust_2021::day05::Day05),
+        6 => run_solution(aoc_rust_2021::day06::Day06),
+        7 => run_solution(aoc_rust_2021::day07::Day07),
         _ => eprintln!("2021 Day {} not found.", day),
     }
 }
 
 fn run_2022(day: u32) {
-    use aoc_2022::*;
+    use aoc_rust_2022::*;
     match day {
         1 => run_solution(day01::Day01),
         2 => run_solution(day02::Day02),
@@ -148,7 +148,7 @@ fn run_2022(day: u32) {
 }
 
 fn run_2025(day: u32) {
-    use aoc_2025::*;
+    use aoc_rust_2025::*;
     match day {
         1 => run_solution(day01::Day01),
         2 => run_solution(day02::Day02),

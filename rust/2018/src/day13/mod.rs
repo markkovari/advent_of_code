@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use std::collections::HashSet;
 
 pub struct Day13;
@@ -219,4 +219,4 @@ impl Solution for Day13 {
     }
 }
 
-aoc_rust_common::aoc_test!(Day13);
+aoc_common::aoc_test!(Day13);

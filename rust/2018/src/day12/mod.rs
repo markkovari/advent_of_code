@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_rust_common::Solution;
+use aoc_common::Solution;
 use regex::Regex;
 
 pub struct Day12;
@@ -94,4 +94,4 @@ fn run_simulation(initial_state: Vec<bool>, rules: [bool; 32], generations: i64)
         .sum()
 }
 
-aoc_rust_common::aoc_test!(Day12);
+aoc_common::aoc_test!(Day12);
