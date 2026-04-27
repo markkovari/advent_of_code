@@ -37,11 +37,11 @@ jobs:
           echo "Changed files: $CHANGED_FILES"
 
           # Shared files that trigger all tests
-          TRIGGER_ALL="^.github/workflows/|^aoc-rust-common/|^Cargo.toml|^Cargo.lock"
+          TRIGGER_ALL="^.github/workflows/|^rust/common/|^rust/Cargo.toml|^rust/Cargo.lock|^golang/common/|^justfile"
 
-          ALL_RUST_PROJECTS=("2015" "2018" "2019/aoc_rust" "2020/01" "2021/_1" "2021/_2" "2021/_3" "2021/_4" "2021/_5" "2021/_6" "2021/_7" "2022" "2023/rust" "2025/rust" "runner")
-          ALL_GO_PROJECTS=("2017" "2019/go" "2020/02" "2024/golang")
-          ALL_ZIG_PROJECTS=("2021/zig" "2024/zig")
+          ALL_RUST_PROJECTS=("rust/2015" "rust/2018" "rust/2019" "rust/2020" "rust/2021" "rust/2022" "rust/2023" "rust/2025" "rust/runner")
+          ALL_GO_PROJECTS=("golang/2017" "golang/2019" "golang/2020" "golang/2024")
+          ALL_ZIG_PROJECTS=("zig/2021" "zig/2024")
 
           if echo "$CHANGED_FILES" | grep -qE "$TRIGGER_ALL"; then
             RUST_PROJECTS=$(printf '%s\n' "${ALL_RUST_PROJECTS[@]}" | jq -R . | jq -s -c .)

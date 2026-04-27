@@ -1,0 +1,22 @@
+[package]
+name = "aoc_2015"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+
+aoc-rust-common = { path = "../common" }
+iter_tools = "0.1.4"
+lazy_static = "1.4.0"
+md5 = "0.7.0"
+onig = "6.4.0"
+rayon = "1.10"
+regex = "1.8.1"
+serde = "1.0.163"
+serde_json = "1.0.96"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }

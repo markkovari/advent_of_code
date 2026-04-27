@@ -1,0 +1,20 @@
+[package]
+name = "runner"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aoc-rust-common = { path = "../common" }
+aoc_2015 = { path = "../2015" }
+aoc_2018 = { package = "aoc", path = "../2018" }
+aoc_2019 = { package = "aoc_rust", path = "../2019" }
+aoc_2020 = { package = "first", path = "../2020" }
+aoc_2021 = { package = "aoc_2021", path = "../2021" }
+aoc_2022 = { path = "../2022" }
+aoc_2023 = { path = "../2023" }
+aoc_2025 = { path = "../2025" }
+clap = { version = "4.0", features = ["derive"] }
+anyhow = "1.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(advent_of_code_ci)'] }
